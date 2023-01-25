@@ -1,0 +1,103 @@
+/* Path: css\style.css */
+
+.body {
+  font-family: "Roboto";
+  background-color: #e4e1e1;
+}
+
+/* Css for the page split into two columns */
+
+.image-divide {
+  background-image: url(https://assets-eu-01.kc-usercontent.com/cb3ef1c8-df8c-01cb-c932-3d4740102b9a/03aa6d89-b549-41da-84c2-f9dd353c912b/Hockey%20Wales-min.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100%;
+  width: 42%;
+  position: absolute;
+}
+
+.right-col{
+  position: absolute;
+  right: 15%;
+  top: 7.5%;
+  width: 30%;
+  height: auto !important;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(5, 5, 5, 0.5);
+}
+
+/*--------------------------------------------------
+
+Text css 
+
+---------------------------------------------------*/
+.heading {
+  font-size: 2em;
+  font-weight: 600;
+  color: #cf2a2a;
+  text-align: center;
+  margin-bottom: 0px;
+}
+.sub-heading {
+  font-size: 1em;
+  font-weight: 600;
+  color: #474749;
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 10px;
+}
+.title {
+  font-size: 1em;
+  font-weight: 600;
+  color: #7f7e83;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+/*--------------------------------------------------
+
+Button  css 
+
+---------------------------------------------------*/
+
+/*League button*/
+.btn-league,
+.btn-login {
+  position: relative;
+  padding: 10px;
+  font-size: 1em;
+  font-weight: 600;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: none;
+}
+.btn-league {
+
+  left: 12.5%;
+  background-color: #d8d6d680;
+  width: 75%;
+}
+.btn-login {
+  background-color: #cf2a2a;
+  color: #ffffff;
+  width: 50%;
+  left: 25%;
+}
+/*--------------------------------------------------
+
+Text box css 
+
+---------------------------------------------------*/
+/* Player and club search */
+.club-player-search {
+  width: 100%;
+  height: 40px;
+  border: none;
+  background: #d8d6d680;
+  border-radius: 10px;
+}
