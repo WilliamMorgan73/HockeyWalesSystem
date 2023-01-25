@@ -54,7 +54,7 @@
               <br />
               <!-- Login/Signup link -->
 
-              <a class="sub-heading" style="display: block; text-align: center" href="login.html"
+              <a class="sub-heading" style="display: block; text-align: center" href="login.php"
                 >Login/signup</a
               >
             </div>
