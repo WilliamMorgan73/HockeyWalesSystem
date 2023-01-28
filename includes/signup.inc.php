@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(E_ALL);
 // Path: includes\signup.inc.php
 
 if (isset($_POST['submit'])) {
@@ -11,11 +11,11 @@ if (isset($_POST['submit'])) {
     $passwordConfirm = $_POST['passwordConfirm'];
     $club = $_POST['club'];
     $accountType = $_POST['accountType'];
-    $DOB = $_POST['DOB'];
+    $DOB = '2000-01-01';
 
     include 'dbh.inc.php';
     include 'functions.inc.php';
-
+/*
     //Check if fields are empty
 
     if (emptyInputSignup($firstName, $lastName, $email, $password, $passwordConfirm, $club, $accountType, $DOB) !== false) {
@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
         header("location: ../signup.php?error=emailtaken");
         exit();
     }
-
+*/
     //Check account type
 
     switch ($accountType) {

@@ -124,7 +124,7 @@ function createPlayer($connection, $firstName, $lastName, $email, $password, $cl
         header("location: ../signup.php?error=stmtfailed");
         exit();
     }
-    mysqli_stmt_bind_param($stmt, "ssidi", $firstName, $lastName, $club, $dob, $user_id);
+    mysqli_stmt_bind_param($stmt, "ssisi", $firstName, $lastName, $club, $dob, $user_id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     header("location: ../playerDashboard.php?error=none");
