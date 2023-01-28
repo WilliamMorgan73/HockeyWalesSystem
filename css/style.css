@@ -77,6 +77,7 @@ Button  css
 /*League button*/
 .btn-league,
 .btn-login{
+  position: relative;
   padding: 10px;
   font-size: 1em;
   font-weight: 600;
@@ -92,7 +93,6 @@ Button  css
   width: 75%;
 }
 .btn-login {
-  position: inherit;
   background-color: #cf2a2a;
   color: #ffffff;
   width: 50%;
