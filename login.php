@@ -39,7 +39,7 @@
                 <button type="submit" class="btn btn-login">Login</button>
             </form>
             <!-- Signup link -->
-            <a class="sub-heading" style="display: block; text-align: center" href="signup.html"
+            <a class="sub-heading" style="display: block; text-align: center" href="signup.php"
                 >Need an account? Signup</a>
             </div>
           </div>

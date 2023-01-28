@@ -5,7 +5,11 @@
   background-color: #e4e1e1;
 }
 
-/* Css for the page split into two columns */
+/* --------------------------------------------------
+
+Layout css
+
+--------------------------------------------------- */
 
 .image-divide {
   background-image: url(https://assets-eu-01.kc-usercontent.com/cb3ef1c8-df8c-01cb-c932-3d4740102b9a/03aa6d89-b549-41da-84c2-f9dd353c912b/Hockey%20Wales-min.png);
@@ -17,7 +21,7 @@
   position: absolute;
 }
 
-.right-col{
+.right-col {
   position: absolute;
   right: 15%;
   top: 7.5%;
@@ -27,6 +31,12 @@
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(5, 5, 5, 0.5);
+}
+
+.fieldBlock {
+  display: block;
+  width: 100%;
+  float: left;
 }
 
 /*--------------------------------------------------
@@ -49,7 +59,8 @@ Text css
   margin-top: 0px;
   margin-bottom: 10px;
 }
-.title {
+.title,
+.confirm-password-title {
   font-size: 1em;
   font-weight: 600;
   color: #7f7e83;
@@ -65,8 +76,7 @@ Button  css
 
 /*League button*/
 .btn-league,
-.btn-login {
-  position: relative;
+.btn-login{
   padding: 10px;
   font-size: 1em;
   font-weight: 600;
@@ -77,27 +87,34 @@ Button  css
   border: none;
 }
 .btn-league {
-
   left: 12.5%;
   background-color: #d8d6d680;
   width: 75%;
 }
 .btn-login {
+  position: inherit;
   background-color: #cf2a2a;
   color: #ffffff;
   width: 50%;
   left: 25%;
 }
+
 /*--------------------------------------------------
 
 Text box css 
 
 ---------------------------------------------------*/
-/* Player and club search */
-.club-player-search {
-  width: 100%;
+/* Player and club search and passwords */
+.club-player-search,
+.passwords-textbox {
   height: 40px;
   border: none;
   background: #d8d6d680;
   border-radius: 10px;
+}
+.club-player-search {
+  width: 100%;
+}
+.passwords-textbox {
+  width: 40%;
 }
