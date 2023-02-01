@@ -23,40 +23,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
   </head>
   <body class="hold-transition sidebar-mini">
     <div class="wrapper">
-      <!-- Navbar -->
-      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
-          <!-- Notifications Dropdown Menu -->
-          <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-              <i class="bi-person-fill"></i>
-              <span class="badge badge-warning navbar-badge">15</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-              <span class="dropdown-header">15 Notifications</span>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-              <i class="fas fa-expand-arrows-alt"></i>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              data-widget="control-sidebar"
-              data-slide="true"
-              href="#"
-              role="button"
-            >
-              <i class="fas fa-th-large"></i>
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <!-- /.navbar -->
-
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-light-primary elevation-4">
         <!-- Brand Logo -->
@@ -118,44 +84,52 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="container-fluid">
             <div class="row">
               <div class="col-lg-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">Stats</h5>
-                    <!-- Player stats -->
+                <div class="card card-widget widget-user shadow">
+                  <!-- Add the bg color to the header using any of the bg-* classes -->
+                  <div class="widget-user-header bg-danger">
+                    <h3 class="widget-user-username">YOUR NAME</h3>
+                    <h5 class="widget-user-desc">YOUR CLUB</h5>
+                  </div>
+                  <div class="widget-user-image">
+                    <img
+                      class="img-circle elevation-2"
+                      src="../dist/img/user1-128x128.jpg"
+                      alt="User Avatar"
+                    />
+                  </div>
+                  <div class="card-footer">
                     <div class="row">
-                      <div class="col-4">
-                        <div class="description-block border-right">
-                          <span class="description-percentage text-success"
-                            ><i class="fas fa-caret-up"></i> 17% of team</span
-                          >
-                          <h5 class="description-header">35,210.43</h5>
-                          <span class="description-text">TOTAL GOALS</span>
+                      <div class="col-sm-4 border-right">
+                        <div class="description-block">
+                          <h5 class="description-header">3,200</h5>
+                          <span class="description-text">GOALS</span>
                         </div>
+                        <!-- /.description-block -->
                       </div>
-                      <div class="col-4">
-                        <div class="description-block border-right">
-                          <span class="description-percentage text-warning"
-                            ><i class="fas fa-caret-left"></i> 0%</span
-                          >
-                          <h5 class="description-header">10</h5>
-                          <span class="description-text">TOTAL ASSISTS</span>
+                      <!-- /.col -->
+                      <div class="col-sm-4 border-right">
+                        <div class="description-block">
+                          <h5 class="description-header">13,000</h5>
+                          <span class="description-text">ASSISTS</span>
                         </div>
+                        <!-- /.description-block -->
                       </div>
-                      <div class="col-4">
-                        <div class="description-block border-right">
-                          <span class="description-percentage text-success"
-                            ><i class="fas fa-caret-up"></i> 17%</span
-                          >
-                          <h5 class="description-header">35,210.43</h5>
-                          <span class="description-text">TOTAL APPERANCES</span>
+                      <!-- /.col -->
+                      <div class="col-sm-4">
+                        <div class="description-block">
+                          <h5 class="description-header">35</h5>
+                          <span class="description-text">APPEARANCES</span>
                         </div>
+                        <!-- /.description-block -->
                       </div>
+                      <!-- /.col -->
                     </div>
+                    <!-- /.row -->
                   </div>
                 </div>
                 <!-- End of player stats -->
                 <!-- Teammates -->
-                <div class="card card-outline">
+                <div class="card card-outline shadow">
                   <div class="card-body">
                     <h5 class="card-title">Teammates</h5>
                     <br />
@@ -202,7 +176,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- /.card -->
 
                 <!-- Fixtures -->
-                <div class="card card-outline">
+                <div class="card card-outline shadow">
                   <div class="card-body">
                     <h5 class="card-title">Fixtures</h5>
                     <br />
@@ -250,28 +224,158 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </div>
 
               <!-- League table -->
-              
+              <div class="card shadow" style="width: 50%">
+                <div class="card-body p-0" ">
+                <table class="table table-striped" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Team</th>
+                      <th>MP</th>
+                      <th>W</th>
+                      <th>D</th>
+                      <th>L</th>
+                      <th>GD</th>
+                      <th>PTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>LG</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>2.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>3.</td>
+                      <td>TEAM NAME</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
             </div>
-            <!-- /.row -->
+            <!-- /.card -->
           </div>
-          <!-- /.container-fluid -->
+
+          <!-- /.row -->
         </div>
-        <!-- /.content -->
+        <!-- /.container-fluid -->
       </div>
-      <!-- /.content-wrapper -->
-
-      <!-- Control Sidebar -->
-      <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-        <div class="p-3">
-          <h5>Title</h5>
-          <p>Sidebar content</p>
-        </div>
-      </aside>
-      <!-- /.control-sidebar -->
-
-      <!-- Main Footer -->
+      <!-- /.content -->
     </div>
+    <!-- /.content-wrapper -->
+
     <!-- ./wrapper -->
 
     <!-- REQUIRED SCRIPTS -->

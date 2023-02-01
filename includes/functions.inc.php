@@ -167,7 +167,12 @@ function loginUser($conn, $email, $password)
         $_SESSION["userID"] = $emailExists["userID"];
         $_SESSION["email"] = $emailExists["email"];
         $_SESSION["accountType"] = $emailExists["accountType"];
-        header("Location: ../index.php");
+        if($_SESSION["accountType"] == "Player"){
+            header("Location: ../playerDashboard.php");
+        }
+        else{
+            header("Location: ../clubAdmin/clubAdminHome.php");
+        }
         exit();
     }
 }
