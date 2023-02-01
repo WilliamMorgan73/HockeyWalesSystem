@@ -1,7 +1,7 @@
 <?php
 //Path: includes\functions.inc.php
 
-//Function to check for empty fields
+//Function to check for empty fields in signup form
 
 function emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB, $accountType)
 {
@@ -51,6 +51,19 @@ function emailExists($conn, $email)
         $result = false;
         return $result;
     }
+}
+
+//Function to check for empty fields in login form
+
+function emptyInputLogin($email, $password)
+{
+    $result = '';
+    if (empty($email) || empty($password)) {
+        $result = true;
+    } else {
+        $result = false;
+    }
+    return $result;
 }
 
 //Function to create a player
@@ -132,6 +145,33 @@ function createClubAdmin($conn, $email, $password, $firstName, $lastName, $club,
     }
 }
 
+//Function to login a user
+
+function loginUser($conn, $email, $password)
+{
+    $emailExists = emailExists($conn, $email);
+
+    if ($emailExists === false) {
+        header("Location: ../login.php?error=wronglogin");
+        exit();
+    }
+
+    $passwordHashed = $emailExists["password"];
+    $checkPassword = password_verify($password, $passwordHashed);
+
+    if ($checkPassword === false) {
+        header("Location: ../login.php?error=wronglogin");
+        exit();
+    } else if ($checkPassword === true) {
+        session_start();
+        $_SESSION["userID"] = $emailExists["userID"];
+        $_SESSION["email"] = $emailExists["email"];
+        $_SESSION["accountType"] = $emailExists["accountType"];
+        header("Location: ../index.php");
+        exit();
+    }
+}
+
 /*
 
 TODO:
@@ -141,6 +181,6 @@ Move details to temppalyerTable until approved by club admin
 Add a check to see if clubs have a club admin already
 Change to insert clubID into player table instead of club name by searching for clubID in club table using a join
 Add validation email to club admin only which is sent to me to approve
-
+OUTPUT ERROR MESSAGES ON SCREEN INSTEAD OF REDIRECTING TO LOGIN PAGE
 
 */

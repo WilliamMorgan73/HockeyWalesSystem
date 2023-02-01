@@ -25,18 +25,18 @@
               <p class="sub-heading">
                 Login as either a player or a club admin
             <!-- Login form -->
-            <form action="includes/login.inc.php">
+            <form action="includes/login.inc.php" method="post">
                 <!-- Email -->
               <p class="title">Email</p>
-                <input type="email" id="email" class="club-player-search"/>
+                <input type="email" id="email" name="email" class="club-player-search"/>
                 <!-- Password -->
                 <p class="title">Password</p>
-                <input type="password" id= "password" class="club-player-search" />
+                <input type="password" id= "password" name="password" class="club-player-search" />
                 <!-- Forgot password link -->
                 <a class="sub-heading" style="display: block; text-align: right;" href="#"
                   >Forgot password?</a>
                 <!-- Login button -->
-                <button type="submit" class="btn btn-login">Login</button>
+                <button type="submit" name="submit" class="btn btn-login">Login</button>
             </form>
             <!-- Signup link -->
             <a class="sub-heading" style="display: block; text-align: center" href="signup.php"
