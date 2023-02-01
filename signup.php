@@ -29,7 +29,7 @@
               <!-- Signup form -->
             </p>
 
-            <form action="includes/signup.inc.php">
+            <form action="includes/signup.inc.php" method="post">
               <!-- Player or club admin radio buttons -->
               <p class="title">Account type</p>
               <input type="radio" id="Player" name="accountType" value="Player" />
@@ -38,32 +38,32 @@
               <label for="Club Admin">Club Admin</label><br />
               <!-- Email -->
               <p class="title">Email</p>
-              <input type="email" id="email" class="club-player-search" />
+              <input type="email" name="email" id="email" class="club-player-search" />
               <!-- Password and confirm password -->
               <div class="fieldBlock">
                 <div class="title">Password</div>
-                <input type="password" id="password" class="passwords-textbox" />
+                <input type="password" name="password" id="password" class="passwords-textbox" />
               </div>
 
               <div class="fieldBlock">
                 <div class="title">Confirm password</div>
-                <input type="password" id="confirmPassword" class="passwords-textbox" />
+                <input type="password" name="confirmPassword" id="confirmPassword" class="passwords-textbox" />
               </div>
               <!-- Forgot password link -->
               <a class="sub-heading" style="text-align: right" href="#">Forgot password?</a>
 
               <!-- First name -->
               <p class="title">First name</p>
-              <input type="text" id="firstName" class="passwords-textbox" />
+              <input type="text" id="firstName" name="firstName" class="passwords-textbox" />
               <!-- Last name -->
               <p class="title">Last name</p>
-              <input type="text" id="lastName" class="passwords-textbox" />
+              <input type="text" id="lastName" name="lastName" class="passwords-textbox" />
               <!-- Club -->
               <p class="title">Club</p>
-              <input type="text" id="club" class="passwords-textbox" />
+              <input type="text" id="club" name="club" class="passwords-textbox" />
               <!-- Date of birth -->
               <p class="title">Date of birth</p>
-              <input type="datetime" />
+              <input type="datetime" id="DOB" name="DOB" />
               <br>
               <br>
               <!-- Signup button -->
