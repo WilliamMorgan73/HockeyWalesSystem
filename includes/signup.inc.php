@@ -1,49 +1,54 @@
 <?php
-$DATABASE_HOST = 'localhost';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'hockeywales';
-// Try and connect using the info above.
-$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-if (mysqli_connect_errno()) {
-    // If there is an error with the connection, stop the script and display the error.
-    exit('Failed to connect to MySQL: ' . mysqli_connect_error());
-}
+// Path: includes\signup.inc.php
 
-// Now we check if the data was submitted, isset() function will check if the data exists.
-if (!isset($_POST['email'], $_POST['password'])) {
-    // Could not get the data that should have been sent.
-    exit('Please complete the registration form!');
-}
-// Make sure the submitted registration values are not empty.
-if (empty($_POST['password']) || empty($_POST['email'])) {
-    // One or more values are empty.
-    exit('Please complete the registration form');
-}
+require('functions.inc.php');
 
-// We need to check if the user with that email exists.
-if ($stmt = $con->prepare('SELECT userID, password FROM user WHERE email = ?')) {
-    $stmt->bind_param('s', $_POST['email']);
-    $stmt->execute();
-    $stmt->store_result();
-    // Store the result so we can check if the user exists in the database.
-    if ($stmt->num_rows > 0) {
-        // Email already exists
-        echo 'Email exists, please choose another!';
-    } else {
-        // Email doesn't exists, insert new user
-        if ($stmt = $con->prepare('INSERT INTO user (email, password, accountType) VALUES (?,?,?)')) {
-            // We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt->bind_param('sss', $_POST['email'], $password, $_POST['accountType']);
-            $stmt->execute();
-            echo 'You have successfully registered! You can now login!';
-        } else {
-            echo 'Could not prepare statement!';
-        }
+//Variables
+
+$email = $_POST['email'];
+$password = $_POST['password'];
+$confirmPassword = $_POST['confirmPassword'];
+$firstName = $_POST['firstName'];
+$lastName = $_POST['lastName'];
+$club = $_POST['club'];
+$DOB = date('Y-m-d', strtotime($_POST['DOB']));
+$accountType = $_POST['accountType'];
+
+$conn = require __DIR__ . '/dbhconfig.php';
+
+if (isset($_POST['submit'])) {
+    //Function call to check for empty fields
+    if (emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB, $accountType) !== false) {
+        header("Location: ../signup.php?error=emptyinput");
+        exit();
     }
-    $stmt->close();
-} else {
-    echo 'Could not prepare statement!';
+
+    //Function call to check if password and confirm password match
+
+    if (passwordMatch($password, $confirmPassword) !== false) {
+        header("Location: ../signup.php?error=passwordsdontmatch");
+        exit();
+    }
+
+    //Function call to check if email already exists
+
+    if (emailExists($conn, $email) !== false) {
+        header("Location: ../signup.php?error=emailalreadyexists");
+        exit();
+    }
+
+    //Check if account type is player or club admin
+
+    if ($accountType == 'Player') {
+        //Function call to create a player
+        createPlayer($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
+        exit();
+    } else if ($accountType == 'ClubAdmin') {
+        //Function call to create a club admin
+        createClubAdmin($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
+        exit();
+    } else {
+        header("Location: ../signup.php?error=accounttype");
+        exit();
+    }
 }
-$con->close();

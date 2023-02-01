@@ -63,7 +63,7 @@
               <input type="text" id="club" name="club" class="passwords-textbox" />
               <!-- Date of birth -->
               <p class="title">Date of birth</p>
-              <input type="datetime" id="DOB" name="DOB" />
+              <input type="date" id="DOB" name="DOB" />
               <br>
               <br>
               <!-- Signup button -->
