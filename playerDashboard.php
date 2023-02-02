@@ -8,6 +8,7 @@ $conn = require 'includes/dbhconfig.php';
 
 session_start();
 $userID = $_SESSION['userID'];
+$playerID = getPlayerID($conn, $userID);
 $playerName = getPlayerName($conn, $userID);
 $playerTeam = getPlayerTeam($conn, $userID);
 $nextOpponent = getOppositionName($conn, $userID);
@@ -101,7 +102,7 @@ $apperances = getPlayerApperances($conn, $userID);
                   <h5 class="widget-user-desc"><?php echo $playerTeam ?></h5>
                 </div>
                 <div class="widget-user-image">
-                  <img class="img-circle elevation-2" src="../dist/img/user1-128x128.jpg" alt="User Avatar" />
+                  <img class="img-circle elevation-2" src="https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg" alt="User Avatar" />
                 </div>
                 <div class="card-footer">
                   <div class="row">
@@ -231,167 +232,73 @@ $apperances = getPlayerApperances($conn, $userID);
 
             <!-- League table -->
             <div class="card shadow" style="width: 50%">
-              <div class="card-body p-0" ">
+              <div class="card-body p-0">
                 <table class=" table table-striped" style="width: 100%">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Team</th>
-                    <th>MP</th>
-                    <th>W</th>
-                    <th>D</th>
-                    <th>L</th>
-                    <th>GD</th>
-                    <th>PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>LG</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>2.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>3.</td>
-                    <td>TEAM NAME</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                  </tr>
-                </tbody>
+                  <thead>
+                    <tr>
+                      <th>Team</th>
+                      <th>W</th>
+                      <th>D</th>
+                      <th>L</th>
+                      <th>GD</th>
+                      <th>PTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                    // Assuming the database connection is established and stored in the variable $conn
+                    $conn = require 'includes/dbhconfig.php';
+                    $sql = "SELECT * FROM team t 
+                    JOIN club c ON t.clubID = c.clubID
+                    WHERE t.leagueID = (SELECT leagueID FROM team WHERE teamID = (SELECT clubID FROM player WHERE playerID = '$playerID'))";
+                    $result = mysqli_query($conn, $sql);
+
+                    $result = mysqli_query($conn, $sql);
+                    if (mysqli_num_rows($result) > 0) {
+                      // Output data of each row
+                      while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>
+                  <td>" . $row["teamName"] . "</td>
+                  <td>" . $row["wins"] . "</td>
+                  <td>" . $row["draws"] . "</td>
+                  <td>" . $row["losses"] . "</td>
+                  <td>" . $row["goalDifference"] . "</td>
+                  <td>" . $row["points"] . "</td>
+                </tr>";
+                      }
+                    } else {
+                      echo "0 results";
+                    }
+                    ?>
+                  </tbody>
                 </table>
               </div>
-              <!-- /.card-body -->
             </div>
-            <!-- /.card -->
+            <!-- End of league table -->
           </div>
-
-          <!-- /.row -->
+          <!-- /.card-body -->
         </div>
-        <!-- /.container-fluid -->
+        <!-- /.card -->
       </div>
-      <!-- /.content -->
+
+      <!-- /.row -->
     </div>
-    <!-- /.content-wrapper -->
+    <!-- /.container-fluid -->
+  </div>
+  <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
 
-    <!-- ./wrapper -->
+  <!-- ./wrapper -->
 
-    <!-- REQUIRED SCRIPTS -->
+  <!-- REQUIRED SCRIPTS -->
 
-    <!-- jQuery -->
-    <script src="js/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="js/adminlte/adminlte.min.js"></script>
+  <!-- jQuery -->
+  <script src="js/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="js/adminlte/adminlte.min.js"></script>
 </body>
 
 </html>
