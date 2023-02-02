@@ -167,16 +167,319 @@ function loginUser($conn, $email, $password)
         $_SESSION["userID"] = $emailExists["userID"];
         $_SESSION["email"] = $emailExists["email"];
         $_SESSION["accountType"] = $emailExists["accountType"];
-        if($_SESSION["accountType"] == "Player"){
+        if ($_SESSION["accountType"] == "Player") {
             header("Location: ../playerDashboard.php");
-        }
-        else{
+        } else {
             header("Location: ../clubAdmin/clubAdminHome.php");
         }
         exit();
     }
 }
 
+function getPlayerName($conn, $userID)
+{
+    $sql = "SELECT firstName FROM player WHERE userID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $userID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['firstName'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getPlayerID($conn, $userID)
+{
+    $sql = "SELECT playerID FROM player WHERE userID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $userID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['playerID'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+function getPlayerGoals($conn, $userID)
+{
+    //get playerID using userID
+    $playerID = getPlayerID($conn, $userID);
+    $sql = "SELECT numOfGoals FROM goal WHERE playerID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['numOfGoals'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getPlayerAssists($conn, $userID)
+{
+    //get playerID using userID
+    $playerID = getPlayerID($conn, $userID);
+    $sql = "SELECT numOfAssists FROM assist WHERE playerID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['numOfAssists'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getPlayerApperances($conn, $userID)
+{
+    //get playerID using userID
+    $playerID = getPlayerID($conn, $userID);
+    $sql = "SELECT numOfAppearances FROM apperance WHERE playerID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['numOfAppearances'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getPlayerTeam($conn, $userID)
+{
+    //get playerID using userID
+    $playerID = getPlayerID($conn, $userID);
+    //get teamID using playerID
+    $sql = "SELECT teamID FROM player WHERE playerID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_execute($stmt);
+
+    //get team name using teamID
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        $teamID = $row['teamID'];
+        $sql = "SELECT teamName FROM team WHERE teamID = ?;";
+        $stmt = mysqli_stmt_init($conn);
+        if (!mysqli_stmt_prepare($stmt, $sql)) {
+            header("Location: ../signup.php?error=stmtfailed");
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "s", $teamID);
+        mysqli_stmt_execute($stmt);
+
+        $resultData = mysqli_stmt_get_result($stmt);
+
+        if ($row = mysqli_fetch_assoc($resultData)) {
+            return $row['teamName'];
+        } else {
+            $result = false;
+            return $result;
+        }
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getNextGame($conn, $userID)
+{
+    //get playerID using userID
+    $playerID = getPlayerID($conn, $userID);
+    //get teamID using playerID
+    $sql = "SELECT teamID FROM player WHERE playerID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_execute($stmt);
+
+    //get next fixture using teamID as hometeamID or awayteamID
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        $teamID = $row['teamID'];
+        $sql = "SELECT fixtureID FROM fixture WHERE homeTeamID = ? OR awayTeamID = ?;";
+        $stmt = mysqli_stmt_init($conn);
+        if (!mysqli_stmt_prepare($stmt, $sql)) {
+            header("Location: ../signup.php?error=stmtfailed");
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "ss", $teamID, $teamID);
+        mysqli_stmt_execute($stmt);
+
+        $resultData = mysqli_stmt_get_result($stmt);
+
+        if ($row = mysqli_fetch_assoc($resultData)) {
+            $fixtureID = $row['fixtureID'];
+            $sql = "SELECT dateTime FROM fixture WHERE fixtureID = ?;";
+            $stmt = mysqli_stmt_init($conn);
+            if (!mysqli_stmt_prepare($stmt, $sql)) {
+                header("Location: ../signup.php?error=stmtfailed");
+                exit();
+            }
+
+            mysqli_stmt_bind_param($stmt, "s", $fixtureID);
+            mysqli_stmt_execute($stmt);
+
+            $resultData = mysqli_stmt_get_result($stmt);
+
+            if ($row = mysqli_fetch_assoc($resultData)) {
+                return $row['dateTime'];
+            } else {
+                $result = false;
+                return $result;
+            }
+        } else {
+            $result = false;
+            return $result;
+        }
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getOppositionName($conn, $userID)
+{
+    //get playerID using userID
+    $playerID = getPlayerID($conn, $userID);
+    //get teamID using playerID
+    $sql = "SELECT teamID FROM player WHERE playerID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_execute($stmt);
+
+    //get oppposition team name using teamID as hometeamID or awayteamID
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        $teamID = $row['teamID'];
+        $sql = "SELECT fixtureID FROM fixture WHERE homeTeamID = ? OR awayTeamID = ?;";
+        $stmt = mysqli_stmt_init($conn);
+        if (!mysqli_stmt_prepare($stmt, $sql)) {
+            header("Location: ../signup.php?error=stmtfailed");
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "ss", $teamID, $teamID);
+        mysqli_stmt_execute($stmt);
+
+        $resultData = mysqli_stmt_get_result($stmt);
+
+        if ($row = mysqli_fetch_assoc($resultData)) {
+            $fixtureID = $row['fixtureID'];
+            $sql = "SELECT homeTeamID, awayTeamID FROM fixture WHERE fixtureID = ?;";
+            $stmt = mysqli_stmt_init($conn);
+            if (!mysqli_stmt_prepare($stmt, $sql)) {
+                header("Location: ../signup.php?error=stmtfailed");
+                exit();
+            }
+
+            mysqli_stmt_bind_param($stmt, "s", $fixtureID);
+            mysqli_stmt_execute($stmt);
+
+            $resultData = mysqli_stmt_get_result($stmt);
+
+            if ($row = mysqli_fetch_assoc($resultData)) {
+                $homeTeamID = $row['homeTeamID'];
+                $awayTeamID = $row['awayTeamID'];
+                if ($homeTeamID == $teamID) {
+                    $sql = "SELECT teamName FROM team WHERE teamID = ?;";
+                    $stmt = mysqli_stmt_init($conn);
+                    if (!mysqli_stmt_prepare($stmt, $sql)) {
+                        header("Location: ../signup.php?error=stmtfailed");
+                        exit();
+                    }
+
+                    mysqli_stmt_bind_param($stmt, "s", $awayTeamID);
+                    mysqli_stmt_execute($stmt);
+
+                    $resultData = mysqli_stmt_get_result($stmt);
+
+                    if ($row = mysqli_fetch_assoc($resultData)) {
+                        return $row['teamName'];
+                    } else {
+                        $result = false;
+                        return $result;
+                    }
+                } else {
+                    $sql = "SELECT teamName FROM team WHERE teamID = ?;";
+                    $stmt = mysqli_stmt_init($conn);
+                    if (!mysqli_stmt_prepare($stmt, $sql)) {
+                        header("Location: ../signup.php?error=stmtfailed");
+                        exit();
+                    }
+                }
+            }
+        }
+    }
+}
 /*
 
 TODO:
@@ -187,5 +490,5 @@ Add a check to see if clubs have a club admin already
 Change to insert clubID into player table instead of club name by searching for clubID in club table using a join
 Add validation email to club admin only which is sent to me to approve
 OUTPUT ERROR MESSAGES ON SCREEN INSTEAD OF REDIRECTING TO LOGIN PAGE
-
+ADD FOREIGN KEYS TO DATABASE
 */
