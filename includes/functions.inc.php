@@ -643,4 +643,8 @@ Make player next game actually be the next game and not a past game or a futher 
 Add dummy data to player and club dashboard
 Tidy up comments in playerDashboard.php
 Output team logos on player dashboard in background of profiel stat thing aswell as in all league tables
+Make all buttons that you are currently on have this code: <a style="cursor:pointer" class="nav-link active">
+When uploading a pfp make it so that it is the same size as the default pfp and make it so that it is a circle and delete the old pfp
+Check if club admin league table is for the top team and not just outputting all teams within the club
+Make all files saved in the database of type .jpg
 */
