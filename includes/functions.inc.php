@@ -66,13 +66,35 @@ function emptyInputLogin($email, $password)
     return $result;
 }
 
+//Function to get club ID
+
+function getClubID($conn, $club)
+{
+    $sql = "SELECT clubID FROM club WHERE clubName = ?";
+    $stmt = $conn->stmt_init();
+    if (!$stmt->prepare($sql)) {
+        echo "SQL statement failed: " . $conn->error;
+        exit;
+    } else {
+        $stmt->bind_param("s", $club);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        if ($row) {
+            return $row['clubID'];
+        } else {
+            return false;
+        }
+    }
+}
+
 //Function to create a player
 
 function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType)
 {
     $conn->begin_transaction();
 
-    $sql = "INSERT INTO user (email, password, accountType) 
+    $sql = "INSERT INTO tempUser (email, password, accountType) 
     VALUES (?, ?, ?)";
 
     $stmt = $conn->stmt_init();
@@ -89,7 +111,14 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
 
     $userID = $conn->insert_id;
 
-    $sql = "INSERT INTO player (firstName, lastName, club, DOB, userID) 
+    $clubID = getClubID($conn, $club);
+    if (!$clubID) {
+        echo "Error: club not found";
+        $conn->rollback();
+        exit;
+    }
+
+    $sql = "INSERT INTO tempPlayer (firstName, lastName, clubID, DOB, tempUserID) 
     VALUES (?, ?, ?, ?, ?)";
 
     $stmt = $conn->stmt_init();
@@ -98,13 +127,12 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
         $conn->rollback();
         exit;
     } else {
-        $stmt->bind_param("ssssi", $firstName, $lastName, $club, $DOB, $userID);
+        $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $userID);
         $stmt->execute();
         $conn->commit();
-        header("Location: ../login.php?signup=success");
+        header("Location: ../login.php?signup=success"); //Change to success page until club admin approves
     }
 }
-
 
 //Function to create a club admin
 
@@ -129,7 +157,14 @@ function createClubAdmin($conn, $email, $password, $firstName, $lastName, $club,
 
     $userID = $conn->insert_id;
 
-    $sql = "INSERT INTO clubAdmin (firstName, lastName, club, DOB, userID) 
+    $clubID = getClubID($conn, $club);
+    if (!$clubID) {
+        echo "Error: club not found";
+        $conn->rollback();
+        exit;
+    }
+
+    $sql = "INSERT INTO clubadmin (firstName, lastName, clubID, DOB, userID) 
     VALUES (?, ?, ?, ?, ?)";
 
     $stmt = $conn->stmt_init();
@@ -138,12 +173,13 @@ function createClubAdmin($conn, $email, $password, $firstName, $lastName, $club,
         $conn->rollback();
         exit;
     } else {
-        $stmt->bind_param("ssssi", $firstName, $lastName, $club, $DOB, $userID);
+        $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $userID);
         $stmt->execute();
         $conn->commit();
-        header("Location: ../login.php?signup=success");
+        header("Location: ../login.php?signup=success"); //Change to success page until club admin approves
     }
 }
+
 
 //Function to login a user
 
@@ -170,7 +206,7 @@ function loginUser($conn, $email, $password)
         if ($_SESSION["accountType"] == "Player") {
             header("Location: ../playerDashboard.php");
         } else {
-            header("Location: ../clubAdmin/clubAdminHome.php");
+            header("Location: ../clubAdminDashboard.php");
         }
         exit();
     }
@@ -480,15 +516,131 @@ function getOppositionName($conn, $userID)
         }
     }
 }
+
+function userPfpCheck($userID)
+{
+    $pfpPath = "images/pfp/" . $userID . ".*";
+    $matchingFiles = glob($pfpPath);
+    if (!empty($matchingFiles)) {
+        // Display the user's pfp
+        echo '<img class="img-circle elevation-2" src="' . $matchingFiles[0] . '" alt="User Avatar" />';
+    } else {
+        // Use default pfp and rename it to user's ID
+        $defaultPfpPath = "images/pfp/defaultpfp.*";
+        $matchingFiles = glob($defaultPfpPath);
+        if (!empty($matchingFiles)) {
+            $extension = pathinfo($matchingFiles[0], PATHINFO_EXTENSION);
+            $newPfpPath = "images/pfp/" . $userID . "." . $extension;
+            if (copy($matchingFiles[0], $newPfpPath)) {
+                // set permissions for newly created file
+                chmod($newPfpPath, 0644);
+                echo '<img class="img-circle elevation-2" src="' . $newPfpPath . '" alt="User Avatar" />';
+            } else {
+                echo "Error: default profile picture not found.";
+            }
+        } else {
+            echo "Error: default profile picture not found.";
+        }
+    }
+}
+
+function getclubAdminName($conn, $userID)
+{
+    $sql = "SELECT firstName FROM clubadmin WHERE userID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $userID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['firstName'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function getClubName($conn, $userID)
+{
+    $sql = "SELECT clubID FROM clubadmin WHERE userID = ?";
+    $stmt = $conn->stmt_init();
+    if (!$stmt->prepare($sql)) {
+        echo "SQL statement failed: " . $conn->error;
+        exit;
+    } else {
+        $stmt->bind_param("i", $userID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        if ($row) {
+            $clubID = $row['clubID'];
+            $sql = "SELECT clubName FROM club WHERE clubID = ?";
+            $stmt = $conn->stmt_init();
+            if (!$stmt->prepare($sql)) {
+                echo "SQL statement failed: " . $conn->error;
+                exit;
+            } else {
+                $stmt->bind_param("i", $clubID);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $row = $result->fetch_assoc();
+                if ($row) {
+                    return $row['clubName'];
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+    }
+}
+
+function getLeagueName($conn, $leagueID)
+{
+    $sql = "SELECT leagueName FROM league WHERE leagueID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $leagueID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['leagueName'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+    
 /*
 
 TODO:
 Add length checks to all fields that need them, can pass maxium and minimum lengths as parameters
 Maybe password strength check
-Move details to temppalyerTable until approved by club admin
 Add a check to see if clubs have a club admin already
-Change to insert clubID into player table instead of club name by searching for clubID in club table using a join
 Add validation email to club admin only which is sent to me to approve
 OUTPUT ERROR MESSAGES ON SCREEN INSTEAD OF REDIRECTING TO LOGIN PAGE
 ADD FOREIGN KEYS TO DATABASE
+ALLOW LEAGUE TABLE HEADER SORTS
+Combine functions such as getplayername and getclubname into one function
+Make signup functions not work if an error occurs in the second query as atm it will still add the user to the database
+On index make league buttons be outputted from database instead of hard coded
+Maybe make email to user when they are added to a club
+On player approval : make rows work when more than 3 players are added to a club
+Make player next game actually be the next game and not a past game or a futher future game
+Add dummy data to player and club dashboard
+Tidy up comments in playerDashboard.php
+Output team logos on player dashboard in background of profiel stat thing aswell as in all league tables
 */

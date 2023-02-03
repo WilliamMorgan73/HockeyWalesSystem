@@ -71,6 +71,7 @@
             </form>
             <!-- Login link -->
             <a class="sub-heading" style="display: block; text-align: center" href="login.php">Already have an account? Login</a>
+            <a class="sub-heading" style="display: block; text-align: center" href="index.php">View leagues</a>
           </div>
         </div>
       </div>

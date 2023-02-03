@@ -8,15 +8,9 @@ $conn = require 'includes/dbhconfig.php';
 
 session_start();
 $userID = $_SESSION['userID'];
-$playerID = getPlayerID($conn, $userID);
-$playerName = getPlayerName($conn, $userID);
-$playerTeam = getPlayerTeam($conn, $userID);
-$nextOpponent = getOppositionName($conn, $userID);
-$nextOpponentDate = getNextGame($conn, $userID);
-$goals = getPlayerGoals($conn, $userID);
-$assists = getPlayerAssists($conn, $userID);
-$apperances = getPlayerApperances($conn, $userID);
-
+$clubAdminName = getclubAdminName($conn, $userID);
+$clubName = getClubName($conn, $userID);
+$clubID = getClubID($conn, $userID);
 ?>
 
 <html lang="en">
@@ -24,7 +18,7 @@ $apperances = getPlayerApperances($conn, $userID);
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><?php echo $playerName ?>'s dashboard</title>
+  <title><?php echo $clubAdminName ?>'s dashboard</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
@@ -42,7 +36,7 @@ $apperances = getPlayerApperances($conn, $userID);
     <aside class="main-sidebar sidebar-light-primary elevation-4">
       <!-- Brand Logo -->
       <a href="index.php" class="brand-link">
-        <span class="brand-text font-weight-bolder">HOCKEY WALES</span>
+        <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span>
       </a>
       <!-- Sidebar -->
       <div class="sidebar">
@@ -58,13 +52,25 @@ $apperances = getPlayerApperances($conn, $userID);
             <li class="nav-item">
               <a href="#" class="nav-link">
                 <i class="far bi bi-people-fill nav-icon"></i>
-                <p>Teammates</p>
+                <p>Team management</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="playerApproval.php" class="nav-link">
+                <i class="far bi bi-check2 nav-icon"></i>
+                <p>Player approval</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="#" class="nav-link">
                 <i class="far bi bi-calendar-date-fill nav-icon"></i>
-                <p>Fixtures</p>
+                <p>Fixture availability</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="far bi bi-bar-chart-fill nav-icon"></i>
+                <p>Result apporval</p>
               </a>
             </li>
           </ul>
@@ -89,8 +95,8 @@ $apperances = getPlayerApperances($conn, $userID);
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Hi <?php echo $playerName ?>,</h1>
-              <h5>The date of your next fixture is: <?php echo $nextOpponentDate ?> against <?php echo $nextOpponent ?></h5>
+              <h1 class="m-0">Hi <?php echo $clubAdminName ?>,</h1>
+              <h5>You can manage your club from here</h5>
             </div>
           </div>
         </div>
@@ -103,117 +109,14 @@ $apperances = getPlayerApperances($conn, $userID);
         <div class="container-fluid">
           <div class="row">
             <div class="col-lg-6">
-              <div class="card card-widget widget-user shadow">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                <div class="widget-user-header bg-danger">
-                  <h3 class="widget-user-username"><?php echo $playerName ?></h3>
-                  <h5 class="widget-user-desc"><?php echo $playerTeam ?></h5>
-                </div>
-                <div class="widget-user-image">
-                  <?php userPfpCheck($userID) ?>
-                </div>
-                <div class="card-footer">
-                  <div class="row">
-                    <div class="col-sm-4 border-right">
-                      <div class="description-block">
-                        <h5 class="description-header"><?php echo $goals ?></h5>
-                        <span class="description-text">GOALS</span>
-                      </div>
-                      <!-- /.description-block -->
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-sm-4 border-right">
-                      <div class="description-block">
-                        <h5 class="description-header"><?php echo $assists ?></h5>
-                        <span class="description-text">ASSISTS</span>
-                      </div>
-                      <!-- /.description-block -->
-                    </div>
-                    <!-- /.col -->
-                    <div class="col-sm-4">
-                      <div class="description-block">
-                        <h5 class="description-header"><?php echo $apperances ?></h5>
-                        <span class="description-text">APPEARANCES</span>
-                      </div>
-                      <!-- /.description-block -->
-                    </div>
-                    <!-- /.col -->
-                  </div>
-                  <!-- /.row -->
-                </div>
-              </div>
-              <!-- End of player stats -->
-              <!-- Teammates -->
-              <div class="card card-outline shadow">
-                <div class="card-body">
-                  <h5 class="card-title">Teammates</h5>
-                  <br />
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- End of teammates -->
 
-              <!-- Fixtures -->
+              <!-- Results approval -->
               <div class="card card-outline shadow">
                 <div class="card-body">
-                  <h5 class="card-title">Fixtures</h5>
+                  <h5 class="card-title">Results approval</h5>
                   <br />
                   <div class="row">
                     <div class="col-md-12">
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                      </div>
                       <div class="row">
                         <div class="col-md-4">
                           <div class="card">
@@ -236,9 +139,88 @@ $apperances = getPlayerApperances($conn, $userID);
                 </div>
               </div>
               <!-- /.card -->
+
+              <!-- Player approval -->
+              <div class="card card-outline shadow">
+                <div class="card-body">
+                  <h5 class="card-title">Player approval</h5>
+                  <br />
+                  <?php
+                  $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
+                  $result = mysqli_query($conn, $query);
+                  if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_array($result)) {
+                      $tempUserID = $row['tempUserID'];
+                      $tempUserQuery = "SELECT email FROM tempUser WHERE tempUserID = '$tempUserID'";
+                      $tempUserResult = mysqli_query($conn, $tempUserQuery);
+                      $tempUserRow = mysqli_fetch_array($tempUserResult);
+                  ?>
+                      <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                          <div class="card bg-light d-flex flex-fill">
+                            <div class="card-body pt-0">
+                              <div class="row">
+                                <div class="col-7">
+                                  <h2 class="header"><b><?php echo $row['firstName'];
+                                                        echo " ";
+                                                        echo $row['lastName']; ?></b></h2>
+                                  <p class="text-muted text-sm">
+                                    About:
+                                  <p>Date of birth:</p> <?php echo $row['DOB']; ?>
+                                  </p>
+                                  <p>Email:</p> <?php echo $tempUserRow['email']; ?></p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card-footer">
+                              <div class="text-left">
+                                <!-- Button that when clicks runs the player approve script -->
+                                <form action="includes/playerApprove.inc.php" method="post">
+                                  <!-- Hidden input to post the tempUserID -->
+                                  <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
+                                  <!-- Drop-down list of teams -->
+                                  <select name="teamID">
+                                    <?php
+                                    $teamQuery = "SELECT * FROM team WHERE clubID = '$clubID'";
+                                    $teamResult = mysqli_query($conn, $teamQuery);
+                                    while ($teamRow = mysqli_fetch_array($teamResult)) {
+                                    ?>
+                                      <option value="<?php echo $teamRow['teamID']; ?>">
+                                        <?php echo $teamRow['teamName']; ?>
+                                      </option>
+                                    <?php
+                                    }
+                                    ?>
+                                  </select>
+                                  <!-- Submit button to approve the player -->
+                                  <button type="submit">Approve Player</button>
+                                </form>
+                              </div>
+                              <div class="text-right">
+                                <!-- Button that when clicks runs the player reject script -->
+                                <form action="includes/playerReject.inc.php" method="post">
+                                  <!-- Hidden input to post the tempUserID -->
+                                  <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
+                                  <!-- Submit button to reject the player -->
+                                  <button type="submit">Reject Player</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  <?php
+                    }
+                  } else {
+                    echo "<h1>No players to approve</h1>";
+                  }
+                  ?>
+                </div>
+              </div>
+              <!-- End of player approval -->
             </div>
+
+            <!-- League table -->
             <div class="col-lg-6">
-              <!-- League table -->
               <div class="card shadow" style="width: 100%">
                 <div class="card-body p-0">
                   <table class=" table table-striped" style="width: 100%">
@@ -258,7 +240,7 @@ $apperances = getPlayerApperances($conn, $userID);
                       $conn = require 'includes/dbhconfig.php';
                       $sql = "SELECT * FROM team t 
                     JOIN club c ON t.clubID = c.clubID
-                    WHERE t.leagueID = (SELECT leagueID FROM team WHERE teamID = (SELECT clubID FROM player WHERE playerID = '$playerID'))";
+                    WHERE t.leagueID = (SELECT leagueID FROM team WHERE teamID = (SELECT clubID FROM clubAdmin WHERE userID = '$userID'))";
                       $result = mysqli_query($conn, $sql);
 
                       $result = mysqli_query($conn, $sql);
@@ -289,7 +271,6 @@ $apperances = getPlayerApperances($conn, $userID);
         </div>
         <!-- /.card -->
       </div>
-
       <!-- /.row -->
     </div>
     <!-- /.container-fluid -->
@@ -298,7 +279,6 @@ $apperances = getPlayerApperances($conn, $userID);
   </div>
   <!-- /.content-wrapper -->
 
-  <!-- ./wrapper -->
 
   <!-- REQUIRED SCRIPTS -->
 

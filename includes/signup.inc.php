@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
         //Function call to create a player
         createPlayer($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
         exit();
-    } else if ($accountType == 'ClubAdmin') {
+    } else if ($accountType == 'Club Admin') {
         //Function call to create a club admin
         createClubAdmin($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
         exit();
