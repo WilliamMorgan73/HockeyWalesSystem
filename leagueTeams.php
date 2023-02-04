@@ -54,15 +54,21 @@ $leagueName = getLeagueName($conn, $leagueID);
                                 </form>
                             </a>
                         </li>
-                        <a style="cursor:pointer" class="nav-link active">
-                            <i class="far bi bi-people-fill nav-icon"></i>
-                            <p>Teams</p>
-                        </a>
+                        <li class="nav-item">
+                            <a style="cursor:pointer" class="nav-link active">
+                                <i class="far bi bi-people-fill nav-icon"></i>
+                                <p>Teams</p>
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far bi bi-calendar-date-fill nav-icon"></i>
-                                <p>Fixtures/Results</p>
+                            <a style="cursor: pointer;" class="nav-link">
+                                <form action="fixturesResults.php" method="post">
+                                    <input type="hidden" name="leagueID" value="<?php echo $leagueID; ?>">
+                                    <i class="far bi bi-calendar-date-fill nav-icon"></i>
+                                    <button type="submit" style="background: transparent; border: none;">
+                                        <p>Fixtures/Results</p>
+                                    </button>
+                                </form>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -129,6 +135,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                         <button type="submit" class="btn btn-sm btn-primary">
                                                             View club
                                                         </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

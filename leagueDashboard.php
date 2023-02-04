@@ -58,17 +58,26 @@ $leagueName = getLeagueName($conn, $leagueID);
               </form>
             </a>
           </li>
-
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="far bi bi-calendar-date-fill nav-icon"></i>
-              <p>Fixtures/Results</p>
+            <a style="cursor: pointer;" class="nav-link">
+              <form action="fixturesResults.php" method="post">
+                <input type="hidden" name="leagueID" value="<?php echo $leagueID; ?>">
+                <i class="far bi bi-calendar-date-fill nav-icon"></i>
+                <button type="submit" style="background: transparent; border: none;">
+                <p>Fixtures/Results</p>
+                </button>
+              </form>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="far bi bi-bar-chart-fill nav-icon"></i>
-              <p>Predictions</p>
+            <a style="cursor: pointer;" class="nav-link">
+              <form action="predictedLeagueDashboard.php" method="post">
+                <input type="hidden" name="leagueID" value="<?php echo $leagueID; ?>">
+                <i class="far bi bi-bar-chart-fill nav-icon"></i>
+                <button type="submit" style="background: transparent; border: none;">
+                <p>Predictions</p>
+                </button>
+              </form>
             </a>
           </li>
         </ul>
@@ -153,7 +162,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                                 $row = mysqli_fetch_assoc($result);
                                 $maxWeek = $row['maxWeek'];
 
-                                $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE matchWeek = '$maxWeek'";
+                                $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE matchWeek = '$maxWeek' AND leagueID = '$leagueID'";
                                 $resultdetailresult = mysqli_query($conn, $query);
 
                                 if (mysqli_num_rows($resultdetailresult) > 0) {
@@ -264,7 +273,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                               $row = mysqli_fetch_assoc($result);
                               $minWeek = $row['minWeek'];
 
-                              $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek'";
+                              $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
                               $resultFixtures = mysqli_query($conn, $query);
 
                               if (mysqli_num_rows($resultFixtures) > 0) {

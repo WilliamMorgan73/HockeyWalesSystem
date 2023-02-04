@@ -602,6 +602,8 @@ function getClubName($conn, $userID)
     }
 }
 
+//Function to get predicted number of wins, draws and losses for a team
+
 function getLeagueName($conn, $leagueID)
 {
     $sql = "SELECT leagueName FROM league WHERE leagueID = ?;";
@@ -623,7 +625,129 @@ function getLeagueName($conn, $leagueID)
         return $result;
     }
 }
-    
+
+function getAveragePointPerGame($teamID, $leagueID, $conn)
+{
+    $sql = "SELECT 
+            ((3 * COUNT(CASE WHEN result.homeTeamScore > result.awayTeamScore AND result.homeTeamID = team.teamID THEN 1 END)) + COUNT(CASE WHEN result.homeTeamScore = result.awayTeamScore THEN 1 END)) / (2 * (COUNT(team.teamID) - 1)) * (2 * (SELECT COUNT(*) FROM team WHERE leagueID = $leagueID) - 2) AS averagePointPerGame
+            FROM team
+            LEFT JOIN result
+            ON result.homeTeamID = team.teamID OR result.awayTeamID = team.teamID
+            WHERE team.leagueID = $leagueID AND team.teamID = $teamID
+            GROUP BY team.leagueID";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $results = $result->fetch_assoc();
+        return $results['averagePointPerGame'];
+    } else {
+        return null;
+    }
+}
+
+function getPredictedPoints($teamID, $leagueID, $conn)
+{
+    $averagePointPerGame = getAveragePointPerGame($teamID, $leagueID, $conn);
+    $gamesLeft = getNumberOfGamesLeft($teamID, $leagueID, $conn);
+
+    $sql = "SELECT ((3 * COUNT(CASE WHEN (result.homeTeamScore > result.awayTeamScore AND result.homeTeamID = team.teamID) OR 
+    (result.homeTeamScore < result.awayTeamScore AND result.awayTeamID = team.teamID) THEN 1 END)) +
+COUNT(CASE WHEN result.homeTeamScore = result.awayTeamScore THEN 1 END)) + 
+($gamesLeft * $averagePointPerGame) AS predictedPoints
+FROM team
+LEFT JOIN result
+ON result.homeTeamID = team.teamID OR result.awayTeamID = team.teamID
+WHERE team.leagueID = $leagueID AND team.teamID = $teamID
+GROUP BY team.leagueID";
+
+
+    $result = $conn->query($sql);
+
+    if ($result === false) {
+        echo "Error: " . mysqli_error($conn);
+    } else if ($result->num_rows > 0) {
+        $results = $result->fetch_assoc();
+        return $results;
+    } else {
+        return null;
+    }
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $results = $result->fetch_assoc();
+        return $results;
+    } else {
+        return null;
+    }
+}
+
+
+function compareTeams($teamID, $leagueID, $conn)
+{
+    $fixtures = getFixturesForTeam($teamID, $conn);
+    $results = array();
+
+    foreach ($fixtures as $fixture) {
+        $homeTeamID = $fixture['homeTeamID'];
+        $awayTeamID = $fixture['awayTeamID'];
+
+        $homeTeamAvgPoints = getAveragePointPerGame($teamID, $leagueID, $conn);
+        $awayTeamAvgPoints = getAveragePointPerGame($teamID, $leagueID, $conn);
+
+        if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
+            if ($homeTeamID == $teamID) {
+                $results[] = "win";
+            } else {
+                $results[] = "loss";
+            }
+        } else if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
+            if ($awayTeamID == $teamID) {
+                $results[] = "win";
+            } else {
+                $results[] = "loss";
+            }
+        } else {
+            $results[] = "draw";
+        }
+    }
+
+    return $results;
+}
+
+function getFixturesForTeam($teamID, $conn)
+{
+    $sql = "SELECT homeTeamID, awayTeamID FROM fixture WHERE homeTeamID = $teamID OR awayTeamID = $teamID";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $fixtures = array();
+        while ($row = $result->fetch_assoc()) {
+            $fixtures[] = $row;
+        }
+        return $fixtures;
+    } else {
+        return null;
+    }
+}
+
+function getNumberOfGamesLeft($teamID, $leagueID, $conn)
+{
+    $sql = "SELECT COUNT(*) as totalGames
+            FROM fixture
+            WHERE (homeTeamID = $teamID OR awayTeamID = $teamID) AND leagueID = $leagueID";
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $results = $result->fetch_assoc();
+        return $results["totalGames"];
+    } else {
+        return null;
+    }
+}
+
 /*
 
 TODO:
@@ -638,7 +762,7 @@ Combine functions such as getplayername and getclubname into one function
 Make signup functions not work if an error occurs in the second query as atm it will still add the user to the database
 On index make league buttons be outputted from database instead of hard coded
 Maybe make email to user when they are added to a club
-On player approval : make rows work when more than 3 players are added to a club
+On player approval : make rows work when more than 3 players are added to a club - Same with clubs in league
 Make player next game actually be the next game and not a past game or a futher future game
 Add dummy data to player and club dashboard
 Tidy up comments in playerDashboard.php
