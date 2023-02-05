@@ -20,12 +20,13 @@ $leagueName = getLeagueName($conn, $leagueID);
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
     <!-- Theme style -->
     <link rel="stylesheet" href="css/adminlte/adminlte.min.css" />
     <!-- Bootstrap Css -->
     <link rel="stylesheet" href="css/bootstrapIcons/bootstrap-icons.css" />
+    <!-- chartJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.0/dist/chart.umd.min.js"></script>
+
 </head>
 
 <body class="hold-transition sidebar-mini"></body>
@@ -131,24 +132,10 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                 foreach ($teams as $team) {
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
-                                                    $predictedWins = 0;
-                                                    $predictedDraws = 0;
-                                                    $predictedLosses = 0;
-                                                    $predictedPoints = 0;
-
-                                                    $results = compareTeams($teamID, $leagueID, $conn);
-                                                    foreach ($results as $result) {
-                                                        if ($result == "win") {
-                                                            $predictedWins++;
-                                                        } else if ($result == "draw") {
-                                                            $predictedDraws++;
-                                                        } else if ($result == "loss") {
-                                                            $predictedLosses++;
-                                                        }
-                                                    }
-
-                                                    $results = getPredictedPoints($teamID, $leagueID, $conn);
-                                                    $predictedPoints = $results['predictedPoints'];
+                                                    $predictedWins = getTeamWins($teamID, $conn) + getPredictedWins($teamID, $conn);
+                                                    $predictedDraws = getTeamDraws($teamID, $conn) + getPredictedDraws($teamID, $conn);
+                                                    $predictedLosses = getTeamLosses($teamID, $conn) + getPredictedLosses($teamID, $conn);
+                                                    $predictedPoints = getPredictedPoints($teamID, $conn);
 
                                                     echo '<tr>';
                                                     echo '<td>' . $teamName . '</td>';
@@ -175,47 +162,24 @@ $leagueName = getLeagueName($conn, $leagueID);
                                             <div class="col-md-6">
                                                 <div class="card card-outline shadow">
                                                     <div class="card-body">
-                                                        <h1 class="card-title">Result</h1>
+                                                        <h1 class="card-title">predicted results</h1>
                                                         <br />
                                                         <div class="col-md-12">
                                                             <?php
-                                                            $query = "SELECT MAX(matchWeek) AS maxWeek FROM result";
-                                                            $result = mysqli_query($conn, $query);
-
-                                                            if (mysqli_num_rows($result) > 0) {
-                                                                $row = mysqli_fetch_assoc($result);
-                                                                $maxWeek = $row['maxWeek'];
-
-                                                                $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE matchWeek = '$maxWeek' AND leagueID = '$leagueID'";
-                                                                $resultdetailresult = mysqli_query($conn, $query);
-
-                                                                if (mysqli_num_rows($resultdetailresult) > 0) {
-                                                                    while ($row = mysqli_fetch_array($resultdetailresult)) {
-                                                                        $homeTeamID = $row['homeTeamID'];
-                                                                        $awayTeamID = $row['awayTeamID'];
-                                                                        $homeTeamScore = $row['homeTeamScore'];
-                                                                        $awayTeamScore = $row['awayTeamScore'];
-
-                                                                        $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
-                                                                        $result2 = mysqli_query($conn, $query);
-                                                                        $row2 = mysqli_fetch_array($result2);
-                                                                        $homeTeamName = $row2['teamName'];
-
-                                                                        $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
-                                                                        $result3 = mysqli_query($conn, $query);
-                                                                        $row3 = mysqli_fetch_array($result3);
-                                                                        $awayTeamName = $row3['teamName'];
+                                                            $predictedResults = getPredictedResults($leagueID, $conn);
+                                                            if (!empty($predictedResults)) {
+                                                                foreach ($predictedResults as $match) {
+                                                                    $homeTeam = $match['homeTeam'];
+                                                                    $awayTeam = $match['awayTeam'];
+                                                                    $predictedResult = $match['predictedResult'];
                                                             ?>
-                                                                        <div class="card">
-                                                                            <h2 class="lead"><b><?php echo "$homeTeamName - $homeTeamScore   -   $awayTeamScore $awayTeamName" . "<br>"; ?>
-                                                                        </div>
+                                                                    <div class="card">
+                                                                        <h2 class="lead text-center"><b><?php echo "$homeTeam vs. $awayTeam: $predictedResult" . "<br>"; ?>
+                                                                    </div>
                                                             <?php
-                                                                    }
-                                                                } else {
-                                                                    echo "No results with the highest game week number found";
                                                                 }
                                                             } else {
-                                                                echo "No game week numbers found in the result table";
+                                                                echo "No predicted results found";
                                                             }
                                                             ?>
                                                         </div>
@@ -304,64 +268,55 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                     <div class="col-md-12">
                                                         <div class="card card-outline shadow">
                                                             <div class="card-body">
-                                                                <h1 class="card-title">Fixtures</h1>
+                                                                <h1 class="card-title">Predicted points graph</h1>
                                                                 <br />
-                                                                <div class="col-md-12">
-                                                                    <?php
-                                                                    $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
-                                                                    $result = mysqli_query($conn, $query);
-
-                                                                    if (mysqli_num_rows($result) > 0) {
-                                                                        $row = mysqli_fetch_assoc($result);
-                                                                        $minWeek = $row['minWeek'];
-
-                                                                        $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
-                                                                        $resultFixtures = mysqli_query($conn, $query);
-
-                                                                        if (mysqli_num_rows($resultFixtures) > 0) {
-                                                                            while ($row = mysqli_fetch_array($resultFixtures)) {
-                                                                                $homeTeamID = $row['homeTeamID'];
-                                                                                $awayTeamID = $row['awayTeamID'];
-
-                                                                                $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
-                                                                                $result2 = mysqli_query($conn, $query);
-                                                                                $row2 = mysqli_fetch_array($result2);
-                                                                                $homeTeamName = $row2['teamName'];
-
-                                                                                $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
-                                                                                $result3 = mysqli_query($conn, $query);
-                                                                                $row3 = mysqli_fetch_array($result3);
-                                                                                $awayTeamName = $row3['teamName'];
-                                                                    ?>
-                                                                                <div class="card">
-                                                                                    <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?>
-                                                                                </div>
-                                                                    <?php
-                                                                            }
-                                                                        } else {
-                                                                            echo "No fixtures with the lowest match week number found";
-                                                                        }
-                                                                    } else {
-                                                                        echo "No match week numbers found in the fixtures table";
-                                                                    }
-                                                                    ?>
+                                                                <div class="col-md-12" style="width:400px; height:100%;">
+                                                                    <canvas id="lineGraph" style="height:400px; width:100%;"></canvas>
                                                                 </div>
+
+
+                                                                <script>
+                                                                    var ctx = document.getElementById("lineGraph").getContext("2d");
+                                                                    var lineGraph = new Chart(ctx, {
+                                                                        type: "line",
+                                                                        data: {
+                                                                            labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+                                                                            datasets: [{
+                                                                                label: "Sales",
+                                                                                data: [10, 20, 30, 40],
+                                                                                borderColor: "rgba(54, 162, 235, 1)",
+                                                                                backgroundColor: "rgba(54, 162, 235, 0.2)",
+                                                                                fill: false,
+                                                                                pointRadius: 5
+                                                                            }]
+                                                                        },
+                                                                        options: {
+                                                                            scales: {
+                                                                                yAxes: [{
+                                                                                    ticks: {
+                                                                                        beginAtZero: true
+                                                                                    }
+                                                                                }]
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                </script>
+
+
+
+                                                                <!-- End of predicted point graph -->
                                                             </div>
+                                                            <!-- End of bottom row -->
                                                         </div>
+                                                        <!-- End of right side split -->
                                                     </div>
-                                                    <!-- End of predicted point graph -->
+                                                    <!-- End of first row -->
                                                 </div>
-                                                <!-- End of bottom row -->
                                             </div>
-                                            <!-- End of right side split -->
                                         </div>
-                                        <!-- End of first row -->
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.card -->
+                                <!-- /.card -->
         </section>
         <!-- /.content -->
     </div>
@@ -377,11 +332,13 @@ $leagueName = getLeagueName($conn, $leagueID);
 <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="js/adminlte/adminlte.min.js"></script>
+
 </body>
 
 
 <!--
 Add error messages when there are no games played or no scorers etc
+Install chartJS
                                                                 -->
 
 </html>

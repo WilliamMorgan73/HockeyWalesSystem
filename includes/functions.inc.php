@@ -626,95 +626,108 @@ function getLeagueName($conn, $leagueID)
     }
 }
 
-function getAveragePointPerGame($teamID, $leagueID, $conn)
+function getAveragePointPerGame($teamID, $conn)
 {
-    $sql = "SELECT 
-            ((3 * COUNT(CASE WHEN result.homeTeamScore > result.awayTeamScore AND result.homeTeamID = team.teamID THEN 1 END)) + COUNT(CASE WHEN result.homeTeamScore = result.awayTeamScore THEN 1 END)) / (2 * (COUNT(team.teamID) - 1)) * (2 * (SELECT COUNT(*) FROM team WHERE leagueID = $leagueID) - 2) AS averagePointPerGame
-            FROM team
-            LEFT JOIN result
-            ON result.homeTeamID = team.teamID OR result.awayTeamID = team.teamID
-            WHERE team.leagueID = $leagueID AND team.teamID = $teamID
-            GROUP BY team.leagueID";
+    $sql = "SELECT COUNT(*) AS gamesPlayed
+    FROM result
+    WHERE homeTeamID = $teamID OR awayTeamID = $teamID;
+    ";
+    $gamesPlayed = $conn->query($sql);
+    $teamWins = getTeamWins($teamID, $conn);
+    $teamLosses = getTeamLosses($teamID, $conn);
+    $teamDraws = getTeamDraws($teamID, $conn);
+    $gamesPlayed = $teamWins + $teamLosses + $teamDraws;
 
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $results = $result->fetch_assoc();
-        return $results['averagePointPerGame'];
-    } else {
-        return null;
-    }
-}
-
-function getPredictedPoints($teamID, $leagueID, $conn)
-{
-    $averagePointPerGame = getAveragePointPerGame($teamID, $leagueID, $conn);
-    $gamesLeft = getNumberOfGamesLeft($teamID, $leagueID, $conn);
-
-    $sql = "SELECT ((3 * COUNT(CASE WHEN (result.homeTeamScore > result.awayTeamScore AND result.homeTeamID = team.teamID) OR 
-    (result.homeTeamScore < result.awayTeamScore AND result.awayTeamID = team.teamID) THEN 1 END)) +
-COUNT(CASE WHEN result.homeTeamScore = result.awayTeamScore THEN 1 END)) + 
-($gamesLeft * $averagePointPerGame) AS predictedPoints
-FROM team
-LEFT JOIN result
-ON result.homeTeamID = team.teamID OR result.awayTeamID = team.teamID
-WHERE team.leagueID = $leagueID AND team.teamID = $teamID
-GROUP BY team.leagueID";
-
-
-    $result = $conn->query($sql);
-
-    if ($result === false) {
-        echo "Error: " . mysqli_error($conn);
-    } else if ($result->num_rows > 0) {
-        $results = $result->fetch_assoc();
-        return $results;
-    } else {
-        return null;
-    }
-
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $results = $result->fetch_assoc();
-        return $results;
-    } else {
-        return null;
-    }
+    $averagePointPerGame = (3 * $teamWins + 1 * $teamDraws) / $gamesPlayed;
+    return $averagePointPerGame;
 }
 
 
-function compareTeams($teamID, $leagueID, $conn)
+function getPredictedPoints($teamID, $conn)
+{
+    $wins = getTeamWins($teamID, $conn);
+    $draws = getTeamDraws($teamID, $conn);
+    $predictedWins = getPredictedWins($teamID, $conn);
+    $predictedDraws = getPredictedDraws($teamID, $conn);
+    $predictedPoints = ((3 * $wins) + $draws) + (3 * $predictedWins) + $predictedDraws;
+    return $predictedPoints;
+}
+
+function getPredictedWins($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
     $results = array();
+    $wins = 0;
 
     foreach ($fixtures as $fixture) {
         $homeTeamID = $fixture['homeTeamID'];
         $awayTeamID = $fixture['awayTeamID'];
 
-        $homeTeamAvgPoints = getAveragePointPerGame($teamID, $leagueID, $conn);
-        $awayTeamAvgPoints = getAveragePointPerGame($teamID, $leagueID, $conn);
+        $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
+        $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
 
         if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
             if ($homeTeamID == $teamID) {
-                $results[] = "win";
-            } else {
-                $results[] = "loss";
+                $wins++;
             }
         } else if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
             if ($awayTeamID == $teamID) {
-                $results[] = "win";
-            } else {
-                $results[] = "loss";
+                $wins++;
             }
-        } else {
-            $results[] = "draw";
         }
     }
 
-    return $results;
+    return $wins;
 }
+
+function getPredictedDraws($teamID, $conn)
+{
+    $fixtures = getFixturesForTeam($teamID, $conn);
+    $results = array();
+    $draws = 0;
+
+    foreach ($fixtures as $fixture) {
+        $homeTeamID = $fixture['homeTeamID'];
+        $awayTeamID = $fixture['awayTeamID'];
+
+        $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
+        $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
+
+        if ($homeTeamAvgPoints == $awayTeamAvgPoints) {
+            $draws++;
+        }
+    }
+
+    return $draws;
+}
+
+function getPredictedLosses($teamID, $conn)
+{
+    $fixtures = getFixturesForTeam($teamID, $conn);
+    $results = array();
+    $losses = 0;
+
+    foreach ($fixtures as $fixture) {
+        $homeTeamID = $fixture['homeTeamID'];
+        $awayTeamID = $fixture['awayTeamID'];
+
+        $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
+        $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
+
+        if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
+            if ($homeTeamID == $teamID) {
+                $losses++;
+            }
+        } else if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
+            if ($awayTeamID == $teamID) {
+                $losses++;
+            }
+        }
+    }
+
+    return $losses;
+}
+
 
 function getFixturesForTeam($teamID, $conn)
 {
@@ -732,11 +745,11 @@ function getFixturesForTeam($teamID, $conn)
     }
 }
 
-function getNumberOfGamesLeft($teamID, $leagueID, $conn)
+function getNumberOfGamesLeft($teamID, $conn)
 {
     $sql = "SELECT COUNT(*) as totalGames
             FROM fixture
-            WHERE (homeTeamID = $teamID OR awayTeamID = $teamID) AND leagueID = $leagueID";
+            WHERE (homeTeamID = $teamID OR awayTeamID = $teamID)";
 
     $result = $conn->query($sql);
 
@@ -747,6 +760,241 @@ function getNumberOfGamesLeft($teamID, $leagueID, $conn)
         return null;
     }
 }
+
+function getTeamWins($teamID, $conn)
+{
+    $sql = "SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore FROM result WHERE homeTeamID = ? OR awayTeamID = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        trigger_error("Prepare statement failed: " . $conn->error, E_USER_ERROR);
+    }
+    $stmt->bind_param("ii", $teamID, $teamID);
+    if (!$stmt->execute()) {
+        trigger_error("Execute statement failed: " . $stmt->error, E_USER_ERROR);
+    }
+    $result = $stmt->get_result();
+    $wins = 0;
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    if (isset($row["homeTeamID"]) && isset($row["homeTeamScore"]) && isset($row["awayTeamScore"])) {
+                        if (
+                            $row["homeTeamID"] == $teamID && $row["homeTeamScore"] > $row["awayTeamScore"] ||
+                            $row["awayTeamID"] == $teamID && $row["awayTeamScore"] > $row["homeTeamScore"]
+                        ) {
+                            $wins++;
+                        }
+                    } else {
+                        error_log("Error: " . $conn->error . "\n", 3, "error.log");
+                    }
+                }
+            }
+            return $wins;
+        }
+        return 0;
+    }
+}
+
+function getTeamDraws($teamID, $conn)
+{
+    $sql = "SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore FROM result WHERE homeTeamID = ? OR awayTeamID = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        error_log("getTeamDraws: Error preparing statement: " . $conn->error, 0);
+        return 0;
+    }
+    $stmt->bind_param("ii", $teamID, $teamID);
+    if (!$stmt->execute()) {
+        error_log("getTeamDraws: Error executing statement: " . $stmt->error, 0);
+        return 0;
+    }
+    $result = $stmt->get_result();
+    $draws = 0;
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            if ($row["homeTeamScore"] == $row["awayTeamScore"]) {
+                $draws++;
+            }
+        }
+        return $draws;
+    }
+    error_log("getTeamDraws: No data found in query result", 0);
+    return 0;
+}
+
+
+function getTeamLosses($teamID, $conn)
+{
+    $sql = "SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore FROM result WHERE homeTeamID = ? OR awayTeamID = ?";
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        error_log("Error preparing SQL statement: " . $conn->error);
+        return 0;
+    }
+    $stmt->bind_param("ii", $teamID, $teamID);
+    if ($stmt->execute() === false) {
+        error_log("Error executing SQL statement: " . $stmt->error);
+        return 0;
+    }
+    $result = $stmt->get_result();
+    if ($result === false) {
+        error_log("Error getting result: " . $stmt->error);
+        return 0;
+    }
+    $losses = 0;
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            if (
+                $row["homeTeamID"] == $teamID && $row["homeTeamScore"] < $row["awayTeamScore"] ||
+                $row["awayTeamID"] == $teamID && $row["awayTeamScore"] < $row["homeTeamScore"]
+            ) {
+                $losses++;
+            }
+        }
+        return $losses;
+    }
+    return 0;
+}
+
+function getPredictedResults($leagueID, $conn)
+{
+    $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
+    $result = mysqli_query($conn, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $minWeek = $row['minWeek'];
+
+        $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
+        $resultdetailresult = mysqli_query($conn, $query);
+
+        if (mysqli_num_rows($resultdetailresult) > 0) {
+            $predictedResults = array();
+            while ($row = mysqli_fetch_array($resultdetailresult)) {
+                $homeTeamID = $row['homeTeamID'];
+                $awayTeamID = $row['awayTeamID'];
+
+                $homeTeamPPG = getAveragePointPerGame($homeTeamID, $conn);
+                $awayTeamPPG = getAveragePointPerGame($awayTeamID, $conn);
+
+                $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
+                $result2 = mysqli_query($conn, $query);
+                $row2 = mysqli_fetch_array($result2);
+                $homeTeamName = $row2['teamName'];
+
+                $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
+                $result3 = mysqli_query($conn, $query);
+                $row3 = mysqli_fetch_array($result3);
+                $awayTeamName = $row3['teamName'];
+
+                if ($homeTeamPPG > $awayTeamPPG) {
+                    $predictedResult = $homeTeamName . " wins";
+                } elseif ($awayTeamPPG > $homeTeamPPG) {
+                    $predictedResult = $awayTeamName . " wins";
+                } else {
+                    $predictedResult = "Draw";
+                }
+
+                $predictedResults[] = array(
+
+                    "homeTeam" => $homeTeamName,
+                    "awayTeam" => $awayTeamName,
+                    "predictedResult" => $predictedResult
+                );
+            }
+            return $predictedResults;
+        } else {
+            return "No fixtures with the minimum game week number found";
+        }
+    } else {
+        return "No game week numbers found in the result table";
+    }
+}
+
+function getPredictedResultsPerWeek($leagueID, $conn)
+{
+    error_log("[".date("Y-m-d H:i:s")."] getPredictedResultsPerWeek called with leagueID: $leagueID\n", 3, "/var/log/my-errors.log");
+    $query = "SELECT MIN(matchWeek) AS minWeek, MAX(matchWeek) AS maxWeek FROM fixture";
+    $result = mysqli_query($conn, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $minWeek = $row['minWeek'];
+        $maxWeek = $row['maxWeek'];
+        $pointsPerGameWeek = array();
+
+        for ($week = $minWeek; $week <= $maxWeek; $week++) {
+            $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$week' AND leagueID = '$leagueID'";
+            $resultDetailResult = mysqli_query($conn, $query);
+
+            if (mysqli_num_rows($resultDetailResult) > 0) {
+                while ($row = mysqli_fetch_array($resultDetailResult)) {
+                    $homeTeamID = $row['homeTeamID'];
+                    $awayTeamID = $row['awayTeamID'];
+
+                    $homeTeamPPG = getAveragePointPerGame($homeTeamID, $conn);
+                    $awayTeamPPG = getAveragePointPerGame($awayTeamID, $conn);
+
+                    if ($homeTeamPPG > $awayTeamPPG) {
+                        $homeTeamPoints = 3;
+                        $awayTeamPoints = 0;
+                    } elseif ($homeTeamPPG < $awayTeamPPG) {
+                        $homeTeamPoints = 0;
+                        $awayTeamPoints = 3;
+                    } else {
+                        $homeTeamPoints = 1;
+                        $awayTeamPoints = 1;
+                    }
+
+                    if (isset($pointsPerGameWeek[$homeTeamID])) {
+                        $pointsPerGameWeek[$homeTeamID][$week] = $homeTeamPoints + $pointsPerGameWeek[$homeTeamID][$week - 1];
+                    } else {
+                        $pointsPerGameWeek[$homeTeamID][$week] = $homeTeamPoints;
+                    }
+
+                    if (isset($pointsPerGameWeek[$awayTeamID])) {
+                        $pointsPerGameWeek[$awayTeamID][$week] = $awayTeamPoints + $pointsPerGameWeek[$awayTeamID][$week - 1];
+                    } else {
+                        $pointsPerGameWeek[$awayTeamID][$week] = $awayTeamPoints;
+                    }
+
+                    $homeTeamPPG = ($homeTeamPPG + $homeTeamPoints) / 2;
+                    $awayTeamPPG = ($awayTeamPPG + $awayTeamPoints) / 2;
+
+                    updateAveragePointPerGame($homeTeamID, $homeTeamPPG, $conn);
+                    updateAveragePointPerGame($awayTeamID, $awayTeamPPG, $conn);
+                }
+            }
+        }
+
+        return $pointsPerGameWeek;
+    } else {
+        return "No game week numbers found in the result table";
+    }
+}
+
+function updateAveragePointPerGame($teamID, $result, $conn)
+{
+    error_log("[".date("Y-m-d H:i:s")."] updateAveragePointPerGame called with teamID: $teamID, result: $result\n", 3, "/var/log/my-errors.log");
+    $teamWins = getTeamWins($teamID, $conn);
+    $teamDraws = getTeamDraws($teamID, $conn);
+    $teamLosses = getTeamLosses($teamID, $conn);
+    $gamesPlayed = $teamWins + $teamDraws + $teamLosses;
+
+    if ($result == "win") {
+        $teamWins += 1;
+    } elseif ($result == "draw") {
+        $teamDraws += 1;
+    } elseif ($result == "loss") {
+        $teamLosses += 1;
+    }
+
+    $averagePointPerGame = (3 * $teamWins + 1 * $teamDraws) / ($gamesPlayed + 1);
+
+    return $averagePointPerGame;
+}
+
 
 /*
 
