@@ -51,7 +51,7 @@ $leagueID = getLeagueID($userID, $conn);
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <a href="teammanagement.php" class="nav-link">
                 <i class="far bi bi-people-fill nav-icon"></i>
                 <p>Team management</p>
               </a>
@@ -63,13 +63,13 @@ $leagueID = getLeagueID($userID, $conn);
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <a href="fixtureAvailability.php" class="nav-link">
                 <i class="far bi bi-calendar-date-fill nav-icon"></i>
                 <p>Fixture availability</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <a href="resultApproval.php" class="nav-link">
                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
                 <p>Result apporval</p>
               </a>
@@ -127,17 +127,22 @@ $leagueID = getLeagueID($userID, $conn);
                           $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
                           $result = mysqli_query($conn, $sql);
                           if (mysqli_num_rows($result) > 0) {
-                            // Output data of each row
+                            $teams = [];
                             while ($row = mysqli_fetch_assoc($result)) {
-                              $teamID = $row["teamID"];
+                              $teams[] = $row;
+                            }
+
+                            $points = getTeamPoints($teams, $conn);
+                            // Display the teams in descending order of points
+                            foreach ($points as $team) {
                               echo "<tr>
-                  <td>" . $row["teamName"] . "</td>
-                  <td>" . getTeamWins($teamID, $conn) . "</td>
-                  <td>" . getTeamDraws($teamID, $conn) . "</td>
-                  <td>" . getTeamLosses($teamID, $conn) . "</td>
-                  <td>" . getTeamGoalDifference($teamID, $conn) . "</td>
-                  <td>" . getTeamPoints($teamID, $conn) . "</td>
-                </tr>";
+              <td>" . $team["teamName"] . "</td>
+              <td>" . getTeamWins($team["teamID"], $conn) . "</td>
+              <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
+              <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
+              <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+              <td>" . $team["points"] . "</td>
+            </tr>";
                             }
                           } else {
                             echo "0 results";

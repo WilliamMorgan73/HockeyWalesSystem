@@ -49,7 +49,7 @@ $clubID = getClubID($conn, $clubName);
                                 <p>Home</p>
                             </a>
                         </li>
-                        <a href="#" class="nav-link">
+                        <a href="teammanagement.php" class="nav-link">
                             <i class="far bi bi-people-fill nav-icon"></i>
                             <p>Team management</p>
                         </a>
@@ -61,7 +61,7 @@ $clubID = getClubID($conn, $clubName);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="fixtureAvailability.php" class="nav-link">
                                 <i class="far bi bi-calendar-date-fill nav-icon"></i>
                                 <p>Fixture availability</p>
                             </a>

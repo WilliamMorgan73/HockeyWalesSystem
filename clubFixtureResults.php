@@ -9,7 +9,10 @@ $conn = require 'includes/dbhconfig.php';
 //Variables
 
 $clubID = $_POST['clubID'];
-
+$query = "SELECT clubName FROM club WHERE clubID = $clubID";
+$result = mysqli_query($conn, $query);
+$row = mysqli_fetch_array($result);
+$clubName = $row['clubName'];
 ?>
 
 <html lang="en">
@@ -17,7 +20,7 @@ $clubID = $_POST['clubID'];
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?php echo $leagueName ?> fixtures/results</title>
+    <title><?php echo $clubName ?>'s fixtures/results</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
@@ -45,7 +48,7 @@ $clubID = $_POST['clubID'];
                         <li class="nav-item">
                             <a style="cursor: pointer;" class="nav-link">
                                 <form action="clubDashboard.php" method="post">
-                                    <input type="hidden" name="#" value="#">
+                                    <input type="hidden" name="clubID" value="<?php echo $clubID; ?>">
                                     <i class="nav-icon bi bi-house-fill"></i>
                                     <button type="submit" style="background: transparent; border: none;">
                                         <p>Home</p>
@@ -56,7 +59,7 @@ $clubID = $_POST['clubID'];
                         <li class="nav-item">
                             <a style="cursor: pointer;" class="nav-link">
                                 <form action="players.php" method="post">
-                                    <input type="hidden" name="#" value="#">
+                                    <input type="hidden" name="clubID" value="<?php echo $clubID; ?>">
                                     <i class="far bi bi-people-fill nav-icon"></i>
                                     <button type="submit" style="background: transparent; border: none;">
                                         <p>Players</p>
@@ -125,7 +128,7 @@ $clubID = $_POST['clubID'];
                 <div class="card card-solid">
                     <div class="card-header pb-0">
                         <form action="" method="post">
-                            <input type="hidden" name="leagueID" value="<?php echo $leagueID; ?>">
+                            <input type="hidden" name="clubID" value="<?php echo $clubID; ?>">
                             <div class="form-group">
                                 <label for="selectedWeek">Select Game Week:</label>
                                 <select name="selectedWeek" id="selectedWeek" class="form-control">
@@ -153,7 +156,9 @@ $clubID = $_POST['clubID'];
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
-                            $query = "SELECT * FROM fixture WHERE matchWeek = '$selectedWeek' AND leagueID = '$leagueID' UNION ALL SELECT * FROM result WHERE matchWeek = '$selectedWeek' AND leagueID = '$leagueID'";
+                            $query = "SELECT fixture.* FROM fixture JOIN team as homeTeam ON fixture.homeTeamID = homeTeam.teamID WHERE matchWeek = '$selectedWeek' AND homeTeam.clubID = '$clubID'
+    UNION ALL
+    SELECT result.* FROM result JOIN team as awayTeam ON result.awayTeamID = awayTeam.teamID WHERE matchWeek = '$selectedWeek' AND awayTeam.clubID = '$clubID'";
                             $result = mysqli_query($conn, $query);
 
                             if (mysqli_num_rows($result) > 0) {
