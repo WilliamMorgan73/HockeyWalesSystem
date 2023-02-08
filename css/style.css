@@ -104,9 +104,8 @@ Button  css
 Text box css 
 
 ---------------------------------------------------*/
-/* Player and club search and passwords */
-.club-player-search,
-.passwords-textbox {
+/* Player and club search */
+.club-player-search {
   height: 40px;
   border: none;
   background: #d8d6d680;
@@ -115,6 +114,4 @@ Text box css
 .club-player-search {
   width: 100%;
 }
-.passwords-textbox {
-  width: 40%;
-}
+

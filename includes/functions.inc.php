@@ -53,6 +53,43 @@ function emailExists($conn, $email)
     }
 }
 
+//Function to check if fields are correct length
+
+function checkLength($email, $password, $firstName, $lastName, $club)
+{
+    $result = '';
+    if (strlen($email) > 50 || strlen($password) > 50 || strlen($firstName) > 50 || strlen($lastName) > 50 || strlen($club) > 50) {
+        $result = true;
+    } else {
+        $result = false;
+    }
+    return $result;
+}
+
+//Function to check if club exists
+
+function clubExists($conn, $club)
+{
+    $sql = "SELECT * FROM club WHERE clubName = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $club);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
 //Function to check for empty fields in login form
 
 function emptyInputLogin($email, $password)
@@ -92,6 +129,7 @@ function getClubID($conn, $club)
 
 function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType)
 {
+    // Start a transaction
     $conn->begin_transaction();
 
     $sql = "INSERT INTO tempUser (email, password, accountType) 
@@ -100,10 +138,10 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
     $stmt = $conn->stmt_init();
     if (!$stmt->prepare($sql)) {
         echo "SQL statement failed: " . $conn->error;
-        $conn->rollback();
+        $conn->rollback(); // Roll back the transaction
         exit;
     } else {
-        //Hash password
+        // Hash password
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $stmt->bind_param("sss", $email, $hashedPassword, $accountType);
         $stmt->execute();
@@ -114,7 +152,7 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
     $clubID = getClubID($conn, $club);
     if (!$clubID) {
         echo "Error: club not found";
-        $conn->rollback();
+        $conn->rollback(); // Roll back the transaction
         exit;
     }
 
@@ -124,15 +162,16 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
     $stmt = $conn->stmt_init();
     if (!$stmt->prepare($sql)) {
         echo "SQL statement failed: " . $conn->error;
-        $conn->rollback();
+        $conn->rollback(); // Roll back the transaction
         exit;
     } else {
         $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $userID);
         $stmt->execute();
-        $conn->commit();
-        header("Location: ../login.php?signup=success"); //Change to success page until club admin approves
+        $conn->commit(); // Commit the transaction
+        header("Location: ../login.php?signup=success"); // Change to success page until club admin approves
     }
 }
+
 
 //Function to create a club admin
 
@@ -188,7 +227,7 @@ function loginUser($conn, $email, $password)
     $emailExists = emailExists($conn, $email);
 
     if ($emailExists === false) {
-        header("Location: ../login.php?error=wronglogin");
+        header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
         exit();
     }
 
@@ -196,7 +235,7 @@ function loginUser($conn, $email, $password)
     $checkPassword = password_verify($password, $passwordHashed);
 
     if ($checkPassword === false) {
-        header("Location: ../login.php?error=wronglogin");
+        header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
         exit();
     } else if ($checkPassword === true) {
         session_start();
@@ -523,7 +562,7 @@ function userPfpCheck($userID)
     $matchingFiles = glob($pfpPath);
     if (!empty($matchingFiles)) {
         // Display the user's pfp
-        echo '<img class="img-circle elevation-2" src="' . $matchingFiles[0] . '" alt="User Avatar" />';
+        echo '<img class="img-circle elevation-2" style="height:100px; width:100px;"src="' . $matchingFiles[0] . '" alt="User Avatar" />';
     } else {
         // Use default pfp and rename it to user's ID
         $defaultPfpPath = "images/pfp/defaultpfp.*";
@@ -534,7 +573,7 @@ function userPfpCheck($userID)
             if (copy($matchingFiles[0], $newPfpPath)) {
                 // set permissions for newly created file
                 chmod($newPfpPath, 0644);
-                echo '<img class="img-circle elevation-2" src="' . $newPfpPath . '" alt="User Avatar" />';
+                echo '<img class="img-circle elevation-2" style="height:100px; width:100px;" src="' . $newPfpPath . '" alt="User Avatar" />';
             } else {
                 echo "Error: default profile picture not found.";
             }
@@ -566,6 +605,7 @@ function getclubAdminName($conn, $userID)
     }
 }
 
+//Function to get club admin's club name
 function getClubName($conn, $userID)
 {
     $sql = "SELECT clubID FROM clubadmin WHERE userID = ?";
@@ -656,7 +696,6 @@ function getPredictedPoints($teamID, $conn)
 function getPredictedWins($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
-    $results = array();
     $wins = 0;
 
     foreach ($fixtures as $fixture) {
@@ -683,7 +722,6 @@ function getPredictedWins($teamID, $conn)
 function getPredictedDraws($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
-    $results = array();
     $draws = 0;
 
     foreach ($fixtures as $fixture) {
@@ -704,7 +742,6 @@ function getPredictedDraws($teamID, $conn)
 function getPredictedLosses($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
-    $results = array();
     $losses = 0;
 
     foreach ($fixtures as $fixture) {
@@ -776,25 +813,23 @@ function getTeamWins($teamID, $conn)
     $wins = 0;
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    if (isset($row["homeTeamID"]) && isset($row["homeTeamScore"]) && isset($row["awayTeamScore"])) {
-                        if (
-                            $row["homeTeamID"] == $teamID && $row["homeTeamScore"] > $row["awayTeamScore"] ||
-                            $row["awayTeamID"] == $teamID && $row["awayTeamScore"] > $row["homeTeamScore"]
-                        ) {
-                            $wins++;
-                        }
-                    } else {
-                        error_log("Error: " . $conn->error . "\n", 3, "error.log");
-                    }
+            if (isset($row["homeTeamID"]) && isset($row["homeTeamScore"]) && isset($row["awayTeamScore"])) {
+                if (
+                    $row["homeTeamID"] == $teamID && $row["homeTeamScore"] > $row["awayTeamScore"] ||
+                    $row["awayTeamID"] == $teamID && $row["awayTeamScore"] > $row["homeTeamScore"]
+                ) {
+                    $wins++;
                 }
+            } else {
+                error_log("Error: " . $conn->error . "\n", 3, "error.log");
             }
-            return $wins;
         }
+        return $wins;
+    } else {
         return 0;
     }
 }
+
 
 function getTeamDraws($teamID, $conn)
 {
@@ -911,112 +946,191 @@ function getPredictedResults($leagueID, $conn)
         return "No game week numbers found in the result table";
     }
 }
-
-function getPredictedResultsPerWeek($leagueID, $conn)
+function calculatePointsPerWeek($teamID, $conn)
 {
-    error_log("[".date("Y-m-d H:i:s")."] getPredictedResultsPerWeek called with leagueID: $leagueID\n", 3, "/var/log/my-errors.log");
-    $query = "SELECT MIN(matchWeek) AS minWeek, MAX(matchWeek) AS maxWeek FROM fixture";
+    // Get the lowest and highest gameWeekID from the fixture table
+    $query = "SELECT MIN(matchWeek) as minGWID, MAX(matchWeek) as maxGWID FROM fixture WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
     $result = mysqli_query($conn, $query);
-
-    if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        $minWeek = $row['minWeek'];
-        $maxWeek = $row['maxWeek'];
-        $pointsPerGameWeek = array();
-
-        for ($week = $minWeek; $week <= $maxWeek; $week++) {
-            $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$week' AND leagueID = '$leagueID'";
-            $resultDetailResult = mysqli_query($conn, $query);
-
-            if (mysqli_num_rows($resultDetailResult) > 0) {
-                while ($row = mysqli_fetch_array($resultDetailResult)) {
-                    $homeTeamID = $row['homeTeamID'];
-                    $awayTeamID = $row['awayTeamID'];
-
-                    $homeTeamPPG = getAveragePointPerGame($homeTeamID, $conn);
-                    $awayTeamPPG = getAveragePointPerGame($awayTeamID, $conn);
-
-                    if ($homeTeamPPG > $awayTeamPPG) {
-                        $homeTeamPoints = 3;
-                        $awayTeamPoints = 0;
-                    } elseif ($homeTeamPPG < $awayTeamPPG) {
-                        $homeTeamPoints = 0;
-                        $awayTeamPoints = 3;
-                    } else {
-                        $homeTeamPoints = 1;
-                        $awayTeamPoints = 1;
-                    }
-
-                    if (isset($pointsPerGameWeek[$homeTeamID])) {
-                        $pointsPerGameWeek[$homeTeamID][$week] = $homeTeamPoints + $pointsPerGameWeek[$homeTeamID][$week - 1];
-                    } else {
-                        $pointsPerGameWeek[$homeTeamID][$week] = $homeTeamPoints;
-                    }
-
-                    if (isset($pointsPerGameWeek[$awayTeamID])) {
-                        $pointsPerGameWeek[$awayTeamID][$week] = $awayTeamPoints + $pointsPerGameWeek[$awayTeamID][$week - 1];
-                    } else {
-                        $pointsPerGameWeek[$awayTeamID][$week] = $awayTeamPoints;
-                    }
-
-                    $homeTeamPPG = ($homeTeamPPG + $homeTeamPoints) / 2;
-                    $awayTeamPPG = ($awayTeamPPG + $awayTeamPoints) / 2;
-
-                    updateAveragePointPerGame($homeTeamID, $homeTeamPPG, $conn);
-                    updateAveragePointPerGame($awayTeamID, $awayTeamPPG, $conn);
-                }
-            }
-        }
-
-        return $pointsPerGameWeek;
-    } else {
-        return "No game week numbers found in the result table";
+    if (!$result) {
+        // Output error message or perform other debugging actions
+        echo "Query failed: " . mysqli_error($conn);
+        exit;
     }
-}
 
-function updateAveragePointPerGame($teamID, $result, $conn)
-{
-    error_log("[".date("Y-m-d H:i:s")."] updateAveragePointPerGame called with teamID: $teamID, result: $result\n", 3, "/var/log/my-errors.log");
+    $gwIDs = mysqli_fetch_assoc($result);
+    $minGWID = $gwIDs['minGWID'];
+    $maxGWID = $gwIDs['maxGWID'];
+
+    // Get the starting number of points by calling the functions teamWins and teamDraws
     $teamWins = getTeamWins($teamID, $conn);
     $teamDraws = getTeamDraws($teamID, $conn);
-    $teamLosses = getTeamLosses($teamID, $conn);
-    $gamesPlayed = $teamWins + $teamDraws + $teamLosses;
+    $startingPoints = $teamWins * 3 + $teamDraws;
 
-    if ($result == "win") {
-        $teamWins += 1;
-    } elseif ($result == "draw") {
-        $teamDraws += 1;
-    } elseif ($result == "loss") {
-        $teamLosses += 1;
+    // Initialize an array to store the team's points per week
+    $pointsPerWeek = [];
+
+    // Loop through every game week
+    for ($i = $minGWID; $i <= $maxGWID; $i++) {
+        // Get the oppositionID and the team's pointPerGame
+        $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE (homeTeamID = '$teamID' OR awayTeamID = '$teamID') AND matchWeek = '$i'";
+        $result = mysqli_query($conn, $query);
+        $fixtureData = mysqli_fetch_assoc($result);
+        if ($fixtureData['homeTeamID'] == $teamID) {
+            $oppositionID = $fixtureData['awayTeamID'];
+        } else {
+            $oppositionID = $fixtureData['homeTeamID'];
+        }
+        $teamPointPerGame = getAveragePointPerGame($teamID, $conn);
+
+        // Get the opposition's pointPerGame
+        $oppositionPointPerGame = getAveragePointPerGame($oppositionID, $conn);
+
+        // Decide the points based on the team's and opposition's pointsPerGame
+        if ($teamPointPerGame > $oppositionPointPerGame) {
+            $startingPoints += 3;
+        } elseif ($teamPointPerGame == $oppositionPointPerGame) {
+            $startingPoints += 1;
+        }
+        $pointsPerWeek[] = [$i, $startingPoints];
+    }
+    return $pointsPerWeek;
+}
+
+//Function to get the amount of points a team has
+function getTeamPoints($teams, $conn)
+{
+    $points = [];
+    foreach ($teams as $team) {
+        $teamID = $team["teamID"];
+        $teamWins = getTeamWins($teamID, $conn);
+        $teamDraws = getTeamDraws($teamID, $conn);
+
+        $teamPoints = $teamWins * 3 + $teamDraws;
+        $points[] = [
+            "teamID" => $teamID,
+            "teamName" => $team["teamName"],
+            "points" => $teamPoints
+        ];
     }
 
-    $averagePointPerGame = (3 * $teamWins + 1 * $teamDraws) / ($gamesPlayed + 1);
+    // Sort the teams based on their points
+    usort($points, function ($a, $b) {
+        return $b["points"] - $a["points"];
+    });
 
-    return $averagePointPerGame;
+    return $points;
+}
+
+//Function to get a team's goal difference
+
+function getTeamGoalDifference($teamID, $conn)
+{
+    //Get the amount of goals the team has scored and conceded
+    $teamGoalsScored = getTeamGoalsScored($teamID, $conn);
+    $teamGoalsConceded = getTeamGoalsConceded($teamID, $conn);
+
+    //Calculate the goal difference
+    $teamGoalDifference = $teamGoalsScored - $teamGoalsConceded;
+
+    return $teamGoalDifference;
+}
+
+//Function to get a team's goals scored
+
+function getTeamGoalsScored($teamID, $conn)
+{
+    //Get the amount of goals the team has scored
+    $query = "SELECT SUM(homeTeamScore) as homeTeamScore, SUM(awayTeamScore) as awayTeamScore FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
+    $result = mysqli_query($conn, $query);
+    $teamGoals = mysqli_fetch_assoc($result);
+    $teamGoalsScored = $teamGoals['homeTeamScore'] + $teamGoals['awayTeamScore'];
+
+    return $teamGoalsScored;
+}
+
+//Function to get a team's goals conceded
+
+function getTeamGoalsConceded($teamID, $conn)
+{
+    //Get the amount of goals the team has conceded
+    $query = "SELECT SUM(IF(homeTeamID = '$teamID', awayTeamScore, homeTeamScore)) as goalsConceded FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
+    $result = mysqli_query($conn, $query);
+    $teamGoals = mysqli_fetch_assoc($result);
+    $teamGoalsConceded = $teamGoals['goalsConceded'];
+
+    return $teamGoalsConceded;
+}
+
+
+//Function to get the leagueID based on the playerID
+function getLeagueID($userID, $conn)
+{
+    //Check account type
+    $query = "SELECT accountType FROM user WHERE userID = '$userID'";
+    $result = mysqli_query($conn, $query);
+    $accountType = mysqli_fetch_assoc($result)['accountType'];
+
+    if ($accountType == 'Player') {
+        //Get the teamID of the player
+        $query = "SELECT teamID FROM player WHERE userID = '$userID'";
+        $result = mysqli_query($conn, $query);
+        $teamID = mysqli_fetch_assoc($result)['teamID'];
+
+        //Get the leagueID of the team
+        $query = "SELECT leagueID FROM team WHERE teamID = '$teamID'";
+        $result2 = mysqli_query($conn, $query);
+        $leagueID = mysqli_fetch_assoc($result2)['leagueID'];
+    } else {
+        $result = mysqli_query($conn, $query);
+        if (!$result) {
+            // Handle the error, for example by echoing an error message
+            echo "Error: " . mysqli_error($conn);
+        } else {
+            // Continue with processing the query result
+            if (mysqli_num_rows($result) > 0) {
+                // Get the club ID
+                $query = "SELECT clubID FROM clubadmin WHERE userID = '$userID'";
+                $result = mysqli_query($conn, $query);
+                $clubID = mysqli_fetch_assoc($result)['clubID'];
+
+                // Get the lowest league ID for the club
+                $query = "SELECT MIN(leagueID) as lowestLeagueID FROM team WHERE clubID = '$clubID'";
+                $result = mysqli_query($conn, $query);
+                $row = mysqli_fetch_assoc($result);
+                $leagueID = $row['lowestLeagueID'];
+            }
+        }
+    }
+    return $leagueID;
+}
+
+//Function to get the top team ID for a club
+
+function getTopTeamLeague($clubID, $conn)
+{
+    //Get the lowest league ID for the club
+    $query = "SELECT MIN(leagueID) as lowestLeagueID FROM team WHERE clubID = '$clubID'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    $lowestLeagueID = $row['lowestLeagueID'];
+
+    return $lowestLeagueID;
 }
 
 
 /*
 
 TODO:
-Add length checks to all fields that need them, can pass maxium and minimum lengths as parameters
-Maybe password strength check
 Add a check to see if clubs have a club admin already
-Add validation email to club admin only which is sent to me to approve
+Add validation email to club admin only which is sent to a system admin to approve
 OUTPUT ERROR MESSAGES ON SCREEN INSTEAD OF REDIRECTING TO LOGIN PAGE
 ADD FOREIGN KEYS TO DATABASE
 ALLOW LEAGUE TABLE HEADER SORTS
-Combine functions such as getplayername and getclubname into one function
-Make signup functions not work if an error occurs in the second query as atm it will still add the user to the database
-On index make league buttons be outputted from database instead of hard coded
 Maybe make email to user when they are added to a club
-On player approval : make rows work when more than 3 players are added to a club - Same with clubs in league
 Make player next game actually be the next game and not a past game or a futher future game
-Add dummy data to player and club dashboard
 Tidy up comments in playerDashboard.php
-Output team logos on player dashboard in background of profiel stat thing aswell as in all league tables
-Make all buttons that you are currently on have this code: <a style="cursor:pointer" class="nav-link active">
-When uploading a pfp make it so that it is the same size as the default pfp and make it so that it is a circle and delete the old pfp
 Check if club admin league table is for the top team and not just outputting all teams within the club
 Make all files saved in the database of type .jpg
+MAYBE MAKE IT PASS PLAYERID AND CLUBADMINID ISNTEAD OF USERID ON DASHBOARDS TO ALLOW OTHERS TO VIEW OTHERS DASHBOARDS - maybe store player and club ID in header
+FIX GOAL DIFFERENCE ON LEAGUE TABLESSSS
 */

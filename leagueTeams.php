@@ -72,9 +72,14 @@ $leagueName = getLeagueName($conn, $leagueID);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far bi bi-bar-chart-fill nav-icon"></i>
-                                <p>Predictions</p>
+                            <a style="cursor: pointer;" class="nav-link">
+                                <form action="predictedLeagueDashboard.php" method="post">
+                                    <input type="hidden" name="leagueID" value="<?php echo $leagueID; ?>">
+                                    <i class="far bi bi-bar-chart-fill nav-icon"></i>
+                                    <button type="submit" style="background: transparent; border: none;">
+                                        <p>Predictions</p>
+                                    </button>
+                                </form>
                             </a>
                         </li>
                     </ul>
@@ -111,20 +116,24 @@ $leagueName = getLeagueName($conn, $leagueID);
                                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                         <div class="card bg-light d-flex flex-fill">
                                             <div class="card-body pt-0">
-                                                <div class="col-7">
-                                                    <h4 class="header"><b><?php echo $row['teamName']; ?></b></h4>
+                                                <div class="row">
+                                                    <div class="col-12 text-center">
+                                                        <h4 class="header"><b><?php echo $row['teamName']; ?></b></h4>
+                                                    </div>
                                                 </div>
-                                                <div class="col-5 text-center">
-                                                    <?php
+                                                <div class="row">
+                                                    <div class="col-12 text-center">
+                                                        <?php
 
-                                                    $query = "SELECT clubID FROM team WHERE teamID = '$teamID'";
-                                                    $result2 = mysqli_query($conn, $query);
-                                                    $row = mysqli_fetch_array($result2);
-                                                    $clubID = $row['clubID'];
+                                                        $query = "SELECT clubID FROM team WHERE teamID = '$teamID'";
+                                                        $result2 = mysqli_query($conn, $query);
+                                                        $row = mysqli_fetch_array($result2);
+                                                        $clubID = $row['clubID'];
 
-                                                    $clubImage = "images/clubLogos/" . $clubID . ".jpg";
-                                                    ?>
-                                                    <img src="<?php echo $clubImage; ?>">
+                                                        $clubImage = "images/clubLogos/" . $clubID . ".jpg";
+                                                        ?>
+                                                        <img src="<?php echo $clubImage; ?>" style="margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="card-footer">

@@ -10,7 +10,8 @@ session_start();
 $userID = $_SESSION['userID'];
 $clubAdminName = getclubAdminName($conn, $userID);
 $clubName = getClubName($conn, $userID);
-$clubID = getClubID($conn, $userID);
+$clubID = getClubID($conn, $clubName);
+$leagueID = getLeagueID($userID, $conn);
 ?>
 
 <html lang="en">
@@ -74,14 +75,6 @@ $clubID = getClubID($conn, $userID);
               </a>
             </li>
           </ul>
-          <div class="info">
-            <p class="d-block"> Change your profile picture</p>
-            <!-- Change user pfp -->
-            <form enctype="multipart/form-data" action="includes/uploadpfp.inc.php" method="POST">
-              <input type="hidden" name="MAX_FILE_SIZE" value="30000000" />
-              <input name="uploadedfile" type="file" />
-              <input type="submit" value="Upload" />
-          </div>
         </nav>
         <!-- /.sidebar-menu -->
       </div>
@@ -90,186 +83,155 @@ $clubID = getClubID($conn, $userID);
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
+      <section class="content-header">
         <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
+          <div class="row mb">
+            <div class="col-sm">
               <h1 class="m-0">Hi <?php echo $clubAdminName ?>,</h1>
               <h5>You can manage your club from here</h5>
             </div>
           </div>
         </div>
         <!-- /.container-fluid -->
+      </section>
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <!-- /.container-fluid -->
       </div>
       <!-- /.content-header -->
 
       <!-- Main content -->
       <div class="content">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-lg-6">
+        <div class="card card-solid">
+          <div class="card-body-0">
+            <div class="container-fluid">
+              <div class="row" style="padding-top:1%;">
+                <!-- League table -->
+                <div class="col-md-6">
+                  <div class="card shadow" style="width: 100%">
+                    <div class="card-body p-0">
+                      <table class=" table table-striped" style="width: 100%">
+                        <thead>
+                          <tr>
+                            <th>Team</th>
+                            <th>W</th>
+                            <th>D</th>
+                            <th>L</th>
+                            <th>GD</th>
+                            <th>PTS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                          // Assuming the database connection is established and stored in the variable $conn
+                          $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
+                          $result = mysqli_query($conn, $sql);
+                          if (mysqli_num_rows($result) > 0) {
+                            // Output data of each row
+                            while ($row = mysqli_fetch_assoc($result)) {
+                              $teamID = $row["teamID"];
+                              echo "<tr>
+                  <td>" . $row["teamName"] . "</td>
+                  <td>" . getTeamWins($teamID, $conn) . "</td>
+                  <td>" . getTeamDraws($teamID, $conn) . "</td>
+                  <td>" . getTeamLosses($teamID, $conn) . "</td>
+                  <td>" . getTeamGoalDifference($teamID, $conn) . "</td>
+                  <td>" . getTeamPoints($teamID, $conn) . "</td>
+                </tr>";
+                            }
+                          } else {
+                            echo "0 results";
+                          }
+                          ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <!-- End of league table -->
+                <div class="col-lg-6">
 
-              <!-- Results approval -->
-              <div class="card card-outline shadow">
-                <div class="card-body">
-                  <h5 class="card-title">Results approval</h5>
-                  <br />
-                  <div class="row">
-                    <div class="col-md-12">
+                  <!-- Results approval -->
+                  <div class="card card-outline shadow">
+                    <div class="card-body">
+                      <h5 class="card-title">Results approval</h5>
+                      <br />
                       <div class="row">
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card">
-                            <img src="test" />
+                        <div class="col-md-12">
+                          <div class="row">
+                            <div class="col-md-4">
+                              <div class="card pt-0">
+                                <div class="col-12">
+                                  <h6 class="header"><b>Swansea 1s</b> vs <b>Whitchurch 1s</b></h6>
+                                  <p>Date: 07/02/23</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="card pt-0">
+                                <div class="col-12">
+                                  <h6 class="header"><b>Swansea 2s</b> vs <b>Whitchurch 2s</b></h6>
+                                  <p>Date: 07/02/23</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="card pt-0">
+                                <div class="col-12">
+                                  <h6 class="header"><b>Swansea 3s</b> vs <b>Whitchurch 3s</b></h6>
+                                  <p>Date: 07/02/23</p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <!-- /.card -->
+                  <!-- /.card -->
 
-              <!-- Player approval -->
-              <div class="card card-outline shadow">
-                <div class="card-body">
-                  <h5 class="card-title">Player approval</h5>
-                  <br />
-                  <?php
-                  $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
-                  $result = mysqli_query($conn, $query);
-                  if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_array($result)) {
-                      $tempUserID = $row['tempUserID'];
-                      $tempUserQuery = "SELECT email FROM tempUser WHERE tempUserID = '$tempUserID'";
-                      $tempUserResult = mysqli_query($conn, $tempUserQuery);
-                      $tempUserRow = mysqli_fetch_array($tempUserResult);
-                  ?>
-                      <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                          <div class="card bg-light d-flex flex-fill">
-                            <div class="card-body pt-0">
-                              <div class="row">
-                                <div class="col-7">
-                                  <h2 class="header"><b><?php echo $row['firstName'];
-                                                        echo " ";
-                                                        echo $row['lastName']; ?></b></h2>
-                                  <p class="text-muted text-sm">
-                                    About:
-                                  <p>Date of birth:</p> <?php echo $row['DOB']; ?>
-                                  </p>
-                                  <p>Email:</p> <?php echo $tempUserRow['email']; ?></p>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="card-footer">
-                              <div class="text-left">
-                                <!-- Button that when clicks runs the player approve script -->
-                                <form action="includes/playerApprove.inc.php" method="post">
-                                  <!-- Hidden input to post the tempUserID -->
-                                  <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
-                                  <!-- Drop-down list of teams -->
-                                  <select name="teamID">
-                                    <?php
-                                    $teamQuery = "SELECT * FROM team WHERE clubID = '$clubID'";
-                                    $teamResult = mysqli_query($conn, $teamQuery);
-                                    while ($teamRow = mysqli_fetch_array($teamResult)) {
-                                    ?>
-                                      <option value="<?php echo $teamRow['teamID']; ?>">
-                                        <?php echo $teamRow['teamName']; ?>
-                                      </option>
-                                    <?php
-                                    }
-                                    ?>
-                                  </select>
-                                  <!-- Submit button to approve the player -->
-                                  <button type="submit">Approve Player</button>
-                                </form>
-                              </div>
-                              <div class="text-right">
-                                <!-- Button that when clicks runs the player reject script -->
-                                <form action="includes/playerReject.inc.php" method="post">
-                                  <!-- Hidden input to post the tempUserID -->
-                                  <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
-                                  <!-- Submit button to reject the player -->
-                                  <button type="submit">Reject Player</button>
-                              </div>
+                  <!-- Player approval -->
+                  <div class="card card-outline shadow">
+                    <div class="card-body">
+                      <h5 class="card-title">Player approval</h5>
+                      <br />
+                      <?php
+                      $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
+                      $result2 = mysqli_query($conn, $query);
+                      if (mysqli_num_rows($result2) > 0) {
+                        while ($row = mysqli_fetch_array($result2)) {
+                          $tempUserID = $row['tempUserID'];
+                          $tempUserQuery = "SELECT email FROM tempUser WHERE tempUserID = '$tempUserID'";
+                          $tempUserResult = mysqli_query($conn, $tempUserQuery);
+                          $tempUserRow = mysqli_fetch_array($tempUserResult);
+                      ?>
+                          <div class="card pt-0">
+                            <div class="col-12">
+                              <h2 class="header"><b><?php echo $row['firstName'];
+                                                    echo " ";
+                                                    echo $row['lastName']; ?></b></h2>
+                              <p class="text-muted text-sm">
+                                About:
+                              <p>Date of birth: <?php echo $row['DOB']; ?></p>
+                              <p>Email: <?php echo $tempUserRow['email']; ?></p>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                  <?php
-                    }
-                  } else {
-                    echo "<h1>No players to approve</h1>";
-                  }
-                  ?>
-                </div>
-              </div>
-              <!-- End of player approval -->
-            </div>
-
-            <!-- League table -->
-            <div class="col-lg-6">
-              <div class="card shadow" style="width: 100%">
-                <div class="card-body p-0">
-                  <table class=" table table-striped" style="width: 100%">
-                    <thead>
-                      <tr>
-                        <th>Team</th>
-                        <th>W</th>
-                        <th>D</th>
-                        <th>L</th>
-                        <th>GD</th>
-                        <th>PTS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
                       <?php
-                      // Assuming the database connection is established and stored in the variable $conn
-                      $conn = require 'includes/dbhconfig.php';
-                      $sql = "SELECT * FROM team t 
-                    JOIN club c ON t.clubID = c.clubID
-                    WHERE t.leagueID = (SELECT leagueID FROM team WHERE teamID = (SELECT clubID FROM clubAdmin WHERE userID = '$userID'))";
-                      $result = mysqli_query($conn, $sql);
-
-                      $result = mysqli_query($conn, $sql);
-                      if (mysqli_num_rows($result) > 0) {
-                        // Output data of each row
-                        while ($row = mysqli_fetch_assoc($result)) {
-                          echo "<tr>
-                  <td>" . $row["teamName"] . "</td>
-                  <td>" . $row["wins"] . "</td>
-                  <td>" . $row["draws"] . "</td>
-                  <td>" . $row["losses"] . "</td>
-                  <td>" . $row["goalDifference"] . "</td>
-                  <td>" . $row["points"] . "</td>
-                </tr>";
                         }
                       } else {
-                        echo "0 results";
+                        echo "<h1>No players to approve</h1>";
                       }
                       ?>
-                    </tbody>
-                  </table>
+                    </div>
+                  </div>
+                  <!-- End of player approval -->
                 </div>
               </div>
-              <!-- End of league table -->
             </div>
+            <!-- /.card-body -->
           </div>
-          <!-- /.card-body -->
+          <!-- /.card -->
         </div>
-        <!-- /.card -->
       </div>
       <!-- /.row -->
     </div>

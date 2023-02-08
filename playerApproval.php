@@ -88,7 +88,8 @@ $clubID = getClubID($conn, $clubName);
                             <h1>Player approval</h1>
                         </div>
                     </div>
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- Main content -->
             <section class="content">
@@ -115,9 +116,8 @@ $clubID = getClubID($conn, $clubName);
                                                                             echo $row['lastName']; ?></b></h2>
                                                     <p class="text-muted text-sm">
                                                         About:
-                                                    <p>Date of birth:</p> <?php echo $row['DOB']; ?>
-                                                    </p>
-                                                    <p>Email:</p> <?php echo $tempUserRow['email']; ?></p>
+                                                    <p>Date of birth: <?php echo $row['DOB']; ?></p>
+                                                    <p>Email: <?php echo $tempUserRow['email']; ?></p>
                                                 </div>
                                             </div>
                                             <div class="card-footer">

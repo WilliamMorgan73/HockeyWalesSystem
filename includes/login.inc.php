@@ -14,7 +14,7 @@ if (isset($_POST["submit"])){
     //Function call to check for empty fields
 
     if (emptyInputLogin($email, $password) !== false) {
-        header("Location: ../login.php?error=emptyinput");
+        header("Location: ../login.php?error=emptyinput&message=" . urlencode("Please fill all fields"));
         exit();
     }
 
@@ -23,6 +23,6 @@ if (isset($_POST["submit"])){
     loginUser($conn, $email, $password);
 }
 else{
-    header("Location: ../login.php");
+    header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
     exit();
 }

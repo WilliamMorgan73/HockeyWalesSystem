@@ -72,9 +72,14 @@ $leagueName = getLeagueName($conn, $leagueID);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far bi bi-bar-chart-fill nav-icon"></i>
-                                <p>Predictions</p>
+                            <a style="cursor: pointer;" class="nav-link">
+                                <form action="predictedLeagueDashboard.php" method="post">
+                                    <input type="hidden" name="leagueID" value="<?php echo $leagueID; ?>">
+                                    <i class="far bi bi-bar-chart-fill nav-icon"></i>
+                                    <button type="submit" style="background: transparent; border: none;">
+                                        <p>Predictions</p>
+                                    </button>
+                                </form>
                             </a>
                         </li>
                     </ul>
@@ -151,7 +156,9 @@ $leagueName = getLeagueName($conn, $leagueID);
                                     ?>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-danger" style="margin-bottom:10px">Submit</button>
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-danger" style="margin-bottom:10px">Submit</button>
+                            </div>
                         </form>
                     </div>
 
@@ -181,17 +188,21 @@ $leagueName = getLeagueName($conn, $leagueID);
                                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                         <div class="card bg-light d-flex flex-fill">
                                             <div class="card-body pt-0 text-center">
-                                                <div class="col-5">
-                                                    <?php $homeClubImage = "images/clubLogos/" . $homeClubID . ".jpg"; ?>
-                                                    <img src="<?php echo $homeClubImage; ?>">
-                                                    <br><br>
-                                                    <b><?php echo $homeTeamName; ?></b>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <b><?php echo $homeTeamName; ?></b>
+                                                        <?php $homeClubImage = "images/clubLogos/" . $homeClubID . ".jpg"; ?>
+                                                        <img src="<?php echo $homeClubImage; ?>" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                                        <br><br>
+                                                    </div>
                                                 </div>
-                                                <div class="col-5">
-                                                    <?php $awayClubImage = "images/clubLogos/" . $awayClubID . ".jpg"; ?>
-                                                    <img src="<?php echo $awayClubImage; ?>">
-                                                    <br><br>
-                                                    <b><?php echo $awayTeamName; ?></b>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <b><?php echo $awayTeamName; ?></b>
+                                                        <?php $awayClubImage = "images/clubLogos/" . $awayClubID . ".jpg"; ?>
+                                                        <img src="<?php echo $awayClubImage; ?>" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                                        <br><br>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="card-footer">
