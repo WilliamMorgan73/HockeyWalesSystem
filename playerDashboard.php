@@ -12,7 +12,6 @@ $playerID = getPlayerID($conn, $userID);
 $playerName = getPlayerName($conn, $userID);
 $playerTeam = getPlayerTeam($conn, $userID);
 $nextOpponent = getOppositionName($conn, $userID);
-$nextOpponentDate = getNextGame($conn, $userID);
 $goals = getPlayerGoals($conn, $userID);
 $assists = getPlayerAssists($conn, $userID);
 $apperances = getPlayerApperances($conn, $userID);
@@ -113,6 +112,12 @@ $leagueID = getLeagueID($userID, $conn);
               <div class="row">
                 <!-- League table -->
                 <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-md-12" style=" margin-bottom:1%">
+                      <!-- Days till next game -->
+                      <h5> Your name game is in <?php getDaysUntilGame($conn, $userID); ?> against <?php echo $nextOpponent ?> </h5>
+                    </div>
+                  </div>
                   <div class="card shadow" style="width: 100%">
                     <div class="card-body p-0">
                       <table class=" table table-striped" style="width: 100%">

@@ -8,7 +8,9 @@ $conn = require 'includes/dbhconfig.php';
 
 //Variables
 session_start();
-$userID = $_SESSION['userID'];
+$currentUserID = $_SESSION['userID'];
+$currentPlayerID = getPlayerID($conn, $currentUserID);
+$teamID = getTeamID($conn, $currentUserID);
 
 ?>
 
@@ -47,7 +49,7 @@ $userID = $_SESSION['userID'];
                         <li class="nav-item">
                             <a style="cursor: pointer;" class="nav-link">
                                 <form action="playerDashboard.php" method="post">
-                                    <input type="hidden" name="userID" value="<?php echo $userID; ?>">
+                                    <input type="hidden" name="userID" value="<?php echo $currentUserID; ?>">
                                     <i class="nav-icon bi bi-house-fill"></i>
                                     <button type="submit" style="background: transparent; border: none;">
                                         <p>Home</p>
@@ -64,7 +66,7 @@ $userID = $_SESSION['userID'];
                         <li class="nav-item">
                             <a style="cursor: pointer;" class="nav-link">
                                 <form action="playerFixtureResult.php" method="post">
-                                    <input type="hidden" name="userID" value="<?php echo $userID; ?>">
+                                    <input type="hidden" name="userID" value="<?php echo $currentUserID; ?>">
                                     <i class="far bi bi-calendar-date-fill nav-icon"></i>
                                     <button type="submit" style="background: transparent; border: none;">
                                         <p>Fixtures</p>
@@ -102,168 +104,55 @@ $userID = $_SESSION['userID'];
                     </div>
                     <div class="card-body pb-0">
                         <div class="row">
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Ethan Smith</b></h4>
+                            <!-- PHP code to get all players with the same teamID -->
+                            <?php
+                            // get all the players who have the same teamID as the current user
+                            $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
+                            $stmt = mysqli_stmt_init($conn);
+                            if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                header("Location: ../signup.php?error=stmtfailed");
+                                exit();
+                            }
+
+                            mysqli_stmt_bind_param($stmt, "ss", $teamID, $currentPlayerID);
+                            mysqli_stmt_execute($stmt);
+                            $resultData = mysqli_stmt_get_result($stmt);
+
+                            while ($row = mysqli_fetch_assoc($resultData)) {
+                                $userID = $row['userID'];
+                                $firstName = $row['firstName'];
+                                $lastName = $row['lastName'];
+                            ?>
+                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                    <div class="card bg-light d-flex flex-fill">
+                                        <div class="card-body pt-0">
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <h4 class="header"><b><?php echo $firstName . " " . $lastName; ?></b></h4>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <img src="images\pfp\<?php echo $userID . '.jpg'; ?>" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                        <div class="card-footer">
+                                            <div class="text-center">
+                                                <!-- Button that takes you to the seleected player page -->
+                                                <form action="#" method="post">
+                                                    <input type="hidden" name="playerID" value="$row['playerID']">
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        View player
+                                                    </button>
+                                                </form>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Kevin Phillips</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Pete Davidson</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>David Tennant</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Matt Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>John Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php
+                            }
+                            ?>
                         </div>
                     </div>
                     <!-- /.card-body -->

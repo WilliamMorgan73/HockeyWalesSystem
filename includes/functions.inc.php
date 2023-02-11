@@ -168,7 +168,7 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
         $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $userID);
         $stmt->execute();
         $conn->commit(); // Commit the transaction
-        header("Location: ../login.php?signup=success"); // Change to success page until club admin approves
+        header("Location: ../signup.php?error=playeraccountcreated&message=" . urlencode("Account created, waiting for club admin to accept"));
     }
 }
 
@@ -227,27 +227,48 @@ function loginUser($conn, $email, $password)
     $emailExists = emailExists($conn, $email);
 
     if ($emailExists === false) {
-        header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
-        exit();
-    }
-
-    $passwordHashed = $emailExists["password"];
-    $checkPassword = password_verify($password, $passwordHashed);
-
-    if ($checkPassword === false) {
-        header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
-        exit();
-    } else if ($checkPassword === true) {
-        session_start();
-        $_SESSION["userID"] = $emailExists["userID"];
-        $_SESSION["email"] = $emailExists["email"];
-        $_SESSION["accountType"] = $emailExists["accountType"];
-        if ($_SESSION["accountType"] == "Player") {
-            header("Location: ../playerDashboard.php");
+        $query = "SELECT * FROM tempuser WHERE email = ?";
+        $stmt = mysqli_stmt_init($conn);
+        if (!mysqli_stmt_prepare($stmt, $query)) {
+            header("Location: ../login.php?error=sqlerror&message=" . urlencode("SQL error"));
+            exit();
         } else {
-            header("Location: ../clubAdminDashboard.php");
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            if ($row = mysqli_fetch_assoc($result)) {
+                $passwordHashed = $row["password"];
+                $checkPassword = password_verify($password, $passwordHashed);
+                if ($checkPassword === false) {
+                    header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
+                    exit();
+                } else if ($checkPassword === true) {
+                    header("Location: ../login.php?error=pendingapproval&message=" . urlencode("Your account is still pending approval"));
+                    exit();
+                }
+            } else {
+                header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
+                exit();
+            }
         }
-        exit();
+    } else {
+        $passwordHashed = $emailExists["password"];
+        $checkPassword = password_verify($password, $passwordHashed);
+        if ($checkPassword === false) {
+            header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
+            exit();
+        } else if ($checkPassword === true) {
+            session_start();
+            $_SESSION["userID"] = $emailExists["userID"];
+            $_SESSION["email"] = $emailExists["email"];
+            $_SESSION["accountType"] = $emailExists["accountType"];
+            if ($_SESSION["accountType"] == "Player") {
+                header("Location: ../playerDashboard.php");
+            } else {
+                header("Location: ../clubAdminDashboard.php");
+            }
+            exit();
+        }
     }
 }
 
@@ -427,12 +448,11 @@ function getNextGame($conn, $userID)
     mysqli_stmt_execute($stmt);
 
     //get next fixture using teamID as hometeamID or awayteamID
-
     $resultData = mysqli_stmt_get_result($stmt);
 
     if ($row = mysqli_fetch_assoc($resultData)) {
         $teamID = $row['teamID'];
-        $sql = "SELECT fixtureID FROM fixture WHERE homeTeamID = ? OR awayTeamID = ?;";
+        $sql = "SELECT fixtureID, matchWeek FROM fixture WHERE homeTeamID = ? OR awayTeamID = ?;";
         $stmt = mysqli_stmt_init($conn);
         if (!mysqli_stmt_prepare($stmt, $sql)) {
             header("Location: ../signup.php?error=stmtfailed");
@@ -445,21 +465,22 @@ function getNextGame($conn, $userID)
         $resultData = mysqli_stmt_get_result($stmt);
 
         if ($row = mysqli_fetch_assoc($resultData)) {
-            $fixtureID = $row['fixtureID'];
-            $sql = "SELECT dateTime FROM fixture WHERE fixtureID = ?;";
+            $gameWeekID = $row['matchWeek'];
+
+            $sql = "SELECT gameDate FROM gameweek WHERE gameWeekID = ?;";
             $stmt = mysqli_stmt_init($conn);
             if (!mysqli_stmt_prepare($stmt, $sql)) {
                 header("Location: ../signup.php?error=stmtfailed");
                 exit();
             }
 
-            mysqli_stmt_bind_param($stmt, "s", $fixtureID);
+            mysqli_stmt_bind_param($stmt, "s", $gameWeekID);
             mysqli_stmt_execute($stmt);
 
             $resultData = mysqli_stmt_get_result($stmt);
 
             if ($row = mysqli_fetch_assoc($resultData)) {
-                return $row['dateTime'];
+                return $row['gameDate'];
             } else {
                 $result = false;
                 return $result;
@@ -471,6 +492,26 @@ function getNextGame($conn, $userID)
     } else {
         $result = false;
         return $result;
+    }
+}
+
+//Function to get how many days until next game
+
+function getDaysUntilGame($conn, $userID)
+{
+    $gameDate = getNextGame($conn, $userID);
+
+    if ($gameDate) {
+        $currentDate = new DateTime();
+        $gameDate = new DateTime($gameDate);
+        $diff = $currentDate->diff($gameDate);
+
+        $days = $diff->format('%d');
+        $hours = $diff->format('%h');
+
+        echo "$days days and $hours hours";
+    } else {
+        echo "No game date found";
     }
 }
 
@@ -641,6 +682,54 @@ function getClubName($conn, $userID)
         }
     }
 }
+
+//Function to get the teamID of the player
+
+function getTeamID($conn, $userID)
+{
+    $sql = "SELECT teamID FROM player WHERE userID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $userID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['teamID'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+//Function to get teams from a club
+
+function getTeams($conn, $clubID)
+{
+    $sql = "SELECT teamID, teamName FROM team WHERE clubID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $clubID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+    $teams = [];
+    while ($row = mysqli_fetch_assoc($resultData)) {
+        $teams[] = $row;
+    }
+    return $teams;
+}
+
+
 
 //Function to get predicted number of wins, draws and losses for a team
 

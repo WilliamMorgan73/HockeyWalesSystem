@@ -11,7 +11,7 @@ $userID = $_SESSION['userID'];
 $clubAdminName = getclubAdminName($conn, $userID);
 $clubName = getClubName($conn, $userID);
 $clubID = getClubID($conn, $clubName);
-$leagueID = getLeagueID($userID, $conn);
+$teams = getTeams($conn, $clubID);
 ?>
 
 <html lang="en">
@@ -19,7 +19,7 @@ $leagueID = getLeagueID($userID, $conn);
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Teammates</title>
+    <title>Manage teams</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
@@ -46,7 +46,7 @@ $leagueID = getLeagueID($userID, $conn);
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
-                        <li class="nav-item menu-open">
+                        <li class="nav-item">
                             <a href="clubAdminDashboard.php" class="nav-link">
                                 <i class="nav-icon bi bi-house-fill"></i>
                                 <p>Home</p>
@@ -54,7 +54,7 @@ $leagueID = getLeagueID($userID, $conn);
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link active">
-                                <i class="far bi bi-people-fill nav-icon" ></i>
+                                <i class="far bi bi-people-fill nav-icon"></i>
                                 <p>Team management</p>
                             </a>
                         </li>
@@ -89,7 +89,7 @@ $leagueID = getLeagueID($userID, $conn);
                 <div class="container-fluid">
                     <div class="row mb">
                         <div class="col-sm">
-                            <h1>Teammates</h1>
+                            <h1>Manage teams</h1>
                         </div>
                     </div>
                 </div><!-- /.container-fluid -->
@@ -102,15 +102,40 @@ $leagueID = getLeagueID($userID, $conn);
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="text-left">
-                                    <h3><?php echo $clubName ?> 1's</h3> <!-- Make this say team name instead -->
+                                    <?php
+                                    $selectedTeamName = '';
+                                    if (isset($_POST['selected-team-id'])) {
+                                        $selectedTeamID = $_POST['selected-team-id'];
+                                        foreach ($teams as $team) {
+                                            if ($team['teamID'] == $selectedTeamID) {
+                                                $selectedTeamName = $team['teamName'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    <h3 id="selected-team-name"><?php echo $selectedTeamName ? $selectedTeamName: 'Team Name 1'; ?></h3>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="text-right">
                                     <div class="form-group">
-                                        <select class="form-control select2" style="width: 30%;">
-                                            <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                        </select>
+                                        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                                            <select class="form-control select2" style="width: 30%;" name="selected-team-id">
+                                                <?php
+                                                foreach ($teams as $team) {
+                                                    $teamID = $team['teamID'];
+                                                    $teamName = $team['teamName'];
+                                                    $selected = '';
+                                                    if ($selectedTeamID == $teamID) {
+                                                        $selected = 'selected';
+                                                    }
+                                                    echo "<option value='$teamID' $selected>$teamName</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -118,198 +143,76 @@ $leagueID = getLeagueID($userID, $conn);
                     </div>
                     <div class="card-body pb-0">
                         <div class="row">
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Ethan Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <div class="form-group">
-                                                    <label> Change Team:</label>
-                                                    <select class="form-control select2" style="width: 50%;">
-                                                        <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                                    </select>
+                            <?php
+                            // get the selected team ID from the hidden input
+                            if (isset($_POST["selected-team-id"])) {
+                                $teamID = $_POST["selected-team-id"];
+                            }
+
+                            // get all the players who have the same teamID as the current user
+                            $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ?";
+                            $stmt = mysqli_stmt_init($conn);
+                            if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                header("Location: ../signup.php?error=stmtfailed");
+                                exit();
+                            }
+
+                            mysqli_stmt_bind_param($stmt, "s", $teamID);
+                            mysqli_stmt_execute($stmt);
+                            $resultData = mysqli_stmt_get_result($stmt);
+
+                            while ($row = mysqli_fetch_assoc($resultData)) {
+                                $userID = $row['userID'];
+                                $firstName = $row['firstName'];
+                                $lastName = $row['lastName'];
+                            ?>
+                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                    <div class="card bg-light d-flex flex-fill">
+                                        <div class="card-body pt-0">
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <h4 class="header"><b><?php echo $firstName . " " . $lastName; ?></b></h4>
                                                 </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    Change team
-                                                </button>
-                                            </form>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <img src="images\pfp\<?php echo $userID . '.jpg'; ?>" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="text-center">
+                                                <form action="includes/updateTeam.php" method="post">
+                                                    <input type="hidden" name="userID" value="<?php echo $userID; ?>">
+                                                    <input type="hidden" name="clubID" value="<?php echo $clubID; ?>">
+                                                    <!-- Drop down to change the player's team -->
+                                                    <select name="change-team-id">
+                                                        <?php
+                                                        // get all the teams from the database
+                                                        $sql = "SELECT teamID, teamName FROM team WHERE clubID = $clubID";
+                                                        $result = mysqli_query($conn, $sql);
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            $teamID = $row['teamID'];
+                                                            $teamName = $row['teamName'];
+                                                            if ($teamID == $selectedTeamID) {
+                                                                continue;
+                                                            }
+                                                        ?>
+                                                            <option value="<?php echo $teamID; ?>"><?php echo $teamName; ?></option>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                    <!-- Submit button to change the player's teamID -->
+                                                    <button type="submit" name="change-team">Change Team</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Kevin Phillips</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <div class="form-group">
-                                                    <label> Change Team:</label>
-                                                    <select class="form-control select2" style="width: 50%;">
-                                                        <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                                    </select>
-                                                </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    Change team
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Pete Davidson</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <div class="form-group">
-                                                    <label> Change Team:</label>
-                                                    <select class="form-control select2" style="width: 50%;">
-                                                        <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                                    </select>
-                                                </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    Change team
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>David Tennant</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <div class="form-group">
-                                                    <label> Change Team:</label>
-                                                    <select class="form-control select2" style="width: 50%;">
-                                                        <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                                    </select>
-                                                </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    Change team
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Matt Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <div class="form-group">
-                                                    <label> Change Team:</label>
-                                                    <select class="form-control select2" style="width: 50%;">
-                                                        <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                                    </select>
-                                                </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    Change team
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>John Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <div class="form-group">
-                                                    <label> Change Team:</label>
-                                                    <select class="form-control select2" style="width: 50%;">
-                                                        <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                                    </select>
-                                                </div>
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    Change team
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php
+                            }
+                            ?>
                         </div>
                     </div>
                     <!-- /.card-body -->

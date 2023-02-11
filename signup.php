@@ -114,7 +114,11 @@
                 $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                 echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
               }
-
+              //Player account created, waiting for admin approval
+              else if (isset($_GET['error']) && $_GET['error'] === "playeraccountcreated") {
+                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+              }
               ?>
 
 

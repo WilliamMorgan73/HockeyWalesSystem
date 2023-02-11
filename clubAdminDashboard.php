@@ -5,6 +5,7 @@ PHP intergration
 <?php
 require_once('includes/functions.inc.php');
 $conn = require 'includes/dbhconfig.php';
+include('includes/datechecker.inc.php');
 
 session_start();
 $userID = $_SESSION['userID'];
@@ -32,6 +33,7 @@ $leagueID = getLeagueID($userID, $conn);
 </head>
 
 <body class="hold-transition sidebar-mini">
+
   <div class="wrapper">
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-light-primary elevation-4">

@@ -9,6 +9,8 @@ $conn = require 'includes/dbhconfig.php';
 //Variables
 session_start();
 $userID = $_SESSION['userID'];
+$playerID = getPlayerID($conn, $userID);
+$playerTeam = getPlayerTeam($conn, $userID);
 
 ?>
 
@@ -120,271 +122,6 @@ $userID = $_SESSION['userID'];
                                         </div>
                                         <div class="row">
                                             <div class="col-12">
-                                                <p>WIS | 11/02/23 | 12:00 </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-md-6 text-left">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        Available
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class=" col-md-6 text-right">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Unavailable
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0 text-center">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Whitchurch 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\1.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Gwent 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row" style="padding-bottom: 1%;">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\2.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <p>Treforest | 18/02/23 | 14:00</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-md-6 text-left">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        Available
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class=" col-md-6 text-right">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Unavailable
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0 text-center">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Whitchurch 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\1.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Whitchurch 2's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row" style="padding-bottom: 1%;">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\1.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <p>WIS | 25/02/23 | 8:30 </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-md-6 text-left">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        Available
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class=" col-md-6 text-right">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Unavailable
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0 text-center">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Whitchurch 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\1.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Gwent 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row" style="padding-bottom: 1%;">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\2.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <p>Whitchurch high school | 04/03/23 | 16:00 </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-md-6 text-left">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        Available
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class=" col-md-6 text-right">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Unavailable
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0 text-center">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Whitchurch 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\1.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Swansea 2's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row" style="padding-bottom: 1%;">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\3.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <p>WIS | 11/03/23 | 8:30 </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-md-6 text-left">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        Available
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class=" col-md-6 text-right">
-                                                <!-- Button that takes you to the club page -->
-                                                <form action="'#" method="post">
-                                                    <input type="hidden" name="#" value="#">
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        Unavailable
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0 text-center">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Whitchurch 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\1.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h4 class="header"><b>Swansea 1's</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row" style="padding-bottom: 1%;">
-                                            <div class="col-12">
-                                                <img src="images\clubLogos\3.jpg" style="margin-left: auto; margin-right: auto; width: 25%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12">
                                                 <p>WIS | 19/03/23 | 9:15</p>
                                             </div>
                                         </div>
@@ -392,7 +129,7 @@ $userID = $_SESSION['userID'];
                                     <div class="card-footer">
                                         <div class="row">
                                             <div class="col-md-6 text-left">
-                                                <!-- Button that takes you to the club page -->
+                                                <!-- Button that submits players availability as available -->
                                                 <form action="'#" method="post">
                                                     <input type="hidden" name="#" value="#">
                                                     <button type="submit" class="btn btn-sm btn-success">
@@ -401,7 +138,7 @@ $userID = $_SESSION['userID'];
                                                 </form>
                                             </div>
                                             <div class=" col-md-6 text-right">
-                                                <!-- Button that takes you to the club page -->
+                                                <!-- Button that submits players availability as unavailable -->
                                                 <form action="'#" method="post">
                                                     <input type="hidden" name="#" value="#">
                                                     <button type="submit" class="btn btn-sm btn-danger">
