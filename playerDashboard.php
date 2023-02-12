@@ -16,6 +16,7 @@ $goals = getPlayerGoals($conn, $userID);
 $assists = getPlayerAssists($conn, $userID);
 $apperances = getPlayerApperances($conn, $userID);
 $leagueID = getLeagueID($userID, $conn);
+$playerTeamID = getTeamID($userID);
 ?>
 
 <html lang="en">
@@ -67,7 +68,7 @@ $leagueID = getLeagueID($userID, $conn);
             </li>
             <li class="nav-item">
               <a style="cursor: pointer;" class="nav-link">
-                <form action="playerFixtureResult.php" method="post">
+                <form action="playerFixtures.php" method="post">
                   <input type="hidden" name="userID" value="<?php echo $userID; ?>">
                   <i class="far bi bi-calendar-date-fill nav-icon"></i>
                   <button type="submit" style="background: transparent; border: none;">
@@ -281,83 +282,45 @@ $leagueID = getLeagueID($userID, $conn);
                           <br />
                           <div class="row">
                             <div class="col-md-12">
-                              <!-- First row of teammates -->
                               <div class="row">
-                                <!-- First teammate -->
-                                <div class="col-md-4">
-                                  <div class="card card-primary card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
+                                <!-- teammate loop -->
+                                <?php
+                                // get all the players who have the same teamID as the current user
+                                $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
+                                $stmt = mysqli_stmt_init($conn);
+                                if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                  header("Location: ../signup.php?error=stmtfailed");
+                                  exit();
+                                }
+
+                                mysqli_stmt_bind_param($stmt, "ss", $playerTeamID, $playerID);
+                                mysqli_stmt_execute($stmt);
+                                $result = mysqli_stmt_get_result($stmt);
+
+                                $counter = 0;
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                  if ($counter == 6) {
+                                    break;
+                                  }
+                                  $userID = $row['userID'];
+                                  $firstName = $row['firstName'];
+                                  $lastName = $row['lastName'];
+                                ?>
+                                  <div class="col-md-4">
+                                    <div class="card card-primary card-outline">
+                                      <div class="card-body box-profile">
+                                        <div class="text-center">
+                                          <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
+                                        </div>
+                                        <h5 class="profile-username text-center"><?php echo $firstName . ' ' . $lastName; ?></h5> <!-- Player name -->
+                                        <p class="text-muted text-center">Team name</p> <!-- Team name -->
                                       </div>
-                                      <h5 class="profile-username text-center">Clem Entwistle</h5> <!-- Player name -->
-                                      <p class="text-muted text-center">Whitchurch 1's</p> <!-- Team name -->
                                     </div>
                                   </div>
-                                </div>
-                                <!-- Second teammate -->
-                                <div class="col-md-4">
-                                  <div class="card card-primary card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
-                                      </div>
-                                      <h3 class="profile-username text-center">Clem Entwistle</h3> <!-- Player name -->
-                                      <p class="text-muted text-center">Whitchurch 1's</p> <!-- Team name -->
-                                    </div>
-                                  </div>
-                                </div>
-                                <!-- Third teammate -->
-                                <div class="col-md-4">
-                                  <div class="card card-primary card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
-                                      </div>
-                                      <h3 class="profile-username text-center">Clem Entwistle</h3> <!-- Player name -->
-                                      <p class="text-muted text-center">Whitchurch 1's</p> <!-- Team name -->
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <!-- Second row of teammates -->
-                              <div class="row">
-                                <!-- First teammate -->
-                                <div class="col-md-4">
-                                  <div class="card card-primary card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
-                                      </div>
-                                      <h3 class="profile-username text-center">Clem Entwistle</h3> <!-- Player name -->
-                                      <p class="text-muted text-center">Whitchurch 1's</p> <!-- Team name -->
-                                    </div>
-                                  </div>
-                                </div>
-                                <!-- Second teammate -->
-                                <div class="col-md-4">
-                                  <div class="card card-primary card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
-                                      </div>
-                                      <h3 class="profile-username text-center">Clem Entwistle</h3> <!-- Player name -->
-                                      <p class="text-muted text-center">Whitchurch 1's</p> <!-- Team name -->
-                                    </div>
-                                  </div>
-                                </div>
-                                <!-- Third teammate -->
-                                <div class="col-md-4">
-                                  <div class="card card-primary card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
-                                      </div>
-                                      <h3 class="profile-username text-center">Clem Entwistle</h3> <!-- Player name -->
-                                      <p class="text-muted text-center">Whitchurch 1's</p> <!-- Team name -->
-                                    </div>
-                                  </div>
-                                </div>
+                                <?php
+                                  $counter++;
+                                }
+                                ?>
                               </div>
                             </div>
                           </div>

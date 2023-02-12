@@ -193,16 +193,36 @@ $leagueID = getLeagueID($userID, $conn);
                     <div class="card-body pb-0">
                         <!-- Header -->
                         <div class="row border-bottom border-subtle" style="margin-bottom:1%;">
-                            <div class="col-md-3">
+                            <div class="col-md-1">
                                 <h5>Home team</h5>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-1">
                                 <h5>Away team</h5>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <h5>Scoreline</h5>
                             </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Home scorers</h5>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Away scorers</h5>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Home assisters</h5>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Away assisters</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
                                 <h5>Submit</h5>
                             </div>
                         </div>
@@ -227,27 +247,105 @@ $leagueID = getLeagueID($userID, $conn);
                             $tempResultID = $row['tempResultID'];
                             $homeTeamName = $row['homeTeamName'];
                             $awayTeamName = $row['awayTeamName'];
+                            $homeTeamID = $row['homeTeamID'];
+                            $awayTeamID = $row['awayTeamID'];
                         ?>
                             <!-- HTML code to display the data -->
                             <div class="row" style="margin-bottom:1%;">
-                                <div class="col-md-3">
+                                <div class="col-md-1">
                                     <h5><?php echo $homeTeamName; ?></h5>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-1">
                                     <h5><?php echo $awayTeamName; ?></h5>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control text-center" placeholder="Home">
+                                            <input type="text" class="form-control text-center" placeholder="Home" id="homeScore">
                                         </div>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control text-center" placeholder="Away">
+                                            <input type="text" class="form-control text-center" placeholder="Away" id="awayScore">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="select2" multiple="multiple" data-placeholder="Home scorers" style="width: 100%;" id="homeScorers">
+                                                <?php
+                                                $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
+                                                $result = mysqli_query($conn, $query);
+
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="select2" multiple="multiple" data-placeholder="Away scorers" style="width: 100%;" id="awayScorers">
+                                                <?php
+                                                $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
+                                                $result = mysqli_query($conn, $query);
+
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <select class="select2" multiple="multiple" data-placeholder="Home assisters" style="width: 100%;" id="homeAssisters">
+                                                <?php
+                                                $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
+                                                $result = mysqli_query($conn, $query);
+
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="select2" multiple="multiple" data-placeholder="Away assisters" style="width: 100%;" id="awayAssisters">
+                                                <?php
+                                                $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
+                                                $result = mysqli_query($conn, $query);
+
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
                                     <button type="button" id="Submit" class="btn btn-block btn-success">Submit</button>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <h4>Home Scorers</h4>
+                                            <div id="homeScorersRows"></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h4>Away Scorers</h4>
+                                            <div id="awayScorersRows"></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h4>Home Assisters</h4>
+                                            <div id="homeAssistersRows"></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <h4>Away Assisters</h4>
+                                            <div id="awayAssistersRows"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         <?php
@@ -261,7 +359,6 @@ $leagueID = getLeagueID($userID, $conn);
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    </div>
     <!-- REQUIRED SCRIPTS -->
 
     <!-- jQuery -->
@@ -278,28 +375,110 @@ $leagueID = getLeagueID($userID, $conn);
             //Initialize Select2 Elements
             $('.select2').select2()
         })
-
-        // Ajax call to update the status of the result
         $(document).ready(function() {
+            // Handle changes in home assisters select
+            $('#homeAssisters').on('change', function() {
+                var selectedOptions = $(this).val();
+                // Remove any existing rows for home assisters
+                $('#homeAssistersRows').empty();
+                // Create new rows for each selected option
+                selectedOptions.forEach(function(option) {
+                    var optionText = $("#homeAssisters option[value='" + option + "']").text();
+                    var newRow = '<div class="form-group"><label>' + optionText + '(Assists)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    $('#homeAssistersRows').append(newRow);
+                });
+            });
+
+            // Handle changes in away assisters select
+            $('#awayAssisters').on('change', function() {
+                var selectedOptions = $(this).val();
+                // Remove any existing rows for away assisters
+                $('#awayAssistersRows').empty();
+                // Create new rows for each selected option
+                selectedOptions.forEach(function(option) {
+                    var optionText = $("#awayAssisters option[value='" + option + "']").text();
+                    var newRow = '<div class="form-group"><label>' + optionText + '(Assists)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    $('#awayAssistersRows').append(newRow);
+                });
+            });
+            // Handle changes in home scorers select
+            $('#homeScorers').on('change', function() {
+                var selectedOptions = $(this).val();
+                // Remove any existing rows for home scorers
+                $('#homeScorersRows').empty();
+                // Create new rows for each selected option
+                selectedOptions.forEach(function(option) {
+                    var optionText = $("#homeScorers option[value='" + option + "']").text();
+                    var newRow = '<div class="form-group"><label>' + optionText + ' (Goals)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    $('#homeScorersRows').append(newRow);
+                });
+            });
+            // Handle changes in away scorers select
+            $('#awayScorers').on('change', function() {
+                var selectedOptions = $(this).select2('data');
+                // Remove any existing rows for away scorers
+                $('#awayScorersRows').empty();
+                // Create new rows for each selected option
+                selectedOptions.forEach(function(option) {
+                    var newRow = '<div class="form-group"><label>' + option.text + ' (Goals)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    $('#awayScorersRows').append(newRow);
+                });
+            });
             $("#Submit").click(function() {
+                // Get the input values for home and away score
                 var homeScore = $(this).parent().siblings().find("input:first").val();
                 var awayScore = $(this).parent().siblings().find("input:last").val();
                 var tempResultID = "<?php echo $tempResultID; ?>";
+                // Get the selected options for home and away scorers and assisters
+                var awayScorers = $(this).parent().siblings().find("#awayScorers").val();
+                var homeScorers = $(this).parent().siblings().find("#homeScorers").val();
+                var homeAssisters = $(this).parent().siblings().find("#homeAssisters").val();
+                var awayAssisters = $(this).parent().siblings().find("#awayAssisters").val();
+                // Create arrays to store the number of goals and assists for each player
+                var homeScorerGoals = [];
+                var awayScorerGoals = [];
+                var homeAssisterGoals = [];
+                var awayAssisterGoals = [];
+                // Get the number of goals for each home scorer
+                $('#homeScorersRows .form-group select').each(function() {
+                    homeScorerGoals.push($(this).val());
+                });
+                // Get the number of goals for each away scorer
+                $('#awayScorersRows .form-group select').each(function() {
+                    awayScorerGoals.push($(this).val());
+                });
+                // Get the number of assists for each home assister
+                $('#homeAssistersRows .form-group select').each(function() {
+                    homeAssisterGoals.push($(this).val());
+                });
+                // Get the number of assists for each away assister
+                $('#awayAssistersRows .form-group select').each(function() {
+                    awayAssisterGoals.push($(this).val());
+                });
                 $.ajax({
                     type: "POST",
                     url: 'includes/updateStatus.php',
                     data: {
                         homeScore: homeScore,
                         awayScore: awayScore,
-                        tempResultID: tempResultID
+                        tempResultID: tempResultID,
+                        awayScorers: awayScorers,
+                        homeScorers: homeScorers,
+                        awayAssisters: awayAssisters,
+                        homeAssisters: homeAssisters,
+                        homeScorerGoals: homeScorerGoals,
+                        awayScorerGoals: awayScorerGoals,
+                        homeAssisterGoals: homeAssisterGoals,
+                        awayAssisterGoals: awayAssisterGoals
                     },
                     success: function(data) {
-                        alert("Scores updated successfully.");
+                        alert("Scores and assists updated successfully.");
                         // Reload the page
                         location.reload();
                     }
                 });
             });
+
         });
     </script>
 </body>

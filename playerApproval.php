@@ -67,7 +67,7 @@ $clubID = getClubID($conn, $clubName);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="resultApproval.php" class="nav-link">
                                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
                                 <p>Result apporval</p>
                             </a>

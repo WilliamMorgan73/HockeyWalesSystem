@@ -10,7 +10,7 @@ $conn = require 'includes/dbhconfig.php';
 session_start();
 $currentUserID = $_SESSION['userID'];
 $currentPlayerID = getPlayerID($conn, $currentUserID);
-$teamID = getTeamID($conn, $currentUserID);
+$teamID = getTeamID($currentUserID);
 
 ?>
 
@@ -65,7 +65,7 @@ $teamID = getTeamID($conn, $currentUserID);
                         </li>
                         <li class="nav-item">
                             <a style="cursor: pointer;" class="nav-link">
-                                <form action="playerFixtureResult.php" method="post">
+                                <form action="playerFixtures.php" method="post">
                                     <input type="hidden" name="userID" value="<?php echo $currentUserID; ?>">
                                     <i class="far bi bi-calendar-date-fill nav-icon"></i>
                                     <button type="submit" style="background: transparent; border: none;">

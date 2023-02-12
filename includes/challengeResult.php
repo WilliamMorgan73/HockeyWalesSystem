@@ -17,6 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   mysqli_query($conn, $query);
 
   // Redirect the user back to the result approval page
-  header('Location: resultApproval.php');
+  header('Location: ../resultApproval.php');
   exit;
 }

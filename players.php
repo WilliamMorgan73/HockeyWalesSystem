@@ -100,207 +100,69 @@ $clubID = $_POST['clubID'];
                     </div>
                     <div class="card-body pb-0">
                         <div class="row">
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Ethan Smith</b></h4>
+                            <!-- PHP code to get all players with the same clubID -->
+                            <?php
+                            // get all the players who have the same clubID as the current club
+                            $sql = "SELECT player.playerID, player.userID, player.firstName, player.lastName, team.clubID 
+FROM player 
+JOIN team ON player.teamID = team.teamID 
+WHERE team.clubID = ?";
+
+                            $stmt = mysqli_stmt_init($conn);
+                            if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                header("Location: ../signup.php?error=stmtfailed");
+                                exit();
+                            }
+
+                            mysqli_stmt_bind_param($stmt, "s", $clubID);
+                            mysqli_stmt_execute($stmt);
+                            $resultData = mysqli_stmt_get_result($stmt);
+
+                            while ($row = mysqli_fetch_assoc($resultData)) {
+                                $userID = $row['userID'];
+                                $firstName = $row['firstName'];
+                                $lastName = $row['lastName'];
+                            ?>
+                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                    <div class="card bg-light d-flex flex-fill">
+                                        <div class="card-body pt-0">
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <h4 class="header"><b><?php echo $firstName . " " . $lastName; ?></b></h4>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 text-center">
+                                                    <img src="images\pfp\<?php echo $userID . '.jpg'; ?>" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h6 class="header"><b>Whitchurch 1's</b></h6>
+                                        <div class="card-footer">
+                                            <div class="text-center">
+                                                <!-- Button that takes you to the selected player page -->
+                                                <form action="#" method="post">
+                                                    <input type="hidden" name="playerID" value="<?php echo $row['playerID']; ?>">
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        View player
+                                                    </button>
+                                                </form>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Kevin Phillips</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h6 class="header"><b>Whitchurch 1's</b></h6>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Pete Davidson</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h6 class="header"><b>Whitchurch 1's</b></h6>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>David Tennant</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h6 class="header"><b>Whitchurch 1's</b></h6>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>Matt Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h6 class="header"><b>Whitchurch 1's</b></h6>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-body pt-0">
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h4 class="header"><b>John Smith</b></h4>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <h6 class="header"><b>Whitchurch 1's</b></h6>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-12 text-center">
-                                                <img src="images\pfp\defaultpfp.jpg" style="  display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="text-center">
-                                            <!-- Button that takes you to the club page -->
-                                            <form action="'#" method="post">
-                                                <input type="hidden" name="clubID" value="#">
-                                                <button type="submit" class="btn btn-sm btn-primary">
-                                                    View player
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php
+                            }
+                            ?>
                         </div>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
-            </section>
-            <!-- /.content -->
+                <!-- /.card-body -->
         </div>
-        <!-- /.content-wrapper -->
+        <!-- /.card -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
     </div>
     <!-- REQUIRED SCRIPTS -->
 

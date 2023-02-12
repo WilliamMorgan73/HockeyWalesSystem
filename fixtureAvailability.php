@@ -8,10 +8,12 @@ $conn = require 'includes/dbhconfig.php';
 
 session_start();
 $userID = $_SESSION['userID'];
+
 $clubAdminName = getclubAdminName($conn, $userID);
 $clubName = getClubName($conn, $userID);
 $clubID = getClubID($conn, $clubName);
-$leagueID = getLeagueID($userID, $conn);
+$teams = getTeams($conn, $clubID);
+
 ?>
 
 <html lang="en">
@@ -102,126 +104,114 @@ $leagueID = getLeagueID($userID, $conn);
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="text-left">
-                                    <h3><?php echo $clubName ?> 1's</h3> <!-- Make this say team name instead -->
+                                    <?php
+                                    $selectedTeamName = '';
+                                    $selectedTeamID = null;
+                                    // Get the lowest teamID with the same clubID
+                                    if ($selectedTeamID == null) {
+                                        // Get the lowest teamID for the club
+                                        $query = "SELECT MIN(teamID) as lowestTeamID, teamName FROM team WHERE clubID = '$clubID'";
+                                        $result = mysqli_query($conn, $query);
+                                        $row = mysqli_fetch_assoc($result);
+                                        $selectedTeamName = $row['teamName'];
+                                        $selectedTeamID = $row['lowestTeamID'];
+                                    }
+                                    if (isset($_POST['selected-team-id'])) {
+                                        $selectedTeamID = $_POST['selected-team-id'];
+                                        foreach ($teams as $team) {
+                                            if ($team['teamID'] == $selectedTeamID) {
+                                                $selectedTeamName = $team['teamName'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    <h3 id="selected-team-name"><?php echo $selectedTeamName ? $selectedTeamName : $clubName . " 1's"; ?></h3>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="text-right">
                                     <div class="form-group">
-                                        <select class="form-control select2" style="width: 30%;">
-                                            <option selected="selected"> <?php echo $clubName ?> 1's</option> <!-- Make this say team name instead -->
-                                        </select>
+                                        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                                            <select class="form-control select2" style="width: 30%;" name="selected-team-id">
+                                                <?php
+                                                foreach ($teams as $team) {
+                                                    $teamID = $team['teamID'];
+                                                    $teamName = $team['teamName'];
+                                                    $selected = '';
+                                                    if ($selectedTeamID == $teamID) {
+                                                        $selected = 'selected';
+                                                    }
+                                                    echo "<option value='$teamID' $selected>$teamName</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-body pb-0">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h3> Whitchurch 1's - Swansea 1's </h3>
+                        <?php
+                        //Get fixtures where the home team or away team has clubID = $clubID
+                        $fixtures = getFixturesByTeamID($selectedTeamID, $conn);
+                        foreach ($fixtures as $fixture) {
+                            $homeTeamID = $fixture['homeTeamID'];
+                            $awayTeamID = $fixture['awayTeamID'];
+                            $fixtureID = $fixture['fixtureID'];
+                            $homeTeamName = getTeamNameByID($homeTeamID, $conn);
+                            $awayTeamName = getTeamNameByID($awayTeamID, $conn);
+                        ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h3><?php echo "$homeTeamName - $awayTeamName"; ?></h3>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col-md-4 border-right broder-dark" ;>
-                                        <h5>Available</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
+                                    <div class="row text-center">
+                                        <div class="col-md-4 border-right broder-dark">
+                                            <h5>Available</h5>
+                                            <?php
+                                            //Get all players with availability = 1 for this fixture
+                                            $availablePlayers = getAvailablePlayersByFixtureID($fixtureID, $conn);
+                                            foreach ($availablePlayers as $player) {
+                                                $playerID = $player['playerID'];
+                                                $playerName = getPlayerNameByID($playerID, $conn);
+                                            ?>
+                                                <p><?php echo $playerName; ?></p>
+                                            <?php } ?>
+                                        </div>
+                                        <div class="col-md-4 border-right broder-dark">
+                                            <h5>Unavailable</h5>
+                                            <?php
+                                            //Get all players with availability = 0 for this fixture
+                                            $unavailablePlayers = getUnavailablePlayersByFixtureID($fixtureID, $conn);
+                                            foreach ($unavailablePlayers as $player) {
+                                                $playerID = $player['playerID'];
+                                                $playerName = getPlayerNameByID($playerID, $conn);
+                                            ?>
+                                                <p><?php echo $playerName; ?></p>
+                                            <?php } ?>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5>Unanswered</h5>
+                                            <?php
+                                            //Get all players with no entry in the availability table for this fixture
+                                            $unansweredPlayers = getUnansweredPlayersByFixtureID($fixtureID, $clubID, $conn);
+                                            foreach ($unansweredPlayers as $player) {
+                                                $playerID = $player['playerID'];
+                                                $playerName = getPlayerNameByID($playerID, $conn);
+                                            ?>
+                                                <p><?php echo $playerName; ?></p>
+                                            <?php } ?>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4 border-right broder-dark">
-                                        <h5>Unavailable</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h5>Unanswered</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h3> Whitchurch 1's - Swansea 1's </h3>
-                                    </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col-md-4 border-right broder-dark" ;>
-                                        <h5>Available</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                    <div class="col-md-4 border-right broder-dark">
-                                        <h5>Unavailable</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h5>Unanswered</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
+                                <?php } ?>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h3> Whitchurch 1's - Swansea 1's </h3>
-                                    </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col-md-4 border-right broder-dark" ;>
-                                        <h5>Available</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                    <div class="col-md-4 border-right broder-dark">
-                                        <h5>Unavailable</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h5>Unanswered</h5>
-                                        <p> John Smith </p>
-                                        <p> Ethan Smith </p>
-                                        <p> Paul Morgan </p>
-                                        <p> Morgan Reed </p>
-                                        <p> Bob Crachet </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <!-- /.card-body -->

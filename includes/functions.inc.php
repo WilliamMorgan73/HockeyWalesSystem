@@ -1,6 +1,8 @@
 <?php
 //Path: includes\functions.inc.php
 
+$conn = require __DIR__ . '/dbhconfig.php';
+
 //Function to check for empty fields in signup form
 
 function emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB, $accountType)
@@ -334,7 +336,7 @@ function getPlayerGoals($conn, $userID)
     if ($row = mysqli_fetch_assoc($resultData)) {
         return $row['numOfGoals'];
     } else {
-        $result = false;
+        $result = 0;
         return $result;
     }
 }
@@ -358,7 +360,7 @@ function getPlayerAssists($conn, $userID)
     if ($row = mysqli_fetch_assoc($resultData)) {
         return $row['numOfAssists'];
     } else {
-        $result = false;
+        $result = 0;
         return $result;
     }
 }
@@ -382,7 +384,7 @@ function getPlayerApperances($conn, $userID)
     if ($row = mysqli_fetch_assoc($resultData)) {
         return $row['numOfAppearances'];
     } else {
-        $result = false;
+        $result = 0;
         return $result;
     }
 }
@@ -685,8 +687,9 @@ function getClubName($conn, $userID)
 
 //Function to get the teamID of the player
 
-function getTeamID($conn, $userID)
+function getTeamID($userID)
 {
+    global $conn;
     $sql = "SELECT teamID FROM player WHERE userID = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -1206,7 +1209,132 @@ function getTopTeamLeague($clubID, $conn)
     return $lowestLeagueID;
 }
 
+function getAvailablePlayersByFixtureID($fixtureID, $conn)
+{
+    $players = array();
 
+    $query = "SELECT playerID FROM availability WHERE fixtureID = $fixtureID AND available = 1 AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))";
+    $result = mysqli_query($conn, $query);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $players[] = array('playerID' => $row['playerID']);
+    }
+
+    return $players;
+}
+
+function getTeamNameByID($teamID, $conn)
+{
+    $teamName = "";
+
+    $query = "SELECT teamName FROM team WHERE teamID = $teamID";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    $teamName = $row['teamName'];
+
+    return $teamName;
+}
+
+function getFixturesByTeamID($teamID, $conn)
+{
+    $fixtures = array();
+
+    $query = "SELECT fixtureID, homeTeamID, awayTeamID FROM fixture WHERE homeTeamID = $teamID OR awayTeamID = $teamID";
+    $result = mysqli_query($conn, $query);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $fixtures[] = $row;
+    }
+
+    return $fixtures;
+}
+
+function getUnavailablePlayersByFixtureID($fixtureID, $conn)
+{
+    $players = array();
+
+    $query = "SELECT playerID FROM availability WHERE fixtureID = $fixtureID AND available = 0 AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))";
+    $result = mysqli_query($conn, $query);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $players[] = array('playerID' => $row['playerID']);
+    }
+
+    return $players;
+}
+
+function getUnansweredPlayersByFixtureID($fixtureID, $clubID, $conn)
+{
+    $players = array();
+
+    $query = "SELECT playerID FROM player WHERE playerID NOT IN (SELECT playerID FROM availability WHERE fixtureID = $fixtureID) AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))";
+    $result = mysqli_query($conn, $query);
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn);
+        exit;
+    }
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $players[] = array('playerID' => $row['playerID']);
+    }
+
+    return $players;
+}
+
+function getPlayerNameByID($playerID, $conn)
+{
+    $query = "SELECT firstName, lastName FROM player WHERE playerID = $playerID";
+    $result = mysqli_query($conn, $query);
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn);
+        exit;
+    }
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $firstName = $row['firstName'];
+        $lastName = $row['lastName'];
+        return $firstName . " " . $lastName;
+    } else {
+        return "";
+    }
+}
+
+//Update goals scored for a player
+
+function updateGoals($playerID, $goals, $conn)
+{
+    $query = "SELECT * FROM goal WHERE playerID = $playerID";
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) == 0) {
+        $query = "INSERT INTO goal (playerID, numOfGoals) VALUES ($playerID, $goals)";
+    } else {
+        $query = "UPDATE goal SET numOfGoals = numOfGoals + $goals WHERE playerID = $playerID";
+    }
+    $result = mysqli_query($conn, $query);
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn);
+        exit;
+    }
+}
+
+//Update assists for a player
+
+function updateAssists($playerID, $assists, $conn)
+{
+    $query = "SELECT * FROM assist WHERE playerID = $playerID";
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) == 0) {
+        $query = "INSERT INTO assist (playerID, numOfAssists) VALUES ($playerID, $assists)";
+    } else {
+        $query = "UPDATE assist SET numOfAssists = numOfAssists + $assists WHERE playerID = $playerID";
+    }
+    $result = mysqli_query($conn, $query);
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn);
+        exit;
+    }
+}
 /*
 
 TODO:

@@ -104,6 +104,7 @@ $teams = getTeams($conn, $clubID);
                                 <div class="text-left">
                                     <?php
                                     $selectedTeamName = '';
+                                    $selectedTeamID = null;
                                     if (isset($_POST['selected-team-id'])) {
                                         $selectedTeamID = $_POST['selected-team-id'];
                                         foreach ($teams as $team) {
@@ -114,7 +115,7 @@ $teams = getTeams($conn, $clubID);
                                         }
                                     }
                                     ?>
-                                    <h3 id="selected-team-name"><?php echo $selectedTeamName ? $selectedTeamName: 'Team Name 1'; ?></h3>
+                                    <h3 id="selected-team-name"><?php echo $selectedTeamName ? $selectedTeamName : $clubName . " 1's"; ?></h3>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -145,7 +146,14 @@ $teams = getTeams($conn, $clubID);
                         <div class="row">
                             <?php
                             // get the selected team ID from the hidden input
-                            if (isset($_POST["selected-team-id"])) {
+                            if (!isset($_POST["selected-team-id"])) {
+                                // Get the lowest teamID for the club
+                                $query = "SELECT MIN(teamID) as lowestTeamID, teamName FROM team WHERE clubID = '$clubID'";
+                                $result = mysqli_query($conn, $query);
+                                $row = mysqli_fetch_assoc($result);
+                                $teamName = $row['teamName'];
+                                $teamID = $row['lowestTeamID'];
+                            } elseif (isset($_POST["selected-team-id"])) {
                                 $teamID = $_POST["selected-team-id"];
                             }
 

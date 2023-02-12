@@ -31,21 +31,24 @@ $conn = require 'includes/dbhconfig.php';
             <!-- Heading and subheading-->
             <p class="heading">Hockey Wales</p>
             <p class="sub-heading">
-              Please pick the league you wish to view, or search for a player
-              or team
+              Please pick the league you wish to view, or search for a team.
             </p>
             <!-- Club search -->
             <p class="title">Club search</p>
-            <form>
-              <input type="text" class="club-player-search" />
+            <form action="includes/clubSearch.php" method="post">
+              <input type="text" name="clubName" class="club-player-search"/ style="margin-bottom: 2%;">
+              <input type="submit" value="Search" class="btn btn-login">
             </form>
-            <!-- Player search -->
-            <p class="title">Player search</p>
-            <form>
-              <input type="text" class="club-player-search" />
-            </form>
+            <!-- Error message -->
+            <?php
+            //Club not found
+            if (isset($_GET['error']) && $_GET['error'] === "clubNotFound") {
+              $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+              echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+            }
+            ?>
             <!-- League selection -->
-            <p class="title">Leagues</p>            
+            <p class="title">Leagues</p>
             <form action="leagueDashboard.php" method="post">
               <?php
               $query = "SELECT * FROM league";
