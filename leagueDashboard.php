@@ -108,224 +108,232 @@ $leagueName = getLeagueName($conn, $leagueID);
             <div class="row" style="padding-top:1%;">
               <!-- League table -->
               <div class="col-md-6">
-                <div class="card shadow" style="width: 100%;">
-                  <div class="card-body p-0">
-                    <table class=" table table-striped" style="width: 100%">
-                      <thead>
-                        <tr>
-                          <th>Team</th>
-                          <th>W</th>
-                          <th>D</th>
-                          <th>L</th>
-                          <th>GD</th>
-                          <th>PTS</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <?php
-                        // Assuming the database connection is established and stored in the variable $conn
-                        $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
-                        $result = mysqli_query($conn, $sql);
-                        if (mysqli_num_rows($result) > 0) {
-                          $teams = [];
-                          while ($row = mysqli_fetch_assoc($result)) {
-                            $teams[] = $row;
-                          }
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card shadow" style="width: 100%;">
+                      <div class="card-body p-0">
+                        <table class="table table-striped" style="width: 100%">
+                          <thead>
+                            <tr>
+                              <th onclick="sortTable(0)">Team</th>
+                              <th onclick="sortTable(1)">W</th>
+                              <th onclick="sortTable(2)">D</th>
+                              <th onclick="sortTable(3)">L</th>
+                              <th onclick="sortTable(4)">GD</th>
+                              <th onclick="sortTable(5)">PTS</th>
+                            </tr>
+                          </thead>
+                          <tbody id="tableBody">
+                            <?php
+                            // Assuming the database connection is established and stored in the variable $conn
+                            $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
+                            $result = mysqli_query($conn, $sql);
+                            if (mysqli_num_rows($result) > 0) {
+                              $teams = [];
+                              while ($row = mysqli_fetch_assoc($result)) {
+                                $teams[] = $row;
+                              }
 
-                          $points = getTeamPoints($teams, $conn);
-                          // Display the teams in descending order of points
-                          foreach ($points as $team) {
-                            echo "<tr>
-              <td>" . $team["teamName"] . "</td>
-              <td>" . getTeamWins($team["teamID"], $conn) . "</td>
-              <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
-              <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
-              <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
-              <td>" . $team["points"] . "</td>
-            </tr>";
-                          }
-                        } else {
-                          echo "0 results";
-                        }
-                        ?>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <!-- End of league table -->
-              <!-- Results -->
-              <div class="col-md-6">
-                <div class="card card-outline shadow">
-                  <div class="card-body text-center">
-                    <h1 class="card-title">Result</h1>
-                    <br />
-                    <div class="col-md-12">
-                      <?php
-                      $query = "SELECT MAX(matchWeek) AS maxWeek FROM result";
-                      $result = mysqli_query($conn, $query);
-
-                      if (mysqli_num_rows($result) > 0) {
-                        $row = mysqli_fetch_assoc($result);
-                        $maxWeek = $row['maxWeek'];
-
-                        $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE matchWeek = '$maxWeek' AND leagueID = '$leagueID'";
-                        $resultdetailresult = mysqli_query($conn, $query);
-
-                        if (mysqli_num_rows($resultdetailresult) > 0) {
-                          while ($row = mysqli_fetch_array($resultdetailresult)) {
-                            $homeTeamID = $row['homeTeamID'];
-                            $awayTeamID = $row['awayTeamID'];
-                            $homeTeamScore = $row['homeTeamScore'];
-                            $awayTeamScore = $row['awayTeamScore'];
-
-                            $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
-                            $result2 = mysqli_query($conn, $query);
-                            $row2 = mysqli_fetch_array($result2);
-                            $homeTeamName = $row2['teamName'];
-
-                            $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
-                            $result3 = mysqli_query($conn, $query);
-                            $row3 = mysqli_fetch_array($result3);
-                            $awayTeamName = $row3['teamName'];
-                      ?>
-                            <div class="card-body">
-                              <h2 class="lead"><b><?php echo "$homeTeamName - $homeTeamScore   -   $awayTeamScore $awayTeamName" . "<br>"; ?>
-                            </div>
-                      <?php
-                          }
-                        } else {
-                          echo "No results with the highest game week number found";
-                        }
-                      } else {
-                        echo "No game week numbers found in the result table";
-                      }
-                      ?>
+                              $points = getTeamPoints($teams, $conn);
+                              // Display the teams in descending order of points
+                              foreach ($points as $team) {
+                                echo "<tr>
+        <td>" . $team["teamName"] . "</td>
+        <td>" . getTeamWins($team["teamID"], $conn) . "</td>
+        <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
+        <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
+        <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+        <td>" . $team["points"] . "</td>
+      </tr>";
+                              }
+                            } else {
+                              echo "0 results";
+                            }
+                            ?>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <!-- End of results -->
-            </div>
-            <!-- End of first row -->
-            <!-- Second row- fixtures -->
-            <div class="row">
-              <!-- Top scorers -->
-              <div class="col-md-6 text-center">
-                <div class="card card-outline shadow">
-                  <div class="card-body">
-                    <h1 class="card-title">Top scorers</h1>
-                    <br />
-                    <?php
-                    $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
-                    $result = mysqli_query($conn, $query);
-                    if (mysqli_num_rows($result) > 0) {
-                      $players = [];
-                      while ($row = mysqli_fetch_array($result)) {
-                        $teamID = $row['teamID'];
-                        $query = "SELECT * FROM player WHERE teamID = '$teamID'";
-                        $teamIDresult = mysqli_query($conn, $query);
-                        if (mysqli_num_rows($teamIDresult) > 0) {
-                          while ($row = mysqli_fetch_array($teamIDresult)) {
-                            $playerID = $row['playerID'];
-                            $firstName = $row['firstName'];
-                            $lastName = $row['lastName'];
+                <!-- End of league table -->
+                <!-- Top scorers -->
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <div class="card card-outline shadow">
+                      <div class="card-body">
+                        <h1 class="card-title">Top scorers</h1>
+                        <br />
+                        <?php
+                        $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
+                        $result = mysqli_query($conn, $query);
+                        if (mysqli_num_rows($result) > 0) {
+                          $players = [];
+                          while ($row = mysqli_fetch_array($result)) {
                             $teamID = $row['teamID'];
+                            $query = "SELECT * FROM player WHERE teamID = '$teamID'";
+                            $teamIDresult = mysqli_query($conn, $query);
+                            if (mysqli_num_rows($teamIDresult) > 0) {
+                              while ($row = mysqli_fetch_array($teamIDresult)) {
+                                $playerID = $row['playerID'];
+                                $firstName = $row['firstName'];
+                                $lastName = $row['lastName'];
+                                $teamID = $row['teamID'];
 
-                            $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
-                            $teamNameresult = mysqli_query($conn, $query);
-                            $row = mysqli_fetch_array($teamNameresult);
-                            $teamName = $row['teamName'];
+                                $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
+                                $teamNameresult = mysqli_query($conn, $query);
+                                $row = mysqli_fetch_array($teamNameresult);
+                                $teamName = $row['teamName'];
 
-                            $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
-                            $numOfGoalsresult = mysqli_query($conn, $query);
-                            if (mysqli_num_rows($numOfGoalsresult) > 0) {
-                              while ($row = mysqli_fetch_array($numOfGoalsresult)) {
-                                $numOfGoals = $row['numOfGoals'];
-                                $players[] = [
-                                  'firstName' => $firstName,
-                                  'lastName' => $lastName,
-                                  'teamName' => $teamName,
-                                  'numOfGoals' => $numOfGoals,
-                                ];
+                                $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
+                                $numOfGoalsresult = mysqli_query($conn, $query);
+                                if (mysqli_num_rows($numOfGoalsresult) > 0) {
+                                  while ($row = mysqli_fetch_array($numOfGoalsresult)) {
+                                    $numOfGoals = $row['numOfGoals'];
+                                    $players[] = [
+                                      'firstName' => $firstName,
+                                      'lastName' => $lastName,
+                                      'teamName' => $teamName,
+                                      'numOfGoals' => $numOfGoals,
+                                    ];
+                                  }
+                                }
                               }
                             }
                           }
-                        }
-                      }
-                      usort($players, function ($a, $b) {
-                        return $b['numOfGoals'] - $a['numOfGoals'];
-                      });
-                      foreach ($players as $player) {
-                    ?>
-                        <div class="card-body col-md-12" style="padding-bottom:0px;">
-                          <h3 class="lead"><b><?php echo $player['firstName'];
-                                              echo " ";
-                                              echo $player['lastName']; ?></b></h3>
-                          <p class="text-muted text-sm"><b>Number of goals:</b> <?php echo $player['numOfGoals']; ?></p>
-                          <p class="text-muted text-sm"><b>Club:</b> <?php echo $player['teamName']; ?></p>
-                        </div>
-                    <?php
-                      }
-                    }
-                    ?>
-                  </div>
-                </div>
-              </div>
-
-              <!-- End of top scorers -->
-              <!-- Fixtures -->
-              <div class="col-md-6 text-center">
-                <div class="card card-outline shadow">
-                  <div class="card-body">
-                    <h1 class="card-title">Fixtures</h1>
-                    <br />
-                    <div class="col-md-12">
-                      <?php
-                      $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
-                      $result = mysqli_query($conn, $query);
-
-                      if (mysqli_num_rows($result) > 0) {
-                        $row = mysqli_fetch_assoc($result);
-                        $minWeek = $row['minWeek'];
-
-                        $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
-                        $resultFixtures = mysqli_query($conn, $query);
-
-                        if (mysqli_num_rows($resultFixtures) > 0) {
-                          while ($row = mysqli_fetch_array($resultFixtures)) {
-                            $homeTeamID = $row['homeTeamID'];
-                            $awayTeamID = $row['awayTeamID'];
-
-                            $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
-                            $result2 = mysqli_query($conn, $query);
-                            $row2 = mysqli_fetch_array($result2);
-                            $homeTeamName = $row2['teamName'];
-
-                            $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
-                            $result3 = mysqli_query($conn, $query);
-                            $row3 = mysqli_fetch_array($result3);
-                            $awayTeamName = $row3['teamName'];
-                      ?>
-                            <div class="card-body">
-                              <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?>
+                          usort($players, function ($a, $b) {
+                            return $b['numOfGoals'] - $a['numOfGoals'];
+                          });
+                          foreach ($players as $player) {
+                        ?>
+                            <div class="card-body col-md-12" style="padding-bottom:0px;">
+                              <h3 class="lead"><b><?php echo $player['firstName'];
+                                                  echo " ";
+                                                  echo $player['lastName']; ?></b></h3>
+                              <p class="text-muted text-sm"><b>Number of goals:</b> <?php echo $player['numOfGoals']; ?></p>
+                              <p class="text-muted text-sm"><b>Club:</b> <?php echo $player['teamName']; ?></p>
                             </div>
-                      <?php
+                        <?php
                           }
-                        } else {
-                          echo "No fixtures with the lowest match week number found";
                         }
-                      } else {
-                        echo "No match week numbers found in the fixtures table";
-                      }
-                      ?>
+                        ?>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <!-- End of top scorers -->
               </div>
-              <!-- End of fixtures -->
+              <!-- Results -->
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card card-outline shadow">
+                      <div class="card-body text-center">
+                        <h1 class="card-title">Result</h1>
+                        <br />
+                        <div class="row">
+                          <div class="col-md-12">
+                            <?php
+                            $query = "SELECT MAX(matchWeek) AS maxWeek FROM result";
+                            $result = mysqli_query($conn, $query);
+
+                            if (mysqli_num_rows($result) > 0) {
+                              $row = mysqli_fetch_assoc($result);
+                              $maxWeek = $row['maxWeek'];
+
+                              $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE matchWeek = '$maxWeek' AND leagueID = '$leagueID'";
+                              $resultdetailresult = mysqli_query($conn, $query);
+
+                              if (mysqli_num_rows($resultdetailresult) > 0) {
+                                while ($row = mysqli_fetch_array($resultdetailresult)) {
+                                  $homeTeamID = $row['homeTeamID'];
+                                  $awayTeamID = $row['awayTeamID'];
+                                  $homeTeamScore = $row['homeTeamScore'];
+                                  $awayTeamScore = $row['awayTeamScore'];
+
+                                  $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
+                                  $result2 = mysqli_query($conn, $query);
+                                  $row2 = mysqli_fetch_array($result2);
+                                  $homeTeamName = $row2['teamName'];
+
+                                  $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
+                                  $result3 = mysqli_query($conn, $query);
+                                  $row3 = mysqli_fetch_array($result3);
+                                  $awayTeamName = $row3['teamName'];
+                            ?>
+                                  <div class="card-body">
+                                    <h2 class="lead"><b><?php echo "$homeTeamName - $homeTeamScore   -   $awayTeamScore $awayTeamName" . "<br>"; ?>
+                                  </div>
+                            <?php
+                                }
+                              } else {
+                                echo "No results with the highest game week number found";
+                              }
+                            } else {
+                              echo "No game week numbers found in the result table";
+                            }
+                            ?>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- End of results -->
+                <!-- Fixtures -->
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <div class="card card-outline shadow">
+                      <div class="card-body">
+                        <h1 class="card-title">Fixtures</h1>
+                        <br />
+                        <div class="col-md-12">
+                          <?php
+                          $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
+                          $result = mysqli_query($conn, $query);
+
+                          if (mysqli_num_rows($result) > 0) {
+                            $row = mysqli_fetch_assoc($result);
+                            $minWeek = $row['minWeek'];
+
+                            $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
+                            $resultFixtures = mysqli_query($conn, $query);
+
+                            if (mysqli_num_rows($resultFixtures) > 0) {
+                              while ($row = mysqli_fetch_array($resultFixtures)) {
+                                $homeTeamID = $row['homeTeamID'];
+                                $awayTeamID = $row['awayTeamID'];
+
+                                $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
+                                $result2 = mysqli_query($conn, $query);
+                                $row2 = mysqli_fetch_array($result2);
+                                $homeTeamName = $row2['teamName'];
+
+                                $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
+                                $result3 = mysqli_query($conn, $query);
+                                $row3 = mysqli_fetch_array($result3);
+                                $awayTeamName = $row3['teamName'];
+                          ?>
+                                <div class="card-body">
+                                  <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?>
+                                </div>
+                          <?php
+                              }
+                            } else {
+                              echo "No fixtures with the lowest match week number found";
+                            }
+                          } else {
+                            echo "No match week numbers found in the fixtures table";
+                          }
+                          ?>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End of fixtures -->
+                </div>
+              </div>
             </div>
-            <!-- End of second row -->
           </div>
         </div>
       </div>
@@ -350,106 +358,69 @@ $leagueName = getLeagueName($conn, $leagueID);
 <!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
 <script src="js/flot/plugins/jquery.flot.resize.js"></script>
 
-
 <script>
-  <?php
+  // Global variable to store the sorting order
+  var sortOrder = [];
 
-  $query = "SELECT teamID, teamName FROM team WHERE leagueID = '$leagueID'";
-  $result = mysqli_query($conn, $query);
-
-  $allPointsPerWeek = [];
-  $teams = [];
-  while ($row = mysqli_fetch_assoc($result)) {
-    $teamID = $row['teamID'];
-    $teamName = $row['teamName'];
-    $pointsPerWeek = calculatePointsPerWeek($teamID, $conn);
-    $allPointsPerWeek[$teamID] = $pointsPerWeek;
-    $teams[$teamID] = array(
-      'name' => $teamName
-    );
-  }
-  ?>
-
-  $(function() {
-    /*
-    LINE CHART
-     */
-    var allPointsPerWeek = <?php echo json_encode($allPointsPerWeek); ?>;
-    var teams = <?php echo json_encode($teams); ?>;
-
-    var line_data = [];
-    for (var teamID in allPointsPerWeek) {
-      line_data.push({
-        data: allPointsPerWeek[teamID],
-        xaxis: {
-          mode: "categories",
-          categories: allPointsPerWeek[teamID].map(function(item) {
-            return item[0];
-          })
-        },
-        yaxis: {
-          show: true
-        },
-        color: '#3c8dbc'
-      });
+  // QuickSort function to sort the table
+  function quickSort(arr, low, high, column) {
+    if (low < high) {
+      var pivot = partition(arr, low, high, column);
+      quickSort(arr, low, pivot - 1, column);
+      quickSort(arr, pivot + 1, high, column);
     }
+  }
 
-    $.plot('#line-chart', line_data, {
-      grid: {
-        hoverable: true,
-        borderColor: '#f3f3f3',
-        borderWidth: 1,
-        tickColor: '#f3f3f3'
-      },
-      series: {
-        shadowSize: 0,
-        lines: {
-          show: true
-        },
-        points: {
-          show: true
-        }
-      },
-      lines: {
-        fill: false,
-        color: ['#3c8dbc']
-      },
-      yaxis: {
-        show: true
-      },
-      xaxis: {
-        show: true
+  // Partition function for QuickSort
+  function partition(arr, low, high, column) {
+    var pivotValue = arr[high][column];
+    var i = low - 1;
+    for (var j = low; j <= high - 1; j++) {
+      if (arr[j][column] < pivotValue) {
+        i++;
+        swap(arr, i, j);
       }
-    })
-    //Initialize tooltip on hover
-    $('<div class="tooltip-inner" id="line-chart-tooltip"></div>').css({
-      position: 'absolute',
-      display: 'none',
-      opacity: 0.8
-    }).appendTo('body')
-    $('#line-chart').bind('plothover', function(event, pos, item) {
+    }
+    swap(arr, i + 1, high);
+    return i + 1;
+  }
 
-      if (item) {
-        var x = item.datapoint[0].toFixed(2),
-          y = item.datapoint[1].toFixed(2),
-          teamName = teams[Object.keys(teams)[item.seriesIndex]].name;
+  // Swap function to swap two elements in the array
+  function swap($arr, $a, $b) {
+    $temp = $arr[$a];
+    $arr[$a] = $arr[$b];
+    $arr[$b] = $temp;
+  }
 
-        $('#line-chart-tooltip').html(teamName + ' had ' + y + ' points at week ' + x)
-          .css({
-            top: item.pageY + 5,
-            left: item.pageX + 5
-          })
-          .fadeIn(200)
-      } else {
-        $('#line-chart-tooltip').hide()
+
+
+  $(document).ready(function() {
+    $("th").click(function() {
+      var table = $(this).parents("table");
+      var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+      this.asc = !this.asc;
+      if (!this.asc) {
+        rows = rows.reverse();
       }
-    })
-  })
+      for (var i = 0; i < rows.length; i++) {
+        table.append(rows[i]);
+      }
+    });
+  });
+
+  function comparer(index) {
+    return function(a, b) {
+      var valA = getCellValue(a, index),
+        valB = getCellValue(b, index);
+      return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+    }
+  }
+
+  function getCellValue(row, index) {
+    return $(row).children("td").eq(index).text();
+  }
+
 </script>
-
 </body>
-
-
-<!-- Add error messages when there are no games played or no scorers etc -->
 
 </html>

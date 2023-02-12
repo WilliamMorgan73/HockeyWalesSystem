@@ -55,6 +55,30 @@ function emailExists($conn, $email)
     }
 }
 
+//Function to check if email exists in temp users table
+
+function emailExistsInTempUsers($conn, $email)
+{
+    $sql = "SELECT * FROM tempuser WHERE email = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../signup.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row;
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
 //Function to check if fields are correct length
 
 function checkLength($email, $password, $firstName, $lastName, $club)
@@ -788,73 +812,81 @@ function getPredictedPoints($teamID, $conn)
 function getPredictedWins($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
-    $wins = 0;
+    if (is_array($fixtures)) {
+        $wins = 0;
+        foreach ($fixtures as $fixture) {
+            $homeTeamID = $fixture['homeTeamID'];
+            $awayTeamID = $fixture['awayTeamID'];
 
-    foreach ($fixtures as $fixture) {
-        $homeTeamID = $fixture['homeTeamID'];
-        $awayTeamID = $fixture['awayTeamID'];
+            $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
+            $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
 
-        $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
-        $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
-
-        if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
-            if ($homeTeamID == $teamID) {
-                $wins++;
+            if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
+                if ($homeTeamID == $teamID) {
+                    $wins++;
+                }
+            } else if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
+                if ($awayTeamID == $teamID) {
+                    $wins++;
+                }
             }
-        } else if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
-            if ($awayTeamID == $teamID) {
-                $wins++;
-            }
+            return $wins;
         }
+    } else {
+        return 0;
     }
-
-    return $wins;
 }
 
 function getPredictedDraws($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
-    $draws = 0;
+    if (is_array($fixtures)) {
+        $draws = 0;
 
-    foreach ($fixtures as $fixture) {
-        $homeTeamID = $fixture['homeTeamID'];
-        $awayTeamID = $fixture['awayTeamID'];
+        foreach ($fixtures as $fixture) {
+            $homeTeamID = $fixture['homeTeamID'];
+            $awayTeamID = $fixture['awayTeamID'];
 
-        $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
-        $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
+            $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
+            $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
 
-        if ($homeTeamAvgPoints == $awayTeamAvgPoints) {
-            $draws++;
+            if ($homeTeamAvgPoints == $awayTeamAvgPoints) {
+                $draws++;
+            }
         }
-    }
 
-    return $draws;
+        return $draws;
+    } else {
+        return 0;
+    }
 }
 
 function getPredictedLosses($teamID, $conn)
 {
     $fixtures = getFixturesForTeam($teamID, $conn);
-    $losses = 0;
+    if (is_array($fixtures)) {
+        $losses = 0;
+        foreach ($fixtures as $fixture) {
+            $homeTeamID = $fixture['homeTeamID'];
+            $awayTeamID = $fixture['awayTeamID'];
 
-    foreach ($fixtures as $fixture) {
-        $homeTeamID = $fixture['homeTeamID'];
-        $awayTeamID = $fixture['awayTeamID'];
+            $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
+            $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
 
-        $homeTeamAvgPoints = getAveragePointPerGame($homeTeamID, $conn);
-        $awayTeamAvgPoints = getAveragePointPerGame($awayTeamID, $conn);
-
-        if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
-            if ($homeTeamID == $teamID) {
-                $losses++;
-            }
-        } else if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
-            if ($awayTeamID == $teamID) {
-                $losses++;
+            if ($homeTeamAvgPoints < $awayTeamAvgPoints) {
+                if ($homeTeamID == $teamID) {
+                    $losses++;
+                }
+            } else if ($homeTeamAvgPoints > $awayTeamAvgPoints) {
+                if ($awayTeamID == $teamID) {
+                    $losses++;
+                }
             }
         }
+        return $losses;
+    } else {
+        return 0;
     }
-
-    return $losses;
 }
 
 
@@ -872,6 +904,31 @@ function getFixturesForTeam($teamID, $conn)
     } else {
         return null;
     }
+}
+
+//Function to get the amount of points a team has
+function getTeamPoints($teams, $conn)
+{
+    $points = [];
+    foreach ($teams as $team) {
+        $teamID = $team["teamID"];
+        $teamWins = getTeamWins($teamID, $conn);
+        $teamDraws = getTeamDraws($teamID, $conn);
+
+        $teamPoints = $teamWins * 3 + $teamDraws;
+        $points[] = [
+            "teamID" => $teamID,
+            "teamName" => $team["teamName"],
+            "points" => $teamPoints
+        ];
+    }
+
+    // Sort the teams based on their points
+    usort($points, function ($a, $b) {
+        return $b["points"] - $a["points"];
+    });
+
+    return $points;
 }
 
 function getNumberOfGamesLeft($teamID, $conn)
@@ -1063,55 +1120,38 @@ function calculatePointsPerWeek($teamID, $conn)
 
     // Loop through every game week
     for ($i = $minGWID; $i <= $maxGWID; $i++) {
-        // Get the oppositionID and the team's pointPerGame
+        // Get the fixtures for the current game week
         $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE (homeTeamID = '$teamID' OR awayTeamID = '$teamID') AND matchWeek = '$i'";
         $result = mysqli_query($conn, $query);
-        $fixtureData = mysqli_fetch_assoc($result);
-        if ($fixtureData['homeTeamID'] == $teamID) {
-            $oppositionID = $fixtureData['awayTeamID'];
-        } else {
-            $oppositionID = $fixtureData['homeTeamID'];
-        }
-        $teamPointPerGame = getAveragePointPerGame($teamID, $conn);
 
-        // Get the opposition's pointPerGame
-        $oppositionPointPerGame = getAveragePointPerGame($oppositionID, $conn);
+        // Loop through each fixture for the current game week
+        $numGames = 0;
+        while ($fixtureData = mysqli_fetch_assoc($result)) {
+            if ($fixtureData['homeTeamID'] == $teamID || $fixtureData['awayTeamID'] == $teamID) {
+                $numGames++;
+                $oppositionID = ($fixtureData['homeTeamID'] == $teamID) ? $fixtureData['awayTeamID'] : $fixtureData['homeTeamID'];
+                $teamPointPerGame = getAveragePointPerGame($teamID, $conn);
+                $oppositionPointPerGame = getAveragePointPerGame($oppositionID, $conn);
 
-        // Decide the points based on the team's and opposition's pointsPerGame
-        if ($teamPointPerGame > $oppositionPointPerGame) {
-            $startingPoints += 3;
-        } elseif ($teamPointPerGame == $oppositionPointPerGame) {
-            $startingPoints += 1;
+                // Decide the points based on the team's and opposition's pointsPerGame
+                if ($teamPointPerGame > $oppositionPointPerGame) {
+                    $startingPoints += 3;
+                } elseif ($teamPointPerGame == $oppositionPointPerGame) {
+                    $startingPoints += 1;
+                }
+            }
         }
-        $pointsPerWeek[] = [$i, $startingPoints];
+
+        // Add the starting points for the current game week
+        if ($numGames > 0) {
+            $pointsPerWeek[] = [$i, $startingPoints];
+        }
     }
     return $pointsPerWeek;
 }
 
-//Function to get the amount of points a team has
-function getTeamPoints($teams, $conn)
-{
-    $points = [];
-    foreach ($teams as $team) {
-        $teamID = $team["teamID"];
-        $teamWins = getTeamWins($teamID, $conn);
-        $teamDraws = getTeamDraws($teamID, $conn);
 
-        $teamPoints = $teamWins * 3 + $teamDraws;
-        $points[] = [
-            "teamID" => $teamID,
-            "teamName" => $team["teamName"],
-            "points" => $teamPoints
-        ];
-    }
 
-    // Sort the teams based on their points
-    usort($points, function ($a, $b) {
-        return $b["points"] - $a["points"];
-    });
-
-    return $points;
-}
 
 //Function to get a team's goal difference
 
@@ -1340,14 +1380,6 @@ function updateAssists($playerID, $assists, $conn)
 TODO:
 Add a check to see if clubs have a club admin already
 Add validation email to club admin only which is sent to a system admin to approve
-OUTPUT ERROR MESSAGES ON SCREEN INSTEAD OF REDIRECTING TO LOGIN PAGE
-ADD FOREIGN KEYS TO DATABASE
-ALLOW LEAGUE TABLE HEADER SORTS
 Maybe make email to user when they are added to a club
-Make player next game actually be the next game and not a past game or a futher future game
 Tidy up comments in playerDashboard.php
-Check if club admin league table is for the top team and not just outputting all teams within the club
-Make all files saved in the database of type .jpg
-MAYBE MAKE IT PASS PLAYERID AND CLUBADMINID ISNTEAD OF USERID ON DASHBOARDS TO ALLOW OTHERS TO VIEW OTHERS DASHBOARDS - maybe store player and club ID in header
-FIX GOAL DIFFERENCE ON LEAGUE TABLESSSS
 */

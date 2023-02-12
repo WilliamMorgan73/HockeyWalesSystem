@@ -38,6 +38,13 @@ if (isset($_POST['submit'])) {
         exit();
     }
 
+    //Function call to check if email exists in temp users table
+
+    if (emailExistsInTempUsers($conn, $email) !== false) {
+        header("Location: ../signup.php?error=pendingapproval&message=" . urlencode("Your account is still pending approval"));
+        exit();
+    }
+
     //Function call to check if fields are correct length
 
     if (checkLength($email, $password, $firstName, $lastName, $club) !== false) {

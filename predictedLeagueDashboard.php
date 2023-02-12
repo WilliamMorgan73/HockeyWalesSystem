@@ -88,7 +88,6 @@ $leagueName = getLeagueName($conn, $leagueID);
     </aside>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-
         <!-- Main content -->
         <section class="content">
             <section class="content-header">
@@ -109,208 +108,216 @@ $leagueName = getLeagueName($conn, $leagueID);
                         <div class="row">
                             <!-- League table -->
                             <div class="col-md-6">
-                                <div class="card shadow" style="width: 100%">
-                                    <div class="card-body p-0">
-                                        <?php
-                                        $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
-                                        $result = $conn->query($sql);
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card shadow" style="width: 100%">
+                                            <div class="card-body p-0">
+                                                <?php
+                                                $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
+                                                $result = $conn->query($sql);
 
-                                        if ($result->num_rows > 0) {
-                                            $teams = array();
-                                            while ($row = $result->fetch_assoc()) {
-                                                $teams[] = $row;
-                                            }
-                                            
-                                            // Sort the teams based on their predicted points
-                                            usort($teams, function($a, $b) use ($conn) {
-                                                $teamAID = $a['teamID'];
-                                                $teamBID = $b['teamID'];
-                                                $predictedPointsA = getPredictedPoints($teamAID, $conn);
-                                                $predictedPointsB = getPredictedPoints($teamBID, $conn);
-                                                return $predictedPointsB - $predictedPointsA;
-                                            });
-                                        } else {
-                                            $teams = null;
-                                        }
-                                        
+                                                if ($result->num_rows > 0) {
+                                                    $teams = array();
+                                                    while ($row = $result->fetch_assoc()) {
+                                                        $teams[] = $row;
+                                                    }
 
-                                        echo '<table class="table table-striped" style="width: 100%">';
-                                        echo '<thead>';
-                                        echo '<tr>';
-                                        echo '<th>Team</th>';
-                                        echo '<th>Predicted wins</th>';
-                                        echo '<th>Predicted draws</th>';
-                                        echo '<th>Predicted losses</th>';
-                                        echo '<th>Predicted points</th>';
-                                        echo '</tr>';
-                                        echo '</thead>';
-                                        echo '<tbody>';
-
-                                        foreach ($teams as $team) {
-                                            $teamID = $team['teamID'];
-                                            $teamName = $team['teamName'];
-                                            $predictedWins = getTeamWins($teamID, $conn) + getPredictedWins($teamID, $conn);
-                                            $predictedDraws = getTeamDraws($teamID, $conn) + getPredictedDraws($teamID, $conn);
-                                            $predictedLosses = getTeamLosses($teamID, $conn) + getPredictedLosses($teamID, $conn);
-                                            $predictedPoints = getPredictedPoints($teamID, $conn);
-
-                                            echo '<tr>';
-                                            echo '<td>' . $teamName . '</td>';
-                                            echo '<td>' . $predictedWins . '</td>';
-                                            echo '<td>' . $predictedDraws . '</td>';
-                                            echo '<td>' . $predictedLosses . '</td>';
-                                            echo '<td>' . $predictedPoints . '</td>';
-                                            echo '</tr>';
-                                        }
-
-                                        echo '</tbody>';
-                                        echo '</table>';
-                                        ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- End of league table -->
-                            <!-- Predicted results -->
-                            <div class="col-md-6">
-                                <div class="card card-outline shadow">
-                                    <div class="card-body">
-                                        <h1 class="card-title">Predicted results</h1>
-                                        <br />
-                                        <div class="col-md-12">
-                                            <?php
-                                            $predictedResults = getPredictedResults($leagueID, $conn);
-                                            if (!empty($predictedResults)) {
-                                                foreach ($predictedResults as $match) {
-                                                    $homeTeam = $match['homeTeam'];
-                                                    $awayTeam = $match['awayTeam'];
-                                                    $predictedResult = $match['predictedResult'];
-                                            ?>
-                                                    <div class="card-body">
-                                                        <h2 class="lead text-center"><b><?php echo "$homeTeam vs. $awayTeam: $predictedResult" . "<br>"; ?>
-                                                    </div>
-                                            <?php
+                                                    // Sort the teams based on their predicted points
+                                                    usort($teams, function ($a, $b) use ($conn) {
+                                                        $teamAID = $a['teamID'];
+                                                        $teamBID = $b['teamID'];
+                                                        $predictedPointsA = getPredictedPoints($teamAID, $conn);
+                                                        $predictedPointsB = getPredictedPoints($teamBID, $conn);
+                                                        return $predictedPointsB - $predictedPointsA;
+                                                    });
+                                                } else {
+                                                    $teams = null;
                                                 }
-                                            } else {
-                                                echo "No predicted results found";
-                                            }
-                                            ?>
+
+                                                echo '<table class="table table-striped" style="width: 100%">';
+                                                echo '<thead>';
+                                                echo '<tr>';
+                                                echo '<th onclick="sortTable(0)">Team</th>';
+                                                echo '<th onclick="sortTable(1)">Predicted wins</th>';
+                                                echo '<th onclick="sortTable(2)">Predicted draws</th>';
+                                                echo '<th onclick="sortTable(3)">Predicted losses</th>';
+                                                echo '<th onclick="sortTable(4)">Predicted points</th>';
+                                                echo '</tr>';
+                                                echo '</thead>';
+                                                echo '<tbody id="tableBody">';
+
+                                                foreach ($teams as $team) {
+                                                    $teamID = $team['teamID'];
+                                                    $teamName = $team['teamName'];
+                                                    $predictedWins = getTeamWins($teamID, $conn) + getPredictedWins($teamID, $conn);
+                                                    $predictedDraws = getTeamDraws($teamID, $conn) + getPredictedDraws($teamID, $conn);
+                                                    $predictedLosses = getTeamLosses($teamID, $conn) + getPredictedLosses($teamID, $conn);
+                                                    $predictedPoints = getPredictedPoints($teamID, $conn);
+
+                                                    echo '<tr>';
+                                                    echo '<td>' . $teamName . '</td>';
+                                                    echo '<td>' . $predictedWins . '</td>';
+                                                    echo '<td>' . $predictedDraws . '</td>';
+                                                    echo '<td>' . $predictedLosses . '</td>';
+                                                    echo '<td>' . $predictedPoints . '</td>';
+                                                    echo '</tr>';
+                                                }
+
+                                                echo '</tbody>';
+                                                echo '</table>';
+                                                ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- End of predicted results -->
+                                <!-- End of league table -->
+                                <div class="row">
+                                    <!-- Predicted top scorers -->
+                                    <div class="col-md-12">
+                                        <div class="card card-outline shadow">
+                                            <div class="card-body">
+                                                <h1 class="card-title">Predicted top scorers</h1>
+                                                <br />
+                                                <div class="col-md-12">
+                                                    <?php
+                                                    $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
+                                                    $result = mysqli_query($conn, $query);
 
-                        </div>
-                        <!-- End of first row -->
-                        <!-- Second row - Predicted graph -->
-                        <div class="row">
-                            <!-- Predicted top scorers -->
-                            <div class="col-md-6">
-                                <div class="card card-outline shadow">
-                                    <div class="card-body">
-                                        <h1 class="card-title">Predicted top scorers</h1>
-                                        <br />
-                                        <div class="col-md-12">
-                                            <?php
-                                            $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
-                                            $result = mysqli_query($conn, $query);
-
-                                            if (mysqli_num_rows($result) > 0) {
-                                                // Take the first team in the team table with a leagueID = $leagueID
-                                                $row = mysqli_fetch_array($result);
-                                                $teamID = $row['teamID'];
-
-                                                // Get the number of teams in the league
-                                                $numOfTeams = mysqli_num_rows($result) - 1;
-
-                                                // Calculate the number of games played
-                                                $numOfGames = $numOfTeams * 2;
-
-                                                // Get the number of records with homeTeamID or awayTeamID = $teamID
-                                                $query = "SELECT * FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
-                                                $gamesPlayedResult = mysqli_query($conn, $query);
-                                                $gamesPlayed = mysqli_num_rows($gamesPlayedResult);
-
-                                                // Calculate the number of games left
-                                                $gamesLeft = $numOfGames - $gamesPlayed;
-
-                                                $query = "SELECT player.* FROM player
-INNER JOIN team ON player.teamID = team.teamID
-WHERE team.leagueID = '$leagueID'";
-                                                $teamIDresult = mysqli_query($conn, $query);
-                                                if (mysqli_num_rows($teamIDresult) > 0) {
-                                                    while ($row = mysqli_fetch_array($teamIDresult)) {
-                                                        $playerID = $row['playerID'];
-                                                        $firstName = $row['firstName'];
-                                                        $lastName = $row['lastName'];
+                                                    if (mysqli_num_rows($result) > 0) {
+                                                        // Take the first team in the team table with a leagueID = $leagueID
+                                                        $row = mysqli_fetch_array($result);
                                                         $teamID = $row['teamID'];
 
-                                                        $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
-                                                        $teamNameresult = mysqli_query($conn, $query);
-                                                        $row = mysqli_fetch_array($teamNameresult);
-                                                        $teamName = $row['teamName'];
+                                                        // Get the number of teams in the league
+                                                        $numOfTeams = mysqli_num_rows($result) - 1;
 
-                                                        $query = "SELECT sum(numOfGoals) as numOfGoals FROM goal WHERE playerID = '$playerID'";
-                                                        $numOfGoalsresult = mysqli_query($conn, $query);
-                                                        if (mysqli_num_rows($numOfGoalsresult) > 0) {
-                                                            $row = mysqli_fetch_array($numOfGoalsresult);
-                                                            $numOfGoals = $row['numOfGoals'];
-                                                            // Calculate the predicted number of goals
-                                                            $predictedNumOfGoals = $numOfGoals * $gamesLeft / $gamesPlayed;
-                                                            $predictedScorers[] = array("firstName" => $firstName, "lastName" => $lastName, "teamName" => $teamName, "predictedNumOfGoals" => $predictedNumOfGoals);
+                                                        // Calculate the number of games played
+                                                        $numOfGames = $numOfTeams * 2;
+
+                                                        // Get the number of records with homeTeamID or awayTeamID = $teamID
+                                                        $query = "SELECT * FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
+                                                        $gamesPlayedResult = mysqli_query($conn, $query);
+                                                        $gamesPlayed = mysqli_num_rows($gamesPlayedResult);
+
+                                                        // Calculate the number of games left
+                                                        $gamesLeft = $numOfGames - $gamesPlayed;
+
+                                                        $query = "SELECT player.* FROM player
+INNER JOIN team ON player.teamID = team.teamID
+WHERE team.leagueID = '$leagueID'";
+                                                        $teamIDresult = mysqli_query($conn, $query);
+                                                        if (mysqli_num_rows($teamIDresult) > 0) {
+                                                            while ($row = mysqli_fetch_array($teamIDresult)) {
+                                                                $playerID = $row['playerID'];
+                                                                $firstName = $row['firstName'];
+                                                                $lastName = $row['lastName'];
+                                                                $teamID = $row['teamID'];
+
+                                                                $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
+                                                                $teamNameresult = mysqli_query($conn, $query);
+                                                                $row = mysqli_fetch_array($teamNameresult);
+                                                                $teamName = $row['teamName'];
+
+                                                                $query = "SELECT sum(numOfGoals) as numOfGoals FROM goal WHERE playerID = '$playerID'";
+                                                                $numOfGoalsresult = mysqli_query($conn, $query);
+                                                                if (mysqli_num_rows($numOfGoalsresult) > 0) {
+                                                                    $row = mysqli_fetch_array($numOfGoalsresult);
+                                                                    $numOfGoals = $row['numOfGoals'];
+                                                                    // Calculate the predicted number of goals
+                                                                    $predictedNumOfGoals = $numOfGoals * $gamesLeft / $gamesPlayed;
+                                                                    $predictedScorers[] = array("firstName" => $firstName, "lastName" => $lastName, "teamName" => $teamName, "predictedNumOfGoals" => $predictedNumOfGoals);
+                                                                }
+                                                            }
                                                         }
                                                     }
-                                                }
-                                            }
 
-                                            // Sort the predictedScorers array in descending order based on the predicted number of goals
-                                            usort($predictedScorers, function ($a, $b) {
-                                                return $b['predictedNumOfGoals'] <=> $a['predictedNumOfGoals'];
-                                            });
+                                                    // Sort the predictedScorers array in descending order based on the predicted number of goals
+                                                    usort($predictedScorers, function ($a, $b) {
+                                                        return $b['predictedNumOfGoals'] <=> $a['predictedNumOfGoals'];
+                                                    });
 
-                                            foreach ($predictedScorers as $player) {
-                                            ?>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="card">
-                                                            <h2 class="lead"><b><?php echo $player['firstName'] . ' ' . $player['lastName']; ?></b></h2>
-                                                            <p class="text-muted text-sm"><b>Team:</b> <?php echo $player['teamName']; ?></p>
-                                                            <p class="text-muted text-sm"><b>Predicted number of goals:</b> <?php echo $player['predictedNumOfGoals']; ?></p>
+                                                    foreach ($predictedScorers as $player) {
+                                                    ?>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="card">
+                                                                    <h2 class="lead"><b><?php echo $player['firstName'] . ' ' . $player['lastName']; ?></b></h2>
+                                                                    <p class="text-muted text-sm"><b>Team:</b> <?php echo $player['teamName']; ?></p>
+                                                                    <p class="text-muted text-sm"><b>Predicted number of goals:</b> <?php echo $player['predictedNumOfGoals']; ?></p>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    <?php
+                                                    }
+                                                    ?>
                                                 </div>
-                                            <?php
-                                            }
-                                            ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End of predicted top scorers -->
+                                </div>
+                            </div>
+                            <!-- Predicted results -->
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card card-outline shadow">
+                                            <div class="card-body">
+                                                <h1 class="card-title">Predicted results</h1>
+                                                <br />
+                                                <div class="col-md-12">
+                                                    <?php
+                                                    $predictedResults = getPredictedResults($leagueID, $conn);
+                                                    if (!empty($predictedResults)) {
+                                                        foreach ($predictedResults as $match) {
+                                                            $homeTeam = $match['homeTeam'];
+                                                            $awayTeam = $match['awayTeam'];
+                                                            $predictedResult = $match['predictedResult'];
+                                                    ?>
+                                                            <div class="card-body">
+                                                                <h2 class="lead text-center"><b><?php echo "$homeTeam vs. $awayTeam: $predictedResult" . "<br>"; ?>
+                                                            </div>
+                                                    <?php
+                                                        }
+                                                    } else {
+                                                        echo "No predicted results found";
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- End of predicted top scorers -->
-                            <!-- Predicted graph -->
-                            <div class="col-md-6 text-center">
-                                <div class="card card-outline shadow">
-                                    <div class="card-header">
-                                        <h3 class="card-title">
-                                            Predicted points throughout the season
-                                        </h3>
+                                <div class="row">
+                                    <!-- Predicted graph -->
+                                    <div class="col-md-12 text-center">
+                                        <div class="card card-outline shadow">
+                                            <div class="card-header">
+                                                <h3 class="card-title">
+                                                    Predicted points throughout the season
+                                                </h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="line-chart" style="height: 300px;"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div id="line-chart" style="height: 300px;"></div>
-                                    </div>
+                                    <!-- End of predicted graph -->
                                 </div>
                             </div>
-                            <!-- End of predicted graph -->
                         </div>
-                        <!-- End of second row -->
                     </div>
+                    <!-- End of predicted results -->
                 </div>
             </div>
-            <!-- /.card -->
-        </section>
-        <!-- /.content -->
+            <!-- End of first row -->
     </div>
-    <!-- /.content-wrapper -->
+</div>
+<!-- /.card -->
+</section>
+<!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
 </div>
 <!-- REQUIRED SCRIPTS -->
 
@@ -330,7 +337,6 @@ WHERE team.leagueID = '$leagueID'";
 
 <script>
     <?php
-
     $query = "SELECT teamID, teamName FROM team WHERE leagueID = '$leagueID'";
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -357,17 +363,13 @@ WHERE team.leagueID = '$leagueID'";
          */
         var allPointsPerWeek = <?php echo json_encode($allPointsPerWeek); ?>;
         var teams = <?php echo json_encode($teams); ?>;
-        console.log(allPointsPerWeek);
-        console.log(teams);
-        console.log('test')
+
         var line_data = [];
         for (var teamID in allPointsPerWeek) {
             line_data.push(allPointsPerWeek[teamID].map(function(item) {
                 return [item[0], item[1]];
             }));
         }
-
-        console.log(line_data);
 
         $.plot('#line-chart', line_data, {
             grid: {
@@ -419,7 +421,7 @@ WHERE team.leagueID = '$leagueID'";
                     y = item.datapoint[1].toFixed(2),
                     teamName = teams[Object.keys(teams)[item.seriesIndex]].name;
 
-                $('#line-chart-tooltip').html(teamName + ' had ' + y + ' points at week ' + x)
+                $('#line-chart-tooltip').html(teamName + ' will have ' + y + ' points at week ' + x)
                     .css({
                         top: item.pageY + 5,
                         left: item.pageX + 5
@@ -430,11 +432,69 @@ WHERE team.leagueID = '$leagueID'";
             }
         })
     })
+
+    // Global variable to store the sorting order
+    var sortOrder = [];
+
+    // QuickSort function to sort the table
+    function quickSort(arr, low, high, column) {
+        if (low < high) {
+            var pivot = partition(arr, low, high, column);
+            quickSort(arr, low, pivot - 1, column);
+            quickSort(arr, pivot + 1, high, column);
+        }
+    }
+
+    // Partition function for QuickSort
+    function partition(arr, low, high, column) {
+        var pivotValue = arr[high][column];
+        var i = low - 1;
+        for (var j = low; j <= high - 1; j++) {
+            if (arr[j][column] < pivotValue) {
+                i++;
+                swap(arr, i, j);
+            }
+        }
+        swap(arr, i + 1, high);
+        return i + 1;
+    }
+
+    // Swap function to swap two elements in the array
+    function swap($arr, $a, $b) {
+        $temp = $arr[$a];
+        $arr[$a] = $arr[$b];
+        $arr[$b] = $temp;
+    }
+
+
+
+    $(document).ready(function() {
+        $("th").click(function() {
+            var table = $(this).parents("table");
+            var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+            this.asc = !this.asc;
+            if (!this.asc) {
+                rows = rows.reverse();
+            }
+            for (var i = 0; i < rows.length; i++) {
+                table.append(rows[i]);
+            }
+        });
+    });
+
+    function comparer(index) {
+        return function(a, b) {
+            var valA = getCellValue(a, index),
+                valB = getCellValue(b, index);
+            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+        }
+    }
+
+    function getCellValue(row, index) {
+        return $(row).children("td").eq(index).text();
+    }
 </script>
 
 </body>
-
-
-<!-- Add error messages when there are no games played or no scorers etc -->
 
 </html>
