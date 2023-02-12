@@ -37,16 +37,53 @@ while ($row = mysqli_fetch_assoc($result)) {
     // Store the fixtureID of the fixture being moved
     $fixtureIDs[] = $fixtureID;
 
-    // Insert the data into the tempresult table with status "waiting"
-    $query = "INSERT INTO tempresult (homeTeamID, awayTeamID, leagueID, matchweek, status)
-            VALUES ($homeTeamID, $awayTeamID, $leagueID, $matchweek, 'waiting')";
+    // Get all playerIDs of players who were available for the fixture
+    $query = "SELECT playerID
+              FROM availability
+              WHERE fixtureID = $fixtureID AND available = 1";
+    $playerIDs = mysqli_query($conn, $query);
+
+    if (!$playerIDs) {
+        die("Query failed: " . mysqli_error($conn));
+    }
+
+    while ($player = mysqli_fetch_assoc($playerIDs)) {
+        $playerID = $player['playerID'];
+
+        // Check if the player already has an entry in the appearances table
+        $query = "SELECT appearanceID
+                  FROM appearance
+                  WHERE playerID = $playerID";
+        $appearance = mysqli_query($conn, $query);
+
+        if (!$appearance) {
+            die("Query failed: " . mysqli_error($conn));
+        }
+
+        if (mysqli_num_rows($appearance) > 0) {
+            // If the player already has an entry in the appearances table, update their appearances count
+            $query = "UPDATE appearance
+                      SET numOfAppearances = numOfAppearances + 1
+                      WHERE playerID = $playerID";
+            mysqli_query($conn, $query);
+        } else {
+            // If the player does not have an entry in the appearances table, create a new entry for them with appearances count 1
+            $query = "INSERT INTO appearance (playerID, numOfAppearances)
+VALUES ($playerID, 1)";
+            mysqli_query($conn, $query);
+        }
+    }
+
+    // Move the fixture to the tempresult table
+    $query = "INSERT INTO tempresult (fixtureID, homeTeamID, awayTeamID, leagueID, matchweek)
+          VALUES ($fixtureID, $homeTeamID, $awayTeamID, $leagueID, $matchweek)";
     mysqli_query($conn, $query);
 }
 
-// Delete the rows from the fixture table according to the fixtureIDs of fixtures being moved
+// Delete the fixtures from the fixture table
 if (!empty($fixtureIDs)) {
-    $fixtureIDs = implode(',', $fixtureIDs);
+    $fixtureIDs = implode(", ", $fixtureIDs);
     $query = "DELETE FROM fixture
-              WHERE fixtureID IN ($fixtureIDs)";
+WHERE fixtureID IN ($fixtureIDs)";
     mysqli_query($conn, $query);
 }

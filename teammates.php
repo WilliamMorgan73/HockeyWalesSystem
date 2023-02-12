@@ -96,12 +96,6 @@ $teamID = getTeamID($currentUserID);
             <section class="content">
                 <!-- Default box -->
                 <div class="card card-solid">
-                    <div class="card-header pb-0 text-right">
-                        <div class="form-group">
-                            <select class="select2" multiple="multiple" data-placeholder="Filters" style="width: 25%;">
-                            </select>
-                        </div>
-                    </div>
                     <div class="card-body pb-0">
                         <div class="row">
                             <!-- PHP code to get all players with the same teamID -->

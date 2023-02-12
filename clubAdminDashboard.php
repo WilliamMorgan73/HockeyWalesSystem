@@ -112,18 +112,18 @@ $leagueID = getLeagueID($userID, $conn);
                 <div class="col-md-6">
                   <div class="card shadow" style="width: 100%">
                     <div class="card-body p-0">
-                      <table class=" table table-striped" style="width: 100%">
+                      <table class="table table-striped" style="width: 100%">
                         <thead>
                           <tr>
-                            <th>Team</th>
-                            <th>W</th>
-                            <th>D</th>
-                            <th>L</th>
-                            <th>GD</th>
-                            <th>PTS</th>
+                            <th onclick="sortTable(0)">Team</th>
+                            <th onclick="sortTable(1)">W</th>
+                            <th onclick="sortTable(2)">D</th>
+                            <th onclick="sortTable(3)">L</th>
+                            <th onclick="sortTable(4)">GD</th>
+                            <th onclick="sortTable(5)">PTS</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tableBody">
                           <?php
                           // Assuming the database connection is established and stored in the variable $conn
                           $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
@@ -138,13 +138,13 @@ $leagueID = getLeagueID($userID, $conn);
                             // Display the teams in descending order of points
                             foreach ($points as $team) {
                               echo "<tr>
-              <td>" . $team["teamName"] . "</td>
-              <td>" . getTeamWins($team["teamID"], $conn) . "</td>
-              <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
-              <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
-              <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
-              <td>" . $team["points"] . "</td>
-            </tr>";
+  <td>" . $team["teamName"] . "</td>
+  <td>" . getTeamWins($team["teamID"], $conn) . "</td>
+  <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
+  <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
+  <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+  <td>" . $team["points"] . "</td>
+</tr>";
                             }
                           } else {
                             echo "0 results";
@@ -165,31 +165,34 @@ $leagueID = getLeagueID($userID, $conn);
                       <br />
                       <div class="row">
                         <div class="col-md-12">
-                          <div class="row">
-                            <div class="col-md-4">
-                              <div class="card pt-0">
-                                <div class="col-12">
-                                  <h6 class="header"><b>Swansea 1s</b> vs <b>Whitchurch 1s</b></h6>
-                                  <p>Date: 07/02/23</p>
+                          <div class="row text-center">
+                            <?php
+                            $query = "SELECT hometeam.teamName AS hometeam, awayteam.teamName AS awayteam, homeTeamScore, awayTeamScore, tempresult.homeTeamID AS homeTeamID, tempresult.awayTeamID AS awayTeamID
+                        FROM tempresult
+                        INNER JOIN team hometeam ON tempresult.homeTeamID = hometeam.teamID
+                        INNER JOIN team awayteam ON tempresult.awayTeamID = awayteam.teamID
+                        WHERE awayteam.clubID = $clubID AND tempresult.status = 'sent'";
+
+                            $result = mysqli_query($conn, $query);
+
+                            // Loop through the data and display it
+                            while ($row = mysqli_fetch_assoc($result)) {
+                              $hometeam = $row['hometeam'];
+                              $awayteam = $row['awayteam'];
+                              $scoreline = $row['homeTeamScore'] . "-" . $row['awayTeamScore'];
+                            ?>
+                              <div class="col-md-4">
+                                <div class="card pt-0">
+                                  <div class="col-12">
+                                    <h6 class="header"><b><?php echo $hometeam; ?></b> vs <b><?php echo $awayteam; ?></b></h6>
+                                    <p>Score: <?php echo $scoreline; ?></p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="card pt-0">
-                                <div class="col-12">
-                                  <h6 class="header"><b>Swansea 2s</b> vs <b>Whitchurch 2s</b></h6>
-                                  <p>Date: 07/02/23</p>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="card pt-0">
-                                <div class="col-12">
-                                  <h6 class="header"><b>Swansea 3s</b> vs <b>Whitchurch 3s</b></h6>
-                                  <p>Date: 07/02/23</p>
-                                </div>
-                              </div>
-                            </div>
+                            <?php
+                            }
+                            ?>
+
                           </div>
                         </div>
                       </div>
@@ -257,6 +260,70 @@ $leagueID = getLeagueID($userID, $conn);
   <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="js/adminlte/adminlte.min.js"></script>
+
+  <script>
+    // Global variable to store the sorting order
+    var sortOrder = [];
+
+    // QuickSort function to sort the table
+    function quickSort(arr, low, high, column) {
+      if (low < high) {
+        var pivot = partition(arr, low, high, column);
+        quickSort(arr, low, pivot - 1, column);
+        quickSort(arr, pivot + 1, high, column);
+      }
+    }
+
+    // Partition function for QuickSort
+    function partition(arr, low, high, column) {
+      var pivotValue = arr[high][column];
+      var i = low - 1;
+      for (var j = low; j <= high - 1; j++) {
+        if (arr[j][column] < pivotValue) {
+          i++;
+          swap(arr, i, j);
+        }
+      }
+      swap(arr, i + 1, high);
+      return i + 1;
+    }
+
+    // Swap function to swap two elements in the array
+    function swap($arr, $a, $b) {
+      $temp = $arr[$a];
+      $arr[$a] = $arr[$b];
+      $arr[$b] = $temp;
+    }
+
+
+
+    $(document).ready(function() {
+      $("th").click(function() {
+        var table = $(this).parents("table");
+        var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+        this.asc = !this.asc;
+        if (!this.asc) {
+          rows = rows.reverse();
+        }
+        for (var i = 0; i < rows.length; i++) {
+          table.append(rows[i]);
+        }
+      });
+    });
+
+    function comparer(index) {
+      return function(a, b) {
+        var valA = getCellValue(a, index),
+          valB = getCellValue(b, index);
+        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+      }
+    }
+
+    function getCellValue(row, index) {
+      return $(row).children("td").eq(index).text();
+    }
+  </script>
+
 </body>
 
 </html>

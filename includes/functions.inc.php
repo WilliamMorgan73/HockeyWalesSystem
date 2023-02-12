@@ -1375,11 +1375,3 @@ function updateAssists($playerID, $assists, $conn)
         exit;
     }
 }
-/*
-
-TODO:
-Add a check to see if clubs have a club admin already
-Add validation email to club admin only which is sent to a system admin to approve
-Maybe make email to user when they are added to a club
-Tidy up comments in playerDashboard.php
-*/
