@@ -1375,3 +1375,25 @@ function updateAssists($playerID, $assists, $conn)
         exit;
     }
 }
+
+//Function to get all clubs in database
+
+function getClubs()
+{
+
+    global $conn;
+    $clubs = array();
+
+    $query = "SELECT clubID, clubName FROM club";
+    $result = mysqli_query($conn, $query);
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn);
+        exit;
+    }
+
+    while ($row = mysqli_fetch_assoc($result)) {
+        $clubs[] = $row;
+    }
+
+    return $clubs;
+}

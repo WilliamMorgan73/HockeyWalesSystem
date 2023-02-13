@@ -76,7 +76,7 @@ Button  css
 
 /*League button*/
 .btn-league,
-.btn-login{
+.btn-login {
   position: relative;
   padding: 10px;
   font-size: 1em;
@@ -114,4 +114,5 @@ Text box css
 .club-player-search {
   width: 100%;
 }
+
 

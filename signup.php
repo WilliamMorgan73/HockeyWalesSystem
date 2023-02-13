@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+<?php
+require_once('includes/functions.inc.php');
+
+$clubs = getClubs();
+?>
 
 <head>
   <meta charset="UTF-8" />
@@ -13,6 +18,10 @@
   <link rel="stylesheet" href="css/style.css" />
   <!-- JQuery -->
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="css/select2/select2.min.css">
+<link rel="stylesheet" href="css/select2/"
+
 
 </head>
 
@@ -71,7 +80,19 @@
               <div class="row">
                 <div class="col-md-6">
                   <p class="title">Club</p>
-                  <input type="text" id="club" name="club" class="form-control club-player-search" />
+                  <select class="form-select form-select-solid" data-control="select2" data-placeholder="Select a club" name="club" style="background-color: #d8d6d680;">
+                    <?php
+                    //Loop through all clubs in the club database
+                    foreach ($clubs as $club) {
+                      //Get the club name
+                      $clubName = $club['clubName'];
+                      //Get the club ID
+                      $clubID = $club['clubID'];
+                      //Display the club name and ID
+                      echo "<option value='$clubID'>$clubName</option>";
+                    }
+                    ?>
+                  </select>
                 </div>
                 <!-- Date of birth -->
                 <div class="col-md-6">
@@ -149,6 +170,9 @@
   <!-- AdminLTE App -->
   <script src="js/adminlte/adminlte.min.js"></script>
 
+  <!-- Select2 -->
+  <script src="js/select2/select2.full.min.js"></script>
+
   <script>
     $(function() {
       var sixteenYearsAgo = new Date();
@@ -161,6 +185,11 @@
         minDate: hundredYearsAgo,
         dateFormat: "yy-mm-dd",
       });
+
+      //Initialize Select2 Elements
+      $('.select2').select2({
+        width: 'resolve'
+      })
     });
   </script>
 </body>

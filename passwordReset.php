@@ -25,18 +25,20 @@
             <!-- Heading and subheading-->
             <p class="heading">Hockey Wales</p>
             <p class="sub-heading">
-              Enter your email here to recieve a verification email to change your password
+              Enter a new password here to change your password
               <!-- Change password form -->
             <form action="#" method="post">
-              <!-- Email -->
-              <p class="title">Enter your email</p>
-              <input type="email" id="email" name="email" class="club-player-search" />
-              <!-- Know password -->
-              <a class="sub-heading" style="display: block; text-align: right;" href="login.php">Know your password?</a>
-
+              <!-- Password -->
+              <p class="title">Password</p>
+              <input type="password" id="password" name="password" class="club-player-search" />
+              <!-- Confirm password -->
+              <p class="title">Confirm password</p>
+              <input type="password" id="confirmPassword" name="confirmPassword" class="club-player-search" />
               <!-- Error message -->
               <?php
-              //Email not found
+              //Empty input
+              
+              //Password doesn't match
               ?>
 
               <!-- Login button -->
