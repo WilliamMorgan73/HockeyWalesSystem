@@ -33,9 +33,10 @@ $leagueName = getLeagueName($conn, $leagueID);
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-light-primary elevation-4">
+        <aside class="main-sidebar sidebar-light-danger elevation-4">
             <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
+                <img src="images/hw_feathers2.png" style="width:25%;">
                 <span class="brand-text font-weight-bolder"><?php echo $leagueName ?></span>
             </a>
             <!-- Sidebar -->
@@ -80,6 +81,12 @@ $leagueName = getLeagueName($conn, $leagueID);
                                         <p>Predictions</p>
                                     </button>
                                 </form>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">
+                                <i class="bi bi-list nav-icon"></i>
+                                <p>League selection</p>
                             </a>
                         </li>
                     </ul>

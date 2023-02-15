@@ -393,7 +393,7 @@ function getPlayerApperances($conn, $userID)
 {
     //get playerID using userID
     $playerID = getPlayerID($conn, $userID);
-    $sql = "SELECT numOfAppearances FROM apperance WHERE playerID = ?;";
+    $sql = "SELECT numOfAppearances FROM appearance WHERE playerID = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
         header("Location: ../signup.php?error=stmtfailed");

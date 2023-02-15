@@ -36,9 +36,10 @@ $leagueID = getLeagueID($userID, $conn);
 
   <div class="wrapper">
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-light-primary elevation-4">
+    <aside class="main-sidebar sidebar-light-danger elevation-4">
       <!-- Brand Logo -->
       <a href="index.php" class="brand-link">
+        <img src="images/hw_feathers2.png" style="width:25%;">
         <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span>
       </a>
       <!-- Sidebar -->
@@ -74,6 +75,12 @@ $leagueID = getLeagueID($userID, $conn);
               <a href="resultApproval.php" class="nav-link">
                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
                 <p>Result apporval</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.php">
+                <i class="bi bi-list nav-icon"></i>
+                <p>League selection</p>
               </a>
             </li>
           </ul>

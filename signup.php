@@ -20,9 +20,7 @@ $clubs = getClubs();
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <!-- Select2 -->
   <link rel="stylesheet" href="css/select2/select2.min.css">
-<link rel="stylesheet" href="css/select2/"
-
-
+<link rel="stylesheet" href="css/select2/">
 </head>
 
 <body>

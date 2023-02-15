@@ -33,9 +33,10 @@ $clubID = getClubID($conn, $clubName);
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-light-primary elevation-4">
+        <aside class="main-sidebar sidebar-light-danger elevation-4">
             <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
+                <img src="images/hw_feathers2.png" style="width:25%;">
                 <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span>
             </a>
             <!-- Sidebar -->
@@ -70,6 +71,12 @@ $clubID = getClubID($conn, $clubName);
                             <a href="resultApproval.php" class="nav-link">
                                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
                                 <p>Result apporval</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">
+                                <i class="bi bi-list nav-icon"></i>
+                                <p>League selection</p>
                             </a>
                         </li>
                     </ul>
@@ -121,36 +128,42 @@ $clubID = getClubID($conn, $clubName);
                                                 </div>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="text-left">
-                                                    <!-- Button that when clicks runs the player approve script -->
-                                                    <form action="includes/playerApprove.inc.php" method="post">
-                                                        <!-- Hidden input to post the tempUserID -->
-                                                        <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
-                                                        <!-- Drop-down list of teams -->
-                                                        <select name="teamID">
-                                                            <?php
-                                                            $teamQuery = "SELECT * FROM team WHERE clubID = '$clubID'";
-                                                            $teamResult = mysqli_query($conn, $teamQuery);
-                                                            while ($teamRow = mysqli_fetch_array($teamResult)) {
-                                                            ?>
-                                                                <option value="<?php echo $teamRow['teamID']; ?>">
-                                                                    <?php echo $teamRow['teamName']; ?>
-                                                                </option>
-                                                            <?php
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                        <!-- Submit button to approve the player -->
-                                                        <button type="submit">Approve Player</button>
-                                                    </form>
-                                                </div>
-                                                <div class="text-right">
-                                                    <!-- Button that when clicks runs the player reject script -->
-                                                    <form action="includes/playerReject.inc.php" method="post">
-                                                        <!-- Hidden input to post the tempUserID -->
-                                                        <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
-                                                        <!-- Submit button to reject the player -->
-                                                        <button type="submit">Reject Player</button>
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <div class="text-left">
+                                                            <!-- Button that when clicks runs the player approve script -->
+                                                            <form action="includes/playerApprove.inc.php" method="post">
+                                                                <!-- Hidden input to post the tempUserID -->
+                                                                <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
+                                                                <!-- Drop-down list of teams -->
+                                                                <select name="teamID">
+                                                                    <?php
+                                                                    $teamQuery = "SELECT * FROM team WHERE clubID = '$clubID'";
+                                                                    $teamResult = mysqli_query($conn, $teamQuery);
+                                                                    while ($teamRow = mysqli_fetch_array($teamResult)) {
+                                                                    ?>
+                                                                        <option value="<?php echo $teamRow['teamID']; ?>">
+                                                                            <?php echo $teamRow['teamName']; ?>
+                                                                        </option>
+                                                                    <?php
+                                                                    }
+                                                                    ?>
+                                                                </select>
+                                                                <!-- Submit button to approve the player -->
+                                                                <button type="submit" class="btn btn-success">Approve Player</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="text-right">
+                                                            <!-- Button that when clicks runs the player reject script -->
+                                                            <form action="includes/playerReject.inc.php" method="post">
+                                                                <!-- Hidden input to post the tempUserID -->
+                                                                <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
+                                                                <!-- Submit button to reject the player -->
+                                                                <button type="submit" class="btn btn-danger">Reject Player</button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

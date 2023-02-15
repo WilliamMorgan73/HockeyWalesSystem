@@ -38,9 +38,10 @@ $teams = getTeams($conn, $clubID);
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-light-primary elevation-4">
+        <aside class="main-sidebar sidebar-light-danger elevation-4">
             <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
+                <img src="images/hw_feathers2.png" style="width:25%;">
                 <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span>
             </a>
             <!-- Sidebar -->
@@ -76,6 +77,12 @@ $teams = getTeams($conn, $clubID);
                             <a href="resultApproval.php" class="nav-link">
                                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
                                 <p>Result apporval</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">
+                                <i class="bi bi-list nav-icon"></i>
+                                <p>League selection</p>
                             </a>
                         </li>
                     </ul>
@@ -146,7 +153,7 @@ $teams = getTeams($conn, $clubID);
                                                 }
                                                 ?>
                                             </select>
-                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                            <button type="submit" class="btn btn-danger">Search</button>
                                         </form>
                                     </div>
                                 </div>

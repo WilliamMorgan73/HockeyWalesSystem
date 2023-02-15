@@ -36,9 +36,10 @@ $teamID = getTeamID($currentUserID);
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-light-primary elevation-4">
+        <aside class="main-sidebar sidebar-light-danger elevation-4">
             <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
+                <img src="images/hw_feathers2.png" style="width:25%;">
                 <span class="brand-text font-weight-bolder">HOCKEY WALES</span>
             </a>
             <!-- Sidebar -->
@@ -72,6 +73,12 @@ $teamID = getTeamID($currentUserID);
                                         <p>Fixtures</p>
                                     </button>
                                 </form>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">
+                                <i class="bi bi-list nav-icon"></i>
+                                <p>League selection</p>
                             </a>
                         </li>
                     </ul>
@@ -129,17 +136,6 @@ $teamID = getTeamID($currentUserID);
                                                 <div class="col-12 text-center">
                                                     <img src="images\pfp\<?php echo $userID . '.jpg'; ?>" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer">
-                                            <div class="text-center">
-                                                <!-- Button that takes you to the seleected player page -->
-                                                <form action="#" method="post">
-                                                    <input type="hidden" name="playerID" value="$row['playerID']">
-                                                    <button type="submit" class="btn btn-sm btn-primary">
-                                                        View player
-                                                    </button>
-                                                </form>
                                             </div>
                                         </div>
                                     </div>

@@ -30,9 +30,10 @@ $leagueName = getLeagueName($conn, $leagueID);
 <body class="hold-transition sidebar-mini"></body>
 <div class="wrapper">
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-light-primary elevation-4">
+    <aside class="main-sidebar sidebar-light-danger elevation-4">
         <!-- Brand Logo -->
         <a href="index.php" class="brand-link">
+            <img src="images/hw_feathers2.png" style="width:25%;">
             <span class="brand-text font-weight-bolder"><?php echo $leagueName ?></span>
         </a>
         <!-- Sidebar -->
@@ -79,7 +80,12 @@ $leagueName = getLeagueName($conn, $leagueID);
                             <p>Predictions</p>
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">
+                            <i class="bi bi-list nav-icon"></i>
+                            <p>League selection</p>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->
@@ -197,15 +203,28 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                         // Get the number of records with homeTeamID or awayTeamID = $teamID
                                                         $query = "SELECT * FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
                                                         $gamesPlayedResult = mysqli_query($conn, $query);
+
+                                                        if (!$gamesPlayedResult) {
+                                                            echo "Error: " . mysqli_error($conn);
+                                                            exit();
+                                                        }
+
                                                         $gamesPlayed = mysqli_num_rows($gamesPlayedResult);
 
                                                         // Calculate the number of games left
                                                         $gamesLeft = $numOfGames - $gamesPlayed;
 
                                                         $query = "SELECT player.* FROM player
-INNER JOIN team ON player.teamID = team.teamID
-WHERE team.leagueID = '$leagueID'";
+        INNER JOIN team ON player.teamID = team.teamID
+        WHERE team.leagueID = '$leagueID'";
+
                                                         $teamIDresult = mysqli_query($conn, $query);
+
+                                                        if (!$teamIDresult) {
+                                                            echo "Error: " . mysqli_error($conn);
+                                                            exit();
+                                                        }
+
                                                         if (mysqli_num_rows($teamIDresult) > 0) {
                                                             while ($row = mysqli_fetch_array($teamIDresult)) {
                                                                 $playerID = $row['playerID'];
@@ -215,22 +234,54 @@ WHERE team.leagueID = '$leagueID'";
 
                                                                 $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
                                                                 $teamNameresult = mysqli_query($conn, $query);
+
+                                                                if (!$teamNameresult) {
+                                                                    echo "Error: " . mysqli_error($conn);
+                                                                    exit();
+                                                                }
+
                                                                 $row = mysqli_fetch_array($teamNameresult);
                                                                 $teamName = $row['teamName'];
 
-                                                                $query = "SELECT sum(numOfGoals) as numOfGoals FROM goal WHERE playerID = '$playerID'";
+                                                                $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID'";
                                                                 $numOfGoalsresult = mysqli_query($conn, $query);
-                                                                if (mysqli_num_rows($numOfGoalsresult) > 0) {
-                                                                    $row = mysqli_fetch_array($numOfGoalsresult);
-                                                                    $numOfGoals = $row['numOfGoals'];
-                                                                    // Calculate the predicted number of goals
-                                                                    $predictedNumOfGoals = $numOfGoals * $gamesLeft / $gamesPlayed;
-                                                                    $predictedScorers[] = array("firstName" => $firstName, "lastName" => $lastName, "teamName" => $teamName, "predictedNumOfGoals" => $predictedNumOfGoals);
+
+                                                                if (!$numOfGoalsresult) {
+                                                                    echo "Error: " . mysqli_error($conn);
+                                                                    exit();
                                                                 }
+
+                                                                $numOfGoals = 0;
+
+                                                                if (mysqli_num_rows($numOfGoalsresult) > 0) {
+                                                                    while ($row = mysqli_fetch_array($numOfGoalsresult)) {
+                                                                        $numOfGoals += $row['numOfGoals'];
+                                                                    }
+                                                                }
+
+                                                                $query = "SELECT numOfAppearances FROM appearance WHERE playerID = '$playerID'";
+                                                                $appearancesResult = mysqli_query($conn, $query);
+
+
+
+                                                                if (!$appearancesResult) {
+                                                                    echo "Error: " . mysqli_error($conn);
+                                                                    exit();
+                                                                }
+                                                                $appearancesRow = mysqli_fetch_array($appearancesResult);
+                                                                $appearances = $appearancesRow['numOfAppearances'];
+
+                                                                // Calculate the predicted number of goals
+                                                                if ($appearances > 0) {
+                                                                    $predictedNumOfGoals = round($numOfGoals * $gamesLeft / $appearances);
+                                                                } else {
+                                                                    $predictedNumOfGoals = 0;
+                                                                }
+
+                                                                $predictedScorers[] = array("firstName" => $firstName, "lastName" => $lastName, "teamName" => $teamName, "predictedNumOfGoals" => $predictedNumOfGoals);
                                                             }
                                                         }
                                                     }
-
                                                     // Sort the predictedScorers array in descending order based on the predicted number of goals
                                                     usort($predictedScorers, function ($a, $b) {
                                                         return $b['predictedNumOfGoals'] <=> $a['predictedNumOfGoals'];
@@ -243,7 +294,7 @@ WHERE team.leagueID = '$leagueID'";
                                                                 <div class="card">
                                                                     <h2 class="lead"><b><?php echo $player['firstName'] . ' ' . $player['lastName']; ?></b></h2>
                                                                     <p class="text-muted text-sm"><b>Team:</b> <?php echo $player['teamName']; ?></p>
-                                                                    <p class="text-muted text-sm"><b>Predicted number of goals:</b> <?php echo $player['predictedNumOfGoals']; ?></p>
+                                                                    <p class="text-muted text-sm"><b>Predicted number of goals: </b> <?php echo $player['predictedNumOfGoals']; ?></p>
                                                                 </div>
                                                             </div>
                                                         </div>

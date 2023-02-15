@@ -35,9 +35,10 @@ $playerTeam = getPlayerTeam($conn, $userID);
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-light-primary elevation-4">
+        <aside class="main-sidebar sidebar-light-danger elevation-4">
             <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
+                <img src="images/hw_feathers2.png" style="width:25%;">
                 <span class="brand-text font-weight-bolder">HOCKEY WALES</span>
             </a>
             <!-- Sidebar -->
@@ -71,6 +72,12 @@ $playerTeam = getPlayerTeam($conn, $userID);
                             <a style="cursor:pointer" class="nav-link active">
                                 <i class="far bi bi-calendar-date-fill nav-icon"></i>
                                 <p>Fixtures</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">
+                                <i class="bi bi-list nav-icon"></i>
+                                <p>League selection</p>
                             </a>
                         </li>
                     </ul>

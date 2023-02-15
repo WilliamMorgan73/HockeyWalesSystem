@@ -39,9 +39,10 @@ $playerTeamID = getTeamID($userID);
 <body class="hold-transition sidebar-mini">
   <div class="wrapper">
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-light-primary elevation-4">
+    <aside class="main-sidebar sidebar-light-danger elevation-4">
       <!-- Brand Logo -->
       <a href="index.php" class="brand-link">
+        <img src="images/hw_feathers2.png" style="width:25%;">
         <span class="brand-text font-weight-bolder">HOCKEY WALES</span>
       </a>
       <!-- Sidebar -->
@@ -75,6 +76,12 @@ $playerTeamID = getTeamID($userID);
                     <p>Fixtures</p>
                   </button>
                 </form>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.php">
+                <i class="bi bi-list nav-icon"></i>
+                <p>League selection</p>
               </a>
             </li>
           </ul>
@@ -307,7 +314,7 @@ $playerTeamID = getTeamID($userID);
                                   $lastName = $row['lastName'];
                                 ?>
                                   <div class="col-md-4">
-                                    <div class="card card-primary card-outline">
+                                    <div class="card card-danger card-outline">
                                       <div class="card-body box-profile">
                                         <div class="text-center">
                                           <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
