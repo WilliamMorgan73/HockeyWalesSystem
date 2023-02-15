@@ -52,7 +52,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         // Check if the player already has an entry in the appearances table
         $query = "SELECT appearanceID
-                  FROM appearance
+                  FROM appearan ce
                   WHERE playerID = $playerID";
         $appearance = mysqli_query($conn, $query);
 
