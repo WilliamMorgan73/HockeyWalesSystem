@@ -10,7 +10,7 @@ $password = $_POST['password'];
 $confirmPassword = $_POST['confirmPassword'];
 $firstName = $_POST['firstName'];
 $lastName = $_POST['lastName'];
-$club = ucfirst(strtolower($_POST['club']));
+$club = $_POST['club'];
 $DOB = date('Y-m-d', strtotime($_POST['DOB']));
 $accountType = $_POST['accountType'];
 
@@ -52,13 +52,6 @@ if (isset($_POST['submit'])) {
         exit();
     }
 
-    //Function call to check if club exists
-
-    if (clubExists($conn, $club) !== false) {
-        header("Location: ../signup.php?error=clubdoesntexist&message=" . urlencode("Club does not exist."));
-        exit();
-    }
-
     //Check if account type is player or club admin
 
     if ($accountType == 'Player') {
@@ -66,6 +59,8 @@ if (isset($_POST['submit'])) {
         createPlayer($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
         exit();
     } else if ($accountType == 'Club Admin') {
+        //Function call to check if club already has a club admin
+        clubHasAdmin($club);
         //Function call to create a club admin
         createClubAdmin($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
         exit();

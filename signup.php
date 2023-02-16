@@ -123,11 +123,6 @@ $clubs = getClubs();
                 $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                 echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
               }
-              //Club doesn't exist
-              else if (isset($_GET['error']) && $_GET['error'] === "clubdoesntexist") {
-                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
-              }
               //Fields incorrect length
               else if (isset($_GET['error']) && $_GET['error'] === "fieldlength") {
                 $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
@@ -140,6 +135,16 @@ $clubs = getClubs();
               }
               //Email exists in temp table
               else if (isset($_GET['error']) && $_GET['error'] === "pendingapproval") {
+                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+              }
+              //Club already has club admin
+              elseif (isset($_GET['error']) && $_GET['error'] === "AlreadyHasAdmin") {
+                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+              }
+              //Club admin account created, waiting for admin approval
+              else if (isset($_GET['error']) && $_GET['error'] === "clubadminaccountcreated") {
                 $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                 echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
               }

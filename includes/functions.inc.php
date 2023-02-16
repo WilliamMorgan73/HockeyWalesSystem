@@ -92,26 +92,21 @@ function checkLength($email, $password, $firstName, $lastName, $club)
     return $result;
 }
 
-//Function to check if club exists
+//Function to check if club has already has a club admin
 
-function clubExists($conn, $club)
+function clubHasAdmin($clubID)
 {
-    $sql = "SELECT * FROM club WHERE clubName = ?;";
-    $stmt = mysqli_stmt_init($conn);
-    if (!mysqli_stmt_prepare($stmt, $sql)) {
-        header("Location: ../signup.php?error=stmtfailed");
-        exit();
-    }
+    global $conn;
+    echo $clubID;
+    // Prepare the query
+    $stmt = $conn->prepare('SELECT * FROM clubAdmin WHERE clubID = ?');
+    $stmt->bind_param('i', $clubID);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    mysqli_stmt_bind_param($stmt, "s", $club);
-    mysqli_stmt_execute($stmt);
-
-    $resultData = mysqli_stmt_get_result($stmt);
-
-    if ($row = mysqli_fetch_assoc($resultData)) {
-        return false;
-    } else {
-        return true;
+    // If a result is found, output an error
+    if ($result->num_rows > 0) {
+        header("Location: ../signup.php?error=AlreadyHasAdmin&message=" . urlencode("The club you are trying to join already have a club admin"));
     }
 }
 
@@ -175,13 +170,6 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
 
     $userID = $conn->insert_id;
 
-    $clubID = getClubID($conn, $club);
-    if (!$clubID) {
-        echo "Error: club not found";
-        $conn->rollback(); // Roll back the transaction
-        exit;
-    }
-
     $sql = "INSERT INTO tempPlayer (firstName, lastName, clubID, DOB, tempUserID) 
     VALUES (?, ?, ?, ?, ?)";
 
@@ -191,7 +179,7 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
         $conn->rollback(); // Roll back the transaction
         exit;
     } else {
-        $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $userID);
+        $stmt->bind_param("ssssi", $firstName, $lastName, $club, $DOB, $userID);
         $stmt->execute();
         $conn->commit(); // Commit the transaction
         header("Location: ../signup.php?error=playeraccountcreated&message=" . urlencode("Account created, waiting for club admin to accept"));
@@ -201,11 +189,11 @@ function createPlayer($conn, $email, $password, $firstName, $lastName, $club, $D
 
 //Function to create a club admin
 
-function createClubAdmin($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType)
+function createClubAdmin($conn, $email, $password, $firstName, $lastName, $clubID, $DOB, $accountType)
 {
     $conn->begin_transaction();
 
-    $sql = "INSERT INTO user (email, password, accountType) 
+    $sql = "INSERT INTO tempUser (email, password, accountType) 
     VALUES (?, ?, ?)";
 
     $stmt = $conn->stmt_init();
@@ -220,16 +208,9 @@ function createClubAdmin($conn, $email, $password, $firstName, $lastName, $club,
         $stmt->execute();
     }
 
-    $userID = $conn->insert_id;
+    $tempuserID = $conn->insert_id;
 
-    $clubID = getClubID($conn, $club);
-    if (!$clubID) {
-        echo "Error: club not found";
-        $conn->rollback();
-        exit;
-    }
-
-    $sql = "INSERT INTO clubadmin (firstName, lastName, clubID, DOB, userID) 
+    $sql = "INSERT INTO tempclubadmin (firstName, lastName, clubID, DOB, tempUserID) 
     VALUES (?, ?, ?, ?, ?)";
 
     $stmt = $conn->stmt_init();
@@ -238,13 +219,21 @@ function createClubAdmin($conn, $email, $password, $firstName, $lastName, $club,
         $conn->rollback();
         exit;
     } else {
-        $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $userID);
+        $stmt->bind_param("ssssi", $firstName, $lastName, $clubID, $DOB, $tempuserID);
         $stmt->execute();
-        $conn->commit();
-        header("Location: ../login.php?signup=success"); //Change to success page until club admin approves
+
+        if ($stmt->error) {
+            // If the second query fails, roll back both queries and output an error message
+            echo "Second SQL statement failed: " . $stmt->error;
+            $conn->rollback();
+            exit;
+        } else {
+            // If both queries succeed, commit the transaction and redirect the user
+            $conn->commit();
+            header("Location: ../signup.php?error=clubadminaccountcreated&message=" . urlencode("Account created, waiting for a system admin to accept"));
+        }
     }
 }
-
 
 //Function to login a user
 
@@ -290,8 +279,10 @@ function loginUser($conn, $email, $password)
             $_SESSION["accountType"] = $emailExists["accountType"];
             if ($_SESSION["accountType"] == "Player") {
                 header("Location: ../playerDashboard.php");
-            } else {
+            } elseif ($_SESSION["Club Admin"] == "Player") {
                 header("Location: ../clubAdminDashboard.php");
+            } else{
+                header("Location: ../systemAdminDashboard.php");
             }
             exit();
         }

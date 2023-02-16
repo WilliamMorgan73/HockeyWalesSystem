@@ -1,0 +1,348 @@
+<?php
+//Add option to create a club and select league
+//Add option to approe or deny a club admin
+//Add option to add a system admin
+//Maybe an option to add a league
+?>
+<!DOCTYPE html>
+<!--
+PHP intergration
+-->
+<?php
+require_once('includes/functions.inc.php');
+$conn = require 'includes/dbhconfig.php';
+
+session_start();
+$userID = $_SESSION['userID'];
+
+?>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>System admin dashboard</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="css/adminlte/adminlte.min.css" />
+    <!-- Bootstrap Css -->
+    <link rel="stylesheet" href="css/bootstrapIcons/bootstrap-icons.css" />
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="hold-transition sidebar-mini">
+
+    <div class="wrapper">
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-light-danger elevation-4">
+            <!-- Brand Logo -->
+            <a href="index.php" class="brand-link">
+                <img src="images/hw_feathers2.png" style="width:25%;">
+                <span class="brand-text font-weight-bolder">System admin</span>
+            </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">
+                                <i class="bi bi-list nav-icon"></i>
+                                <p>Back</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb">
+                        <div class="col-sm">
+                            <h1 class="m-0">Manage the whole system from here</h1>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <div class="content">
+                <div class="card card-solid">
+                    <div class="card-body-0">
+                        <div class="container-fluid">
+                            <div class="row" style="padding-top:1%;">
+                                <!-- Club admin approval -->
+                                <div class="col-md-12">
+                                    <div class="card shadow" style="width: 100%">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Club admin approval</h5>
+                                            <br />
+                                            <?php
+                                            $query = "SELECT * FROM tempclubadmin";
+                                            $result = mysqli_query($conn, $query);
+                                            if (mysqli_num_rows($result) > 0) {
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $tempUserID = $row['tempUserID'];
+                                                    $tempUserQuery = "SELECT email FROM tempUser WHERE tempUserID = '$tempUserID'";
+                                                    $tempUserResult = mysqli_query($conn, $tempUserQuery);
+                                                    $tempUserRow = mysqli_fetch_array($tempUserResult);
+
+                                                    $clubID = $row['clubID'];
+                                                    $clubQuery = "SELECT clubName FROM club WHERE clubID = '$clubID'";
+                                                    $clubResult = mysqli_query($conn, $clubQuery);
+                                                    $clubRow = mysqli_fetch_array($clubResult);
+                                            ?>
+                                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-body pt-0">
+                                                                <div class="col-7">
+                                                                    <h2 class="header"><b><?php echo $row['firstName'];
+                                                                                            echo " ";
+                                                                                            echo $row['lastName']; ?></b></h2>
+                                                                    <p class="text-muted text-sm">
+                                                                        About:
+                                                                    <p>Date of birth: <?php echo $row['DOB']; ?></p>
+                                                                    <p>Email: <?php echo $tempUserRow['email']; ?></p>
+                                                                    <p>Club: <?php echo $clubRow['clubName']; ?></p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-footer">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="text-left">
+                                                                            <!-- Button that when clicks runs the club admin approve script -->
+                                                                            <form action="includes/clubAdminApprove.php" method="post">
+                                                                                <!-- Hidden input to post the tempUserID -->
+                                                                                <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
+
+                                                                                <!-- Submit button to approve the club admin -->
+                                                                                <button type="submit" class="btn btn-success">Approve Club Admin</button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="text-right">
+                                                                            <!-- Button that when clicks runs the club admin reject script -->
+                                                                            <form action="includes/clubAdminReject.php" method="post">
+                                                                                <!-- Hidden input to post the tempUserID -->
+                                                                                <input type="hidden" name="tempUserID" value="<?php echo $row['tempUserID']; ?>">
+                                                                                <!-- Submit button to reject the club admin -->
+                                                                                <button type="submit" class="btn btn-danger">Reject Club Admin</button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            <?php
+                                                }
+                                            } else {
+                                                echo "<h1>No club admins to approve</h1>";
+                                            }
+                                            ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of club admin approval -->
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Add system admins -->
+                                    <div class="card card-outline shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Add system admins</h5>
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <form action="includes/signup.inc.php" method="post">
+                                                        <!-- Email -->
+                                                        <p class="title" style=" padding-top:2%">Email</p>
+                                                        <input type="email" name="email" id="email" class="form-control club-player-search" />
+
+                                                        <!-- Password and confirm password -->
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="title">Password</div>
+                                                                <input type="password" name="password" id="password" class="form-control club-player-search" />
+                                                            </div>
+                                                            <!-- Confirm password -->
+                                                            <div class="col-md-6">
+                                                                <div class="title">Confirm password</div>
+                                                                <input type="password" name="confirmPassword" id="confirmPassword" class="form-control club-player-search" />
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Error message -->
+                                                        <?php
+                                                        //Empty input
+                                                        if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
+                                                            $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                            echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                        }
+                                                        //Password mismatch
+                                                        else if (isset($_GET['error']) && $_GET['error'] === "passwordsdontmatch") {
+                                                            $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                            echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                        }
+                                                        //Email already exists
+                                                        else if (isset($_GET['error']) && $_GET['error'] === "emailalreadyexists") {
+                                                            $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                            echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                        }
+                                                        ?>
+                                                        <!-- End of error message -->
+                                                        <!-- Signup button -->
+                                                        <button type="submit" name="submit" class="btn btn-login">Add system admin</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of add system admins -->
+                                <!-- Add league -->
+                                <div class="col-md-6">
+                                    <div class="card card-outline shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Add league</h5>
+                                            <br />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of add league -->
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Add club -->
+                                    <div class="card card-outline shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Add club</h5>
+                                            <br />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of add club -->
+                                <!-- Add team -->
+                                <div class="col-md-6">
+                                    <div class="card card-outline shadow">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Add team</h5>
+                                            <br />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of add team -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+    <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <!-- REQUIRED SCRIPTS -->
+
+    <!-- jQuery -->
+    <script src="js/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="js/adminlte/adminlte.min.js"></script>
+
+    <script>
+        // Global variable to store the sorting order
+        var sortOrder = [];
+
+        // QuickSort function to sort the table
+        function quickSort(arr, low, high, column) {
+            if (low < high) {
+                var pivot = partition(arr, low, high, column);
+                quickSort(arr, low, pivot - 1, column);
+                quickSort(arr, pivot + 1, high, column);
+            }
+        }
+
+        // Partition function for QuickSort
+        function partition(arr, low, high, column) {
+            var pivotValue = arr[high][column];
+            var i = low - 1;
+            for (var j = low; j <= high - 1; j++) {
+                if (arr[j][column] < pivotValue) {
+                    i++;
+                    swap(arr, i, j);
+                }
+            }
+            swap(arr, i + 1, high);
+            return i + 1;
+        }
+
+        // Swap function to swap two elements in the array
+        function swap($arr, $a, $b) {
+            $temp = $arr[$a];
+            $arr[$a] = $arr[$b];
+            $arr[$b] = $temp;
+        }
+
+
+
+        $(document).ready(function() {
+            $("th").click(function() {
+                var table = $(this).parents("table");
+                var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+                this.asc = !this.asc;
+                if (!this.asc) {
+                    rows = rows.reverse();
+                }
+                for (var i = 0; i < rows.length; i++) {
+                    table.append(rows[i]);
+                }
+            });
+        });
+
+        function comparer(index) {
+            return function(a, b) {
+                var valA = getCellValue(a, index),
+                    valB = getCellValue(b, index);
+                return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+            }
+        }
+
+        function getCellValue(row, index) {
+            return $(row).children("td").eq(index).text();
+        }
+    </script>
+
+</body>
+
+</html>
