@@ -16,6 +16,19 @@ function emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB,
     return $result;
 }
 
+//Function to check for empty fields in the system admin form
+
+function emptyInputSystemAdmin($email, $password)
+{
+    $result = '';
+    if (empty($email) || empty($password)) {
+        $result = true;
+    } else {
+        $result = false;
+    }
+    return $result;
+}
+
 //Email validation done in the HTML form
 
 //Function to check if password and confirm password match
@@ -235,6 +248,88 @@ function createClubAdmin($conn, $email, $password, $firstName, $lastName, $clubI
     }
 }
 
+//Function to create system admin
+
+function createSystemAdmin($email, $password, $accountType)
+{
+    global $conn;
+    $conn->begin_transaction();
+
+    $sql = "INSERT INTO user (email, password, accountType) 
+    VALUES (?, ?, ?)";
+
+    $stmt = $conn->stmt_init();
+    if (!$stmt->prepare($sql)) {
+        echo "SQL statement failed: " . $conn->error;
+        $conn->rollback();
+        exit;
+    } else {
+        //Hash password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $stmt->bind_param("sss", $email, $hashedPassword, $accountType);
+        $stmt->execute();
+
+        if ($stmt->error) {
+            // If the query fails, roll back the transaction and output an error message
+            echo "SQL statement failed: " . $stmt->error;
+            $conn->rollback();
+            exit;
+        } else {
+            // If the query succeeds, commit the transaction and redirect the user
+            $conn->commit();
+            header("Location: ../systemAdminDashboard.php?error=systemadminaccountcreated&message=" . urlencode("Account created"));
+        }
+    }
+}
+
+//Function to create a club
+
+function createClub($clubName)
+{
+    global $conn;
+    $sql = "INSERT INTO club (clubName) VALUES (?)";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        // Handle error here
+        echo "Error: " . $conn->error;
+        exit();
+    }
+    $stmt->bind_param("s", $clubName);
+    $stmt->execute();
+}
+
+//Function to create league
+
+function createLeague($leagueName)
+{
+    global $conn;
+    $sql = "INSERT INTO league (leagueName) VALUES (?)";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        // Handle error here
+        echo "Error: " . $conn->error;
+        exit();
+    }
+    $stmt->bind_param("s", $leagueName);
+    $stmt->execute();
+}
+
+//Function to create a team
+
+function createTeam($teamName, $clubID, $leagueID)
+{
+    global $conn;
+    $sql = "INSERT INTO team (teamName, clubID, leagueID) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        // Handle error here
+        echo "Error: " . $conn->error;
+        exit();
+    }
+    $stmt->bind_param("sii", $teamName, $clubID, $leagueID);
+    $stmt->execute();
+}
+
 //Function to login a user
 
 function loginUser($conn, $email, $password)
@@ -279,9 +374,9 @@ function loginUser($conn, $email, $password)
             $_SESSION["accountType"] = $emailExists["accountType"];
             if ($_SESSION["accountType"] == "Player") {
                 header("Location: ../playerDashboard.php");
-            } elseif ($_SESSION["Club Admin"] == "Player") {
+            } elseif ($_SESSION["accountType"] == "Club Admin") {
                 header("Location: ../clubAdminDashboard.php");
-            } else{
+            } else {
                 header("Location: ../systemAdminDashboard.php");
             }
             exit();

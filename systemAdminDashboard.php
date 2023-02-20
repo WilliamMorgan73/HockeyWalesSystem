@@ -32,8 +32,6 @@ $userID = $_SESSION['userID'];
     <link rel="stylesheet" href="css/adminlte/adminlte.min.css" />
     <!-- Bootstrap Css -->
     <link rel="stylesheet" href="css/bootstrapIcons/bootstrap-icons.css" />
-    <!-- Custom Css -->
-    <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -158,101 +156,214 @@ $userID = $_SESSION['userID'];
                                                 echo "<h1>No club admins to approve</h1>";
                                             }
                                             ?>
-
                                         </div>
                                     </div>
+                                    <!-- End of club admin approval -->
                                 </div>
-                                <!-- End of club admin approval -->
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <!-- Add system admins -->
-                                    <div class="card card-outline shadow">
-                                        <div class="card-body text-center">
-                                            <h5 class="card-title">Add system admins</h5>
-                                            <br />
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <form action="includes/signup.inc.php" method="post">
-                                                        <!-- Email -->
-                                                        <p class="title" style=" padding-top:2%">Email</p>
-                                                        <input type="email" name="email" id="email" class="form-control club-player-search" />
-
-                                                        <!-- Password and confirm password -->
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="title">Password</div>
-                                                                <input type="password" name="password" id="password" class="form-control club-player-search" />
-                                                            </div>
-                                                            <!-- Confirm password -->
-                                                            <div class="col-md-6">
-                                                                <div class="title">Confirm password</div>
-                                                                <input type="password" name="confirmPassword" id="confirmPassword" class="form-control club-player-search" />
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Error message -->
-                                                        <?php
-                                                        //Empty input
-                                                        if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
-                                                            $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                            echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
-                                                        }
-                                                        //Password mismatch
-                                                        else if (isset($_GET['error']) && $_GET['error'] === "passwordsdontmatch") {
-                                                            $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                            echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
-                                                        }
-                                                        //Email already exists
-                                                        else if (isset($_GET['error']) && $_GET['error'] === "emailalreadyexists") {
-                                                            $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                            echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
-                                                        }
-                                                        ?>
-                                                        <!-- End of error message -->
-                                                        <!-- Signup button -->
-                                                        <button type="submit" name="submit" class="btn btn-login">Add system admin</button>
-                                                    </form>
-                                                </div>
-                                            </div>
+                                    <div class="card card-danger">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Add system admin</h3>
                                         </div>
+                                        <form action="includes/addSystemAdmin.php" method="post">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="exampleInputEmail1">Email address</label>
+                                                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="Password">Password</label>
+                                                            <input type="password" class="form-control" id="Password" placeholder="Password" name="password">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="confirmPassword">Confirm password</label>
+                                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Password" name="confirmPassword">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Error message -->
+                                                <?php
+                                                //Empty input
+                                                if (isset($_GET['error']) && $_GET['error'] === "emptyinputSignup") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                //Password mismatch
+                                                if (isset($_GET['error']) && $_GET['error'] === "passwordsdontmatch") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                //Email already exists
+                                                if (isset($_GET['error']) && $_GET['error'] === "emailalreadyexists") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                //Account created
+                                                if (isset($_GET['error']) && $_GET['error'] === "accountcreated") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                ?>
+                                                <!-- End of error message -->
+                                            </div>
+                                            <div class="card-footer text-center">
+                                                <button type="submit" class="btn btn-danger" name="submitUser">Add user</button>
+                                            </div>
+                                        </form>
                                     </div>
+                                    <!-- End of add system admins -->
+                                    <!-- Add club -->
+                                    <div class="card card-danger">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Add club</h3>
+                                        </div>
+                                        <form enctype="multipart/form-data" action="includes/addClub.php" method="POST">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="clubName">Club name</label>
+                                                    <input type="text" class="form-control" id="clubName" placeholder="Club name" name="clubName">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="clubLogo">Club logo</label>
+                                                    <input type="hidden" name="MAX_FILE_SIZE" value="30000000" />
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="clubLogo" name="clubLogo" accept="image/jpeg,image/png">
+                                                        <label class="custom-file-label" for="clubLogo">Choose file</label>
+                                                    </div>
+                                                </div>
+                                                <!-- Error message -->
+                                                <?php
+                                                //Empty input
+                                                if (isset($_GET['error']) && $_GET['error'] === "emptyinputClub") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                //Club created
+                                                if (isset($_GET['error']) && $_GET['error'] === "clubcreated") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                ?>
+                                                <!-- End of error message -->
+                                            </div>
+                                            <div class="card-footer text-center">
+                                                <button type="submit" class="btn btn-danger" name="submitClub">Add club</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- End of add club -->
                                 </div>
-                                <!-- End of add system admins -->
                                 <!-- Add league -->
                                 <div class="col-md-6">
-                                    <div class="card card-outline shadow">
-                                        <div class="card-body text-center">
-                                            <h5 class="card-title">Add league</h5>
-                                            <br />
+                                    <div class="card card-danger">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Add league</h3>
                                         </div>
+                                        <form action="includes/addLeague.php" method="post">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="leagueName">League name</label>
+                                                    <input type="text" class="form-control" id="leagueName" placeholder="League name" name="leagueName">
+                                                </div>
+                                                <!-- Error message -->
+                                                <?php
+                                                //Empty input
+                                                if (isset($_GET['error']) && $_GET['error'] === "emptyinputLeague") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                //league created
+                                                if (isset($_GET['error']) && $_GET['error'] === "leaguecreated") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                ?>
+                                                <!-- End of error message -->
+                                            </div>
+                                            <div class="card-footer text-center">
+                                                <button type="submit" class="btn btn-danger" name="submitLeague">Add league</button>
+                                            </div>
+                                        </form>
                                     </div>
+                                    <!-- End of add league -->
+                                    <!-- Add team -->
+                                    <div class="card card-danger">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Add team</h3>
+                                        </div>
+                                        <form action="includes/addTeam.php" method="post">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="teamName">Team name</label>
+                                                    <input type="text" class="form-control" id="teamName" placeholder="Team name" name="teamName">
+                                                </div>
+                                                <!-- Drop-down list of clubs -->
+                                                <div class="form-group">
+                                                    <label for="club">Club</label>
+                                                    <select name="club" class="form-control">
+                                                        <option value="" disabled selected hidden>Please select a club</option>
+                                                        <?php
+                                                        $clubQuery = "SELECT * FROM club";
+                                                        $clubResult = mysqli_query($conn, $clubQuery);
+                                                        while ($clubRow = mysqli_fetch_array($clubResult)) {
+                                                        ?>
+                                                            <option value="<?php echo $clubRow['clubID']; ?>">
+                                                                <?php echo $clubRow['clubName']; ?>
+                                                            </option>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <!-- Drop-down list of leagues -->
+                                                <div class="form-group">
+                                                    <label for="league">League</label>
+                                                    <select name="league" class="form-control">
+                                                        <?php
+                                                        $leagueQuery = "SELECT * FROM league";
+                                                        $leagueResult = mysqli_query($conn, $leagueQuery);
+                                                        while ($leagueRow = mysqli_fetch_array($leagueResult)) {
+                                                        ?>
+                                                            <option value="<?php echo $leagueRow['leagueID']; ?>">
+                                                                <?php echo $leagueRow['leagueName']; ?>
+                                                            </option>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <!-- Error message -->
+                                                <?php
+                                                //Empty input
+                                                if (isset($_GET['error']) && $_GET['error'] === "emptyinputTeam") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                //Team created
+                                                if (isset($_GET['error']) && $_GET['error'] === "teamcreated") {
+                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+                                                }
+                                                ?>
+                                                <!-- End of error message -->
+                                            </div>
+                                            <div class="card-footer text-center">
+                                                <button type="submit" class="btn btn-danger" name="submitTeam">Add team</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- End of add team -->
                                 </div>
-                                <!-- End of add league -->
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <!-- Add club -->
-                                    <div class="card card-outline shadow">
-                                        <div class="card-body text-center">
-                                            <h5 class="card-title">Add club</h5>
-                                            <br />
 
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End of add club -->
-                                <!-- Add team -->
-                                <div class="col-md-6">
-                                    <div class="card card-outline shadow">
-                                        <div class="card-body text-center">
-                                            <h5 class="card-title">Add team</h5>
-                                            <br />
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End of add team -->
                             </div>
+
                         </div>
                     </div>
 

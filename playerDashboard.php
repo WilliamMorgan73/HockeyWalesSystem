@@ -92,6 +92,7 @@ $playerTeamID = getTeamID($userID);
               <input type="hidden" name="MAX_FILE_SIZE" value="30000000" />
               <input name="uploadedfile" type="file" />
               <input type="submit" value="Upload" />
+            </form>
           </div>
         </nav>
         <!-- /.sidebar-menu -->
