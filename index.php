@@ -1,8 +1,5 @@
-<!--
-PHP intergration
--->
 <?php
-$conn = require 'includes/dbhconfig.php';
+$conn = require 'includes/dbhconfig.php'; // establish a database connection using the configuration file
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,7 +33,7 @@ $conn = require 'includes/dbhconfig.php';
             <!-- Club search -->
             <p class="title">Club search</p>
             <form action="includes/clubSearch.php" method="post">
-              <input type="text" name="clubName" class="club-player-search"/ style="margin-bottom: 2%;">
+              <input type="text" name="clubName" class="club-player-search" / style="margin-bottom: 2%;">
               <input type="submit" value="Search" class="btn btn-login">
             </form>
             <!-- Error message -->
@@ -51,21 +48,19 @@ $conn = require 'includes/dbhconfig.php';
             <p class="title">Leagues</p>
             <form action="leagueDashboard.php" method="post">
               <?php
-              $query = "SELECT * FROM league";
-              $result = mysqli_query($conn, $query);
-              while ($row = mysqli_fetch_array($result)) {
+              $query = "SELECT * FROM league"; // SQL query to select all leagues
+              $result = mysqli_query($conn, $query); // execute the query using the established database connection
+              while ($row = mysqli_fetch_array($result)) { // loop through the query results
               ?>
                 <button type="submit" name="leagueID" value="<?php echo $row['leagueID']; ?>" class="btn btn-league">
-                  <?php echo $row['leagueName']; ?>
+                  <?php echo $row['leagueName']; ?> <!-- display the league name in a button -->
                 </button>
                 <br />
               <?php
               }
               ?>
             </form>
-
             <!-- Login/Signup link -->
-
             <a class="sub-heading" style="display: block; text-align: center" href="login.php">Login/signup</a>
           </div>
         </div>

@@ -140,7 +140,7 @@ $teams = getTeams($conn, $clubID);
                                 <div class="text-right">
                                     <div class="form-group">
                                         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                                            <select class="form-control select2" style="width: 30%;" name="selected-team-id">
+                                            <select class="form-control select2 " style="width: 30%;" name="selected-team-id">
                                                 <?php
                                                 foreach ($teams as $team) {
                                                     $teamID = $team['teamID'];

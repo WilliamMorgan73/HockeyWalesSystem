@@ -398,8 +398,6 @@ $playerTeamID = getTeamID($userID);
       $arr[$b] = $temp;
     }
 
-
-
     $(document).ready(function() {
       $("th").click(function() {
         var table = $(this).parents("table");
@@ -408,6 +406,15 @@ $playerTeamID = getTeamID($userID);
         if (!this.asc) {
           rows = rows.reverse();
         }
+        // Remove the sort icons from other columns
+        table.find("th i").remove();
+        // Set the sort icon for the clicked column
+        if (this.asc) {
+          $(this).append(' <i class="bi bi-caret-up-fill"></i>');
+        } else {
+          $(this).append(' <i class="bi bi-caret-down-fill"></i>');
+        }
+        // Reorder the rows based on the sorting order
         for (var i = 0; i < rows.length; i++) {
           table.append(rows[i]);
         }

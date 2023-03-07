@@ -1483,3 +1483,4 @@ function getClubs()
 
     return $clubs;
 }
+

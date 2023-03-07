@@ -27,8 +27,6 @@ $clubName = $row['clubName'];
     <link rel="stylesheet" href="css/adminlte/adminlte.min.css" />
     <!-- Bootstrap Css -->
     <link rel="stylesheet" href="css/bootstrapIcons/bootstrap-icons.css" />
-
-
 </head>
 
 <body class="hold-transition sidebar-mini"></body>
@@ -107,34 +105,35 @@ $clubName = $row['clubName'];
                         <div class="row" style="padding-top:1%;">
                             <!-- League table -->
                             <div class="col-md-6">
-                                <div class="card shadow" style="width: 100%">
-                                    <div class="card-body p-0">
-                                        <table class=" table table-striped" style="width: 100%">
-                                            <thead>
-                                                <tr>
-                                                    <th onclick="sortTable(0)">Team</th>
-                                                    <th onclick="sortTable(1)">W</th>
-                                                    <th onclick="sortTable(2)">D</th>
-                                                    <th onclick="sortTable(3)">L</th>
-                                                    <th onclick="sortTable(4)">GD</th>
-                                                    <th onclick="sortTable(5)">PTS</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                // Assuming the database connection is established and stored in the variable $conn
-                                                $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $topTeamLeague";
-                                                $result = mysqli_query($conn, $sql);
-                                                if (mysqli_num_rows($result) > 0) {
-                                                    $teams = [];
-                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                        $teams[] = $row;
-                                                    }
+                                <div class="col-md-12">
+                                    <div class="card shadow" style="width: 100%">
+                                        <div class="card-body p-0">
+                                            <table class=" table table-striped" style="width: 100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th onclick="sortTable(0)">Team</th>
+                                                        <th onclick="sortTable(1)">W</th>
+                                                        <th onclick="sortTable(2)">D</th>
+                                                        <th onclick="sortTable(3)">L</th>
+                                                        <th onclick="sortTable(4)">GD</th>
+                                                        <th onclick="sortTable(5)">PTS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    // Assuming the database connection is established and stored in the variable $conn
+                                                    $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $topTeamLeague";
+                                                    $result = mysqli_query($conn, $sql);
+                                                    if (mysqli_num_rows($result) > 0) {
+                                                        $teams = [];
+                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                            $teams[] = $row;
+                                                        }
 
-                                                    $points = getTeamPoints($teams, $conn);
-                                                    // Display the teams in descending order of points
-                                                    foreach ($points as $team) {
-                                                        echo "<tr>
+                                                        $points = getTeamPoints($teams, $conn);
+                                                        // Display the teams in descending order of points
+                                                        foreach ($points as $team) {
+                                                            echo "<tr>
               <td>" . $team["teamName"] . "</td>
               <td>" . getTeamWins($team["teamID"], $conn) . "</td>
               <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
@@ -142,13 +141,98 @@ $clubName = $row['clubName'];
               <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
               <td>" . $team["points"] . "</td>
             </tr>";
+                                                        }
+                                                    } else {
+                                                        echo "0 results";
                                                     }
-                                                } else {
-                                                    echo "0 results";
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Top scorer graph -->
+                                <div class="col-md-12">
+                                    <div class="card shadow" style="width: 100%">
+                                        <div class="card-body p-0">
+                                            <div class="card-body">
+                                                <div id="pie-chart" style="height: 25rem;"></div>
+                                            </div>
+                                            <?php
+                                            // SELECT all team IDs for the given club ID from the 'team' table
+                                            $query = "SELECT teamID FROM team WHERE clubID = '$clubID'";
+                                            $result = mysqli_query($conn, $query);
+
+                                            // Check if there are any teams for the given club ID
+                                            if (mysqli_num_rows($result) > 0) {
+                                                // If there are teams, create an empty array to store team IDs
+                                                $teamIDs = [];
+                                                // Loop through the result set and add each team ID to the array
+                                                while ($row = mysqli_fetch_array($result)) {
+                                                    $teamIDs[] = $row['teamID'];
                                                 }
-                                                ?>
-                                            </tbody>
-                                        </table>
+                                                // Convert the array of team IDs to a comma-separated string
+                                                $teamIDs = implode(',', $teamIDs);
+                                                // SELECT all player data for the teams associated with the given club ID
+                                                $query = "SELECT * FROM player WHERE teamID IN ($teamIDs)";
+                                                $playersResult = mysqli_query($conn, $query);
+
+                                                // Check if there are any players in the result set
+                                                if (mysqli_num_rows($playersResult) > 0) {
+                                                    // If there are players, create an empty array to store player data
+                                                    $players = [];
+                                                    // Loop through the result set and add each player's data to the array
+                                                    while ($row = mysqli_fetch_array($playersResult)) {
+                                                        $playerID = $row['playerID'];
+                                                        $firstName = $row['firstName'];
+                                                        $lastName = $row['lastName'];
+                                                        $teamID = $row['teamID'];
+
+                                                        // SELECT the team name for the current player's team ID
+                                                        $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
+                                                        $teamNameResult = mysqli_query($conn, $query);
+                                                        $row = mysqli_fetch_array($teamNameResult);
+                                                        $teamName = $row['teamName'];
+
+                                                        // SELECT the number of goals scored by the current player, limited to the top 6
+                                                        $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
+                                                        $numOfGoalsResult = mysqli_query($conn, $query);
+
+                                                        // Check if there are any goals in the result set
+                                                        if (mysqli_num_rows($numOfGoalsResult) > 0) {
+                                                            // If there are goals, loop through the result set and add the player's data to the array for each goal
+                                                            while ($row = mysqli_fetch_array($numOfGoalsResult)) {
+                                                                $numOfGoals = $row['numOfGoals'];
+                                                                $players[] = [
+                                                                    'firstName' => $firstName,
+                                                                    'lastName' => $lastName,
+                                                                    'teamName' => $teamName,
+                                                                    'numOfGoals' => $numOfGoals,
+                                                                ];
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                // Sort the array of players by number of goals, from highest to lowest
+                                                usort($players, function ($a, $b) {
+                                                    return $b['numOfGoals'] - $a['numOfGoals'];
+                                                });
+
+                                                // Create a new array to store the top scorers for the given club
+                                                $clubTopScorers = array();
+                                                // Loop through the sorted array of players and add each player's data to the new array
+                                                foreach ($players as $player) {
+                                                    $clubTopScorers[] = [
+                                                        'firstName' => $player['firstName'],
+                                                        'lastName' => $player['lastName'],
+                                                        'teamName' => $player['teamName'],
+                                                        'numOfGoals' => $player['numOfGoals'],
+                                                    ];
+                                                }
+                                            }
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -336,7 +420,6 @@ $clubName = $row['clubName'];
 
                             <!-- End of results -->
                         </div>
-                        <!-- End of first row -->
 
                     </div>
                 </div>
@@ -357,8 +440,79 @@ $clubName = $row['clubName'];
 <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="js/adminlte/adminlte.min.js"></script>
+<!-- FLOT CHARTS -->
+<script src="js/flot/jquery.flot.js"></script>
+<!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
+<script src="js/flot/plugins/jquery.flot.resize.js"></script>
+<!-- FLOT PIE PLUGIN - also used to draw donut charts -->
+<script src="js/flot/plugins/jquery.flot.pie.js"></script>
+
 
 <script>
+    $(function() {
+        // Get the clubTopScorers data from the server and store it in a variable
+        var clubTopScorers = <?php echo json_encode($clubTopScorers); ?>;
+
+        // Initialize an empty array to store data for the pie chart
+        var pie_data = [];
+
+        // Loop through each player in the clubTopScorers data and add their data to the pie_data array
+        for (var i = 0; i < clubTopScorers.length; i++) {
+            var player = clubTopScorers[i];
+            pie_data.push({
+                label: player.firstName + ' ' + player.lastName + ' (' + player.teamName + ')', // Player's full name and team name
+                data: player.numOfGoals, // Number of goals scored by the player
+                color: getRandomColor(), // Random color for the slice of the pie chart
+                tooltip: player.numOfGoals + ' goals' // Tooltip message showing the number of goals
+            });
+        }
+
+        // Generate a random hexadecimal color code for the pie chart slice
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Initialize the pie chart using Flot
+        $.plot('#pie-chart', pie_data, {
+            series: {
+                pie: {
+                    show: true, // Show the pie chart
+                    radius: 1, // Set the radius of the pie chart
+                    label: {
+                        show: true, // Show the label for each slice of the pie chart
+                        radius: 3 / 5, // Set the radius of the label
+                        formatter: function(label, series) {
+                            // Custom format the label to show the player's name and number of goals
+                            return '<div style="font-size:12px; text-align:center; padding:2px; color:white;">' + label + '<br/>' + series.data[0][1] + ' goals</div>';
+                        },
+                        threshold: 0.1 // Set the threshold for displaying labels
+                    }
+                }
+            },
+            legend: {
+                show: false // Disable the legend
+            },
+            grid: {
+                hoverable: true // Make the chart hoverable
+            },
+        });
+
+        // Add an event listener for the "plothover" event on the pie chart div
+        $("#pie-chart").bind("plothover", function(event, pos, item) {
+            if (item) {
+                // If the user hovers over a slice of the pie chart, highlight the slice and change the cursor to a pointer
+                $(this).css("cursor", "pointer");
+                item.series.chart.highlight(item.series, item.datapoint);
+            }
+        });
+    });
+
+
     // Global variable to store the sorting order
     var sortOrder = [];
 
@@ -392,8 +546,6 @@ $clubName = $row['clubName'];
         $arr[$b] = $temp;
     }
 
-
-
     $(document).ready(function() {
         $("th").click(function() {
             var table = $(this).parents("table");
@@ -402,6 +554,15 @@ $clubName = $row['clubName'];
             if (!this.asc) {
                 rows = rows.reverse();
             }
+            // Remove the sort icons from other columns
+            table.find("th i").remove();
+            // Set the sort icon for the clicked column
+            if (this.asc) {
+                $(this).append(' <i class="bi bi-caret-up-fill"></i>');
+            } else {
+                $(this).append(' <i class="bi bi-caret-down-fill"></i>');
+            }
+            // Reorder the rows based on the sorting order
             for (var i = 0; i < rows.length; i++) {
                 table.append(rows[i]);
             }

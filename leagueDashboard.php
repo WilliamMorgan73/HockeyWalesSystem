@@ -81,7 +81,7 @@ $leagueName = getLeagueName($conn, $leagueID);
               </form>
             </a>
           </li>
-          <li class="nav-item" >
+          <li class="nav-item">
             <a class="nav-link" href="index.php">
               <i class="bi bi-list nav-icon"></i>
               <p>League selection</p>
@@ -122,7 +122,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                         <table class="table table-striped" style="width: 100%">
                           <thead>
                             <tr>
-                              <th onclick="sortTable(0)">Team</th>
+                              <th onclick="sortTable(0)">Team <span class="fa fa-sort"></span> </th>
                               <th onclick="sortTable(1)">W</th>
                               <th onclick="sortTable(2)">D</th>
                               <th onclick="sortTable(3)">L</th>
@@ -399,8 +399,6 @@ $leagueName = getLeagueName($conn, $leagueID);
     $arr[$b] = $temp;
   }
 
-
-
   $(document).ready(function() {
     $("th").click(function() {
       var table = $(this).parents("table");
@@ -409,6 +407,15 @@ $leagueName = getLeagueName($conn, $leagueID);
       if (!this.asc) {
         rows = rows.reverse();
       }
+      // Remove the sort icons from other columns
+      table.find("th i").remove();
+      // Set the sort icon for the clicked column
+      if (this.asc) {
+        $(this).append(' <i class="bi bi-caret-up-fill"></i>');
+      } else {
+        $(this).append(' <i class="bi bi-caret-down-fill"></i>');
+      }
+      // Reorder the rows based on the sorting order
       for (var i = 0; i < rows.length; i++) {
         table.append(rows[i]);
       }
@@ -427,6 +434,7 @@ $leagueName = getLeagueName($conn, $leagueID);
     return $(row).children("td").eq(index).text();
   }
 </script>
+
 </body>
 
 </html>
