@@ -7,7 +7,7 @@ require_once('includes/functions.inc.php');
 $conn = require 'includes/dbhconfig.php';
 
 $leagueID = $_POST['leagueID'];
-$leagueName = getLeagueName($conn, $leagueID);
+$leagueName = getLeagueName($leagueID);
 
 ?>
 
@@ -141,15 +141,15 @@ $leagueName = getLeagueName($conn, $leagueID);
                                 $teams[] = $row;
                               }
 
-                              $points = getTeamPoints($teams, $conn);
+                              $points = getTeamPoints($teams,);
                               // Display the teams in descending order of points
                               foreach ($points as $team) {
                                 echo "<tr>
         <td>" . $team["teamName"] . "</td>
-        <td>" . getTeamWins($team["teamID"], $conn) . "</td>
-        <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
-        <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
-        <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+        <td>" . getTeamWins($team["teamID"]) . "</td>
+        <td>" . getTeamDraws($team["teamID"]) . "</td>
+        <td>" . getTeamLosses($team["teamID"]) . "</td>
+        <td>" . getTeamGoalDifference($team["teamID"]) . "</td>
         <td>" . $team["points"] . "</td>
       </tr>";
                               }

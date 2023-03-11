@@ -33,14 +33,14 @@ if (isset($_POST['submit'])) {
 
     //Function call to check if email already exists
 
-    if (emailExists($conn, $email) !== false) {
+    if (emailExists($email) !== false) {
         header("Location: ../signup.php?error=emailalreadyexists&message=" . urlencode("Email already exists."));
         exit();
     }
 
     //Function call to check if email exists in temp users table
 
-    if (emailExistsInTempUsers($conn, $email) !== false) {
+    if (emailExistsInTempUsers($email) !== false) {
         header("Location: ../signup.php?error=pendingapproval&message=" . urlencode("Your account is still pending approval"));
         exit();
     }
@@ -56,13 +56,13 @@ if (isset($_POST['submit'])) {
 
     if ($accountType == 'Player') {
         //Function call to create a player
-        createPlayer($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
+        createPlayer($email, $password, $firstName, $lastName, $club, $DOB, $accountType);
         exit();
     } else if ($accountType == 'Club Admin') {
         //Function call to check if club already has a club admin
         clubHasAdmin($club);
         //Function call to create a club admin
-        createClubAdmin($conn, $email, $password, $firstName, $lastName, $club, $DOB, $accountType);
+        createClubAdmin($email, $password, $firstName, $lastName, $club, $DOB, $accountType);
         exit();
     } else {
         header("Location: ../signup.php?error=accounttype");

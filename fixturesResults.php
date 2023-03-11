@@ -9,7 +9,7 @@ $conn = require 'includes/dbhconfig.php';
 //Variables
 
 $leagueID = $_POST['leagueID'];
-$leagueName = getLeagueName($conn, $leagueID);
+$leagueName = getLeagueName($leagueID);
 
 ?>
 

@@ -9,8 +9,6 @@ $password = $_POST['password'];
 
 if (isset($_POST["submit"])){
 
-    $conn = require __DIR__ . '/dbhconfig.php';
-
     //Function call to check for empty fields
 
     if (emptyInputLogin($email, $password) !== false) {
@@ -20,7 +18,7 @@ if (isset($_POST["submit"])){
 
     //Function call to login user
 
-    loginUser($conn, $email, $password);
+    loginUser($email, $password);
 }
 else{
     header("Location: ../login.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));

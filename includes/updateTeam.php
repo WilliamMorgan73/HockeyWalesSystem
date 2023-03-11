@@ -18,6 +18,6 @@ if (isset($_POST['change-team'])) {
     mysqli_stmt_bind_param($stmt, "ss", $selectedTeamID, $useriD);
     mysqli_stmt_execute($stmt);
 
-    header("Location: ../teammanagement.php?teamupdated");
+    header("Location: ../teammanagement.php?teamupdated"); // redirect to the team management page
     exit();
 }

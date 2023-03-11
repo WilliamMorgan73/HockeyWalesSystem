@@ -30,14 +30,14 @@ if (isset($_POST['submitUser'])) {
 
     //Function call to check if email already exists
 
-    if (emailExists($conn, $email) !== false) {
+    if (emailExists($email) !== false) {
         header("Location: ../systemAdminDashboard.php?error=emailalreadyexists&message=" . urlencode("Email already exists."));
         exit();
     }
 
     //Function call to check if email exists in temp users table
 
-    if (emailExistsInTempUsers($conn, $email) !== false) {
+    if (emailExistsInTempUsers($email) !== false) {
         header("Location: ../systemAdminDashboard.php?error=emailalreadyexists&message=" . urlencode("Email already exists."));
         exit();
     }
