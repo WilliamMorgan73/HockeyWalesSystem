@@ -99,7 +99,7 @@ $leagueName = getLeagueName($leagueID);
       <div class="container-fluid">
         <div class="row mb">
           <div class="col-sm">
-            <h1><?php echo $leagueName ?> dashboard</h1>
+            <h1><?php echo $leagueName ?> dashboard</h1> <!-- League name -->
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ $leagueName = getLeagueName($leagueID);
                   <div class="col-md-12">
                     <div class="card shadow" style="width: 100%;">
                       <div class="card-body p-0">
-                        <table class="table table-striped" style="width: 100%">
+                        <table class="table table-striped" style="width: 100%"> <!-- League table -->
                           <thead>
                             <tr>
                               <th onclick="sortTable(0)">Team <span class="fa fa-sort"></span> </th>
@@ -174,6 +174,7 @@ $leagueName = getLeagueName($leagueID);
                         <?php
                         $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
                         $result = mysqli_query($conn, $query);
+                        // If there are teams in the league
                         if (mysqli_num_rows($result) > 0) {
                           $players = [];
                           while ($row = mysqli_fetch_array($result)) {
@@ -186,12 +187,12 @@ $leagueName = getLeagueName($leagueID);
                                 $firstName = $row['firstName'];
                                 $lastName = $row['lastName'];
                                 $teamID = $row['teamID'];
-
+                                // Get the team name
                                 $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
                                 $teamNameresult = mysqli_query($conn, $query);
                                 $row = mysqli_fetch_array($teamNameresult);
                                 $teamName = $row['teamName'];
-
+                                // Get the number of goals scored by the player
                                 $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
                                 $numOfGoalsresult = mysqli_query($conn, $query);
                                 if (mysqli_num_rows($numOfGoalsresult) > 0) {
@@ -208,6 +209,7 @@ $leagueName = getLeagueName($leagueID);
                               }
                             }
                           }
+                          // Sort the players in descending order of number of goals
                           usort($players, function ($a, $b) {
                             return $b['numOfGoals'] - $a['numOfGoals'];
                           });
@@ -243,7 +245,7 @@ $leagueName = getLeagueName($leagueID);
                             <?php
                             $query = "SELECT MAX(matchWeek) AS maxWeek FROM result";
                             $result = mysqli_query($conn, $query);
-
+                            // If there are results
                             if (mysqli_num_rows($result) > 0) {
                               $row = mysqli_fetch_assoc($result);
                               $maxWeek = $row['maxWeek'];
@@ -253,6 +255,7 @@ $leagueName = getLeagueName($leagueID);
 
                               if (mysqli_num_rows($resultdetailresult) > 0) {
                                 while ($row = mysqli_fetch_array($resultdetailresult)) {
+                                  // Get the team names
                                   $homeTeamID = $row['homeTeamID'];
                                   $awayTeamID = $row['awayTeamID'];
                                   $homeTeamScore = $row['homeTeamScore'];
@@ -296,13 +299,14 @@ $leagueName = getLeagueName($leagueID);
                         <br />
                         <div class="col-md-12">
                           <?php
+                          // Get the minimum game week number
                           $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
                           $result = mysqli_query($conn, $query);
 
                           if (mysqli_num_rows($result) > 0) {
                             $row = mysqli_fetch_assoc($result);
                             $minWeek = $row['minWeek'];
-
+                            // Get the fixtures with the minimum game week number
                             $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
                             $resultFixtures = mysqli_query($conn, $query);
 
@@ -310,7 +314,7 @@ $leagueName = getLeagueName($leagueID);
                               while ($row = mysqli_fetch_array($resultFixtures)) {
                                 $homeTeamID = $row['homeTeamID'];
                                 $awayTeamID = $row['awayTeamID'];
-
+                                // Get the team names
                                 $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
                                 $result2 = mysqli_query($conn, $query);
                                 $row2 = mysqli_fetch_array($result2);
@@ -350,8 +354,6 @@ $leagueName = getLeagueName($leagueID);
   </div>
   <!-- /.content-wrapper -->
 </div>
-<!-- REQUIRED SCRIPTS -->
-
 <!-- REQUIRED SCRIPTS -->
 
 <!-- jQuery -->
@@ -402,7 +404,7 @@ $leagueName = getLeagueName($leagueID);
   $(document).ready(function() {
     $("th").click(function() {
       var table = $(this).parents("table");
-      var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+      var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index())); // Get all the rows except the header row
       this.asc = !this.asc;
       if (!this.asc) {
         rows = rows.reverse();
@@ -426,12 +428,12 @@ $leagueName = getLeagueName($leagueID);
     return function(a, b) {
       var valA = getCellValue(a, index),
         valB = getCellValue(b, index);
-      return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+      return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB); // Compare the values
     }
   }
 
   function getCellValue(row, index) {
-    return $(row).children("td").eq(index).text();
+    return $(row).children("td").eq(index).text(); // Get the value of the cell
   }
 </script>
 

@@ -178,6 +178,7 @@ $clubs = getClubs();
 
   <script>
     $(function() {
+      //Set the datepicker to only allow dates between 100 and 16 years ago
       var sixteenYearsAgo = new Date();
       var hundredYearsAgo = new Date();
       sixteenYearsAgo.setFullYear(sixteenYearsAgo.getFullYear() - 16)

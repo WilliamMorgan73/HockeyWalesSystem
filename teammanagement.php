@@ -8,10 +8,10 @@ $conn = require 'includes/dbhconfig.php';
 
 session_start();
 $userID = $_SESSION['userID'];
-$clubAdminName = getclubAdminName($conn, $userID);
-$clubName = getClubName($conn, $userID);
-$clubID = getClubID($conn, $clubName);
-$teams = getTeams($conn, $clubID);
+$clubAdminName = getclubAdminName($userID);
+$clubName = getClubName($userID);
+$clubID = getClubID($clubName);
+$teams = getTeams($clubID);
 ?>
 
 <html lang="en">
@@ -114,6 +114,7 @@ $teams = getTeams($conn, $clubID);
                                     $selectedTeamID = null;
                                     if (isset($_POST['selected-team-id'])) {
                                         $selectedTeamID = $_POST['selected-team-id'];
+                                        // get the selected team name
                                         foreach ($teams as $team) {
                                             if ($team['teamID'] == $selectedTeamID) {
                                                 $selectedTeamName = $team['teamName'];
@@ -131,6 +132,7 @@ $teams = getTeams($conn, $clubID);
                                         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                                             <select class="form-control select2" style="width: 30%;" name="selected-team-id">
                                                 <?php
+                                                // get the teams for the club
                                                 foreach ($teams as $team) {
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
@@ -175,7 +177,7 @@ $teams = getTeams($conn, $clubID);
                             mysqli_stmt_bind_param($stmt, "s", $teamID);
                             mysqli_stmt_execute($stmt);
                             $resultData = mysqli_stmt_get_result($stmt);
-
+                            //loop through the results
                             while ($row = mysqli_fetch_assoc($resultData)) {
                                 $userID = $row['userID'];
                                 $firstName = $row['firstName'];

@@ -1,8 +1,4 @@
 <?php
-//Add option to create a club and select league
-//Add option to approe or deny a club admin
-//Add option to add a system admin
-//Maybe an option to add a league
 ?>
 <!DOCTYPE html>
 <!--
@@ -93,6 +89,7 @@ $userID = $_SESSION['userID'];
                                             <h5 class="card-title">Club admin approval</h5>
                                             <br />
                                             <?php
+                                            // Query to get all the club admins that are waiting to be approved
                                             $query = "SELECT * FROM tempclubadmin";
                                             $result = mysqli_query($conn, $query);
                                             if (mysqli_num_rows($result) > 0) {
@@ -310,6 +307,7 @@ $userID = $_SESSION['userID'];
                                                     <select name="club" class="form-control">
                                                         <option value="" disabled selected hidden>Please select a club</option>
                                                         <?php
+                                                        //Get all clubs from database
                                                         $clubQuery = "SELECT * FROM club";
                                                         $clubResult = mysqli_query($conn, $clubQuery);
                                                         while ($clubRow = mysqli_fetch_array($clubResult)) {
@@ -327,6 +325,7 @@ $userID = $_SESSION['userID'];
                                                     <label for="league">League</label>
                                                     <select name="league" class="form-control">
                                                         <?php
+                                                        //Get all leagues from database
                                                         $leagueQuery = "SELECT * FROM league";
                                                         $leagueResult = mysqli_query($conn, $leagueQuery);
                                                         while ($leagueRow = mysqli_fetch_array($leagueResult)) {

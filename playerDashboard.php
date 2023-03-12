@@ -5,17 +5,17 @@ PHP intergration
 <?php
 require_once('includes/functions.inc.php');
 $conn = require 'includes/dbhconfig.php';
-
+//Variables
 session_start();
 $userID = $_SESSION['userID'];
-$playerID = getPlayerID($conn, $userID);
-$playerName = getPlayerName($conn, $userID);
-$playerTeam = getPlayerTeam($conn, $userID);
-$nextOpponent = getOppositionName($conn, $userID);
-$goals = getPlayerGoals($conn, $userID);
-$assists = getPlayerAssists($conn, $userID);
-$apperances = getPlayerApperances($conn, $userID);
-$leagueID = getLeagueID($userID, $conn);
+$playerID = getPlayerID($userID);
+$playerName = getPlayerName($userID);
+$playerTeam = getPlayerTeam($userID);
+$nextOpponent = getOppositionName($userID);
+$goals = getPlayerGoals($userID);
+$assists = getPlayerAssists($userID);
+$apperances = getPlayerApperances($userID);
+$leagueID = getLeagueID($userID);
 $playerTeamID = getTeamID($userID);
 ?>
 
@@ -105,7 +105,7 @@ $playerTeamID = getTeamID($userID);
         <div class="container-fluid">
           <div class="row mb">
             <div class="col-sm">
-              <h1><?php echo $playerName ?>'s' dashboard</h1>
+              <h1><?php echo $playerName ?>'s' dashboard</h1> <!-- Player name -->
             </div>
           </div>
         </div>
@@ -124,12 +124,12 @@ $playerTeamID = getTeamID($userID);
                   <div class="row">
                     <div class="col-md-12" style=" margin-bottom:1%">
                       <!-- Days till next game -->
-                      <h5> Your name game is in <?php getDaysUntilGame($conn, $userID); ?> against <?php echo $nextOpponent ?> </h5>
+                      <h5> Your name game is in <?php getDaysUntilGame($userID); ?> against <?php echo $nextOpponent ?> </h5> <!-- Days till next game -->
                     </div>
                   </div>
                   <div class="card shadow" style="width: 100%">
                     <div class="card-body p-0">
-                      <table class="table table-striped" style="width: 100%">
+                      <table class="table table-striped" style="width: 100%"> <!-- League table -->
                         <thead>
                           <tr>
                             <th onclick="sortTable(0)">Team</th>
@@ -151,15 +151,15 @@ $playerTeamID = getTeamID($userID);
                               $teams[] = $row;
                             }
 
-                            $points = getTeamPoints($teams, $conn);
+                            $points = getTeamPoints($teams);
                             // Display the teams in descending order of points
                             foreach ($points as $team) {
                               echo "<tr>
         <td>" . $team["teamName"] . "</td>
-        <td>" . getTeamWins($team["teamID"], $conn) . "</td>
-        <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
-        <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
-        <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+        <td>" . getTeamWins($team["teamID"]) . "</td>
+        <td>" . getTeamDraws($team["teamID"]) . "</td>
+        <td>" . getTeamLosses($team["teamID"]) . "</td>
+        <td>" . getTeamGoalDifference($team["teamID"]) . "</td>
         <td>" . $team["points"] . "</td>
       </tr>";
                             }
@@ -184,175 +184,175 @@ $playerTeamID = getTeamID($userID);
                           <h5 class="widget-user-desc"><?php echo $playerTeam ?></h5>
                         </div>
                         <div class="widget-user-image">
-                          <?php userPfpCheck($userID) ?>
+                          <?php userPfpCheck($userID) ?> <!-- User pfp -->
                         </div>
                         <div class="card-footer">
                           <div class="row">
                             <div class="col-sm-4 border-right">
                               <div class="description-block">
-                                <h5 class="description-header"><?php echo $goals ?></h5>
+                                <h5 class="description-header"><?php echo $goals ?></h5> <!-- Goals -->
                                 <span class="description-text">GOALS</span>
                               </div>
                               <!-- /.description-block -->
                             </div>
                             <!-- /.col -->
                             <div class="col-sm-4 border-right">
-                              <div class="description-block">
-                                <h5 class="description-header"><?php echo $assists ?></h5>
+                              < class="description-block">
+                                <h5 class="description-header"><?php echo $assists ?></h5> <!-- Assists -->
                                 <span class="description-text">ASSISTS</span>
-                              </div>
-                              <!-- /.description-block -->
                             </div>
-                            <!-- /.col -->
-                            <div class="col-sm-4">
-                              <div class="description-block">
-                                <h5 class="description-header"><?php echo $apperances ?></h5>
-                                <span class="description-text">APPEARANCES</span>
-                              </div>
-                              <!-- /.description-block -->
-                            </div>
-                            <!-- /.col -->
+                            <!-- /.description-block -->
                           </div>
-                          <!-- /.row -->
+                          <!-- /.col -->
+                          <div class="col-sm-4">
+                            <div class="description-block">
+                              <h5 class="description-header"><?php echo $apperances ?></h5> <!-- Appearances -->
+                              <span class="description-text">APPEARANCES</span>
+                            </div>
+                            <!-- /.description-block -->
+                          </div>
+                          <!-- /.col -->
                         </div>
+                        <!-- /.row -->
                       </div>
                     </div>
                   </div>
-                  <div class="row">
-                    <!-- Fixtures -->
-                    <div class="col-md-12 text-center">
-                      <div class="card card-outline shadow">
-                        <div class="card-body">
-                          <h1 class="card-title">Fixtures</h1>
-                          <br />
-                          <div class="col-md-12">
-                            <?php
-                            $sql = "SELECT teamID FROM player WHERE playerID = $playerID";
-                            $teamResult = mysqli_query($conn, $sql);
-                            if (mysqli_num_rows($teamResult) > 0) {
-                              $teamRow = mysqli_fetch_assoc($teamResult);
-                              $teamID = $teamRow['teamID'];
+                </div>
+                <div class="row">
+                  <!-- Fixtures -->
+                  <div class="col-md-12 text-center">
+                    <div class="card card-outline shadow">
+                      <div class="card-body">
+                        <h1 class="card-title">Fixtures</h1>
+                        <br />
+                        <div class="col-md-12">
+                          <?php
+                          $sql = "SELECT teamID FROM player WHERE playerID = $playerID";
+                          $teamResult = mysqli_query($conn, $sql);
+                          if (mysqli_num_rows($teamResult) > 0) {
+                            $teamRow = mysqli_fetch_assoc($teamResult);
+                            $teamID = $teamRow['teamID'];
+                            //Get the minimum match week
+                            $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
+                            $result = mysqli_query($conn, $query);
 
-                              $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
-                              $result = mysqli_query($conn, $query);
+                            if (mysqli_num_rows($result) > 0) {
+                              $row = mysqli_fetch_assoc($result);
+                              $minWeek = $row['minWeek'];
+                              //Get the next 3 fixtures
+                              $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek >= '$minWeek' AND leagueID = '$leagueID' AND (homeTeamID = '$teamID' OR awayTeamID = '$teamID') LIMIT 3";
+                              $resultFixtures = mysqli_query($conn, $query);
 
-                              if (mysqli_num_rows($result) > 0) {
-                                $row = mysqli_fetch_assoc($result);
-                                $minWeek = $row['minWeek'];
+                              if (mysqli_num_rows($resultFixtures) > 0) {
+                                while ($row = mysqli_fetch_array($resultFixtures)) {
+                                  $homeTeamID = $row['homeTeamID'];
+                                  $awayTeamID = $row['awayTeamID'];
+                                  //Get the team names
+                                  $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
+                                  $result2 = mysqli_query($conn, $query);
+                                  $row2 = mysqli_fetch_array($result2);
+                                  $homeTeamName = $row2['teamName'];
 
-                                $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek >= '$minWeek' AND leagueID = '$leagueID' AND (homeTeamID = '$teamID' OR awayTeamID = '$teamID') LIMIT 3";
-                                $resultFixtures = mysqli_query($conn, $query);
-
-                                if (mysqli_num_rows($resultFixtures) > 0) {
-                                  while ($row = mysqli_fetch_array($resultFixtures)) {
-                                    $homeTeamID = $row['homeTeamID'];
-                                    $awayTeamID = $row['awayTeamID'];
-
-                                    $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
-                                    $result2 = mysqli_query($conn, $query);
-                                    $row2 = mysqli_fetch_array($result2);
-                                    $homeTeamName = $row2['teamName'];
-
-                                    $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
-                                    $result3 = mysqli_query($conn, $query);
-                                    $row3 = mysqli_fetch_array($result3);
-                                    $awayTeamName = $row3['teamName'];
-                            ?>
-                                    <div class="card">
-                                      <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?></b></h2>
-                                    </div>
-                            <?php
-                                  }
-                                } else {
-                                  echo "No fixtures found for the team";
+                                  $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
+                                  $result3 = mysqli_query($conn, $query);
+                                  $row3 = mysqli_fetch_array($result3);
+                                  $awayTeamName = $row3['teamName'];
+                          ?>
+                                  <div class="card">
+                                    <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?></b></h2>
+                                  </div>
+                          <?php
                                 }
                               } else {
-                                echo "No match week numbers found in the fixtures table";
+                                echo "No fixtures found for the team";
                               }
                             } else {
-                              echo "No team found for the player";
+                              echo "No match week numbers found in the fixtures table";
                             }
-                            ?>
-                          </div>
+                          } else {
+                            echo "No team found for the player";
+                          }
+                          ?>
                         </div>
                       </div>
                     </div>
-
-                    <!-- End of fixtures -->
                   </div>
-                  <div class="row">
 
-                    <!-- Teammates -->
-                    <div class="col-md-12 text-center">
-                      <div class="card card-outline shadow">
-                        <div class="card-body">
-                          <h5 class="card-title">Teammates</h5>
-                          <br />
-                          <div class="row">
-                            <div class="col-md-12">
-                              <div class="row">
-                                <!-- teammate loop -->
-                                <?php
-                                // get all the players who have the same teamID as the current user
-                                $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
-                                $stmt = mysqli_stmt_init($conn);
-                                if (!mysqli_stmt_prepare($stmt, $sql)) {
-                                  header("Location: ../signup.php?error=stmtfailed");
-                                  exit();
+                  <!-- End of fixtures -->
+                </div>
+                <div class="row">
+
+                  <!-- Teammates -->
+                  <div class="col-md-12 text-center">
+                    <div class="card card-outline shadow">
+                      <div class="card-body">
+                        <h5 class="card-title">Teammates</h5>
+                        <br />
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="row">
+                              <!-- teammate loop -->
+                              <?php
+                              // get all the players who have the same teamID as the current user
+                              $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
+                              $stmt = mysqli_stmt_init($conn);
+                              if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                header("Location: ../signup.php?error=stmtfailed");
+                                exit();
+                              }
+
+                              mysqli_stmt_bind_param($stmt, "ss", $playerTeamID, $playerID);
+                              mysqli_stmt_execute($stmt);
+                              $result = mysqli_stmt_get_result($stmt);
+                              $counter = 0;
+                              // loop through the results and display the players
+                              while ($row = mysqli_fetch_assoc($result)) {
+                                if ($counter == 6) {
+                                  break;
                                 }
-
-                                mysqli_stmt_bind_param($stmt, "ss", $playerTeamID, $playerID);
-                                mysqli_stmt_execute($stmt);
-                                $result = mysqli_stmt_get_result($stmt);
-
-                                $counter = 0;
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                  if ($counter == 6) {
-                                    break;
-                                  }
-                                  $userID = $row['userID'];
-                                  $firstName = $row['firstName'];
-                                  $lastName = $row['lastName'];
-                                ?>
-                                  <div class="col-md-4">
-                                    <div class="card card-danger card-outline">
-                                      <div class="card-body box-profile">
-                                        <div class="text-center">
-                                          <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
-                                        </div>
-                                        <h5 class="profile-username text-center"><?php echo $firstName . ' ' . $lastName; ?></h5> <!-- Player name -->
-                                        <p class="text-muted text-center">Team name</p> <!-- Team name -->
+                                $userID = $row['userID'];
+                                $firstName = $row['firstName'];
+                                $lastName = $row['lastName'];
+                              ?>
+                                <div class="col-md-4">
+                                  <div class="card card-danger card-outline">
+                                    <div class="card-body box-profile">
+                                      <div class="text-center">
+                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
                                       </div>
+                                      <h5 class="profile-username text-center"><?php echo $firstName . ' ' . $lastName; ?></h5> <!-- Player name -->
+                                      <p class="text-muted text-center">Team name</p> <!-- Team name -->
                                     </div>
                                   </div>
-                                <?php
-                                  $counter++;
-                                }
-                                ?>
-                              </div>
+                                </div>
+                              <?php
+                                $counter++;
+                              }
+                              ?>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <!-- End of fixtures -->
                   </div>
-
+                  <!-- End of fixtures -->
                 </div>
-                <!-- End of stats -->
+
               </div>
-              <!-- End of top row -->
-
-              <!-- End of second row -->
-              <!-- Third row- Teammates -->
-
+              <!-- End of stats -->
             </div>
+            <!-- End of top row -->
+
+            <!-- End of second row -->
+            <!-- Third row- Teammates -->
+
           </div>
         </div>
-        <!-- /.card -->
-      </section>
-      <!-- /.content -->
     </div>
+    <!-- /.card -->
+    </section>
+    <!-- /.content -->
+  </div>
   </div>
 
   <!-- REQUIRED SCRIPTS -->
@@ -401,7 +401,7 @@ $playerTeamID = getTeamID($userID);
     $(document).ready(function() {
       $("th").click(function() {
         var table = $(this).parents("table");
-        var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+        var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index())); // Get all the rows except the header
         this.asc = !this.asc;
         if (!this.asc) {
           rows = rows.reverse();
@@ -425,12 +425,12 @@ $playerTeamID = getTeamID($userID);
       return function(a, b) {
         var valA = getCellValue(a, index),
           valB = getCellValue(b, index);
-        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB); // Compare the values
       }
     }
 
     function getCellValue(row, index) {
-      return $(row).children("td").eq(index).text();
+      return $(row).children("td").eq(index).text(); // Get the value of the cell at the given index
     }
   </script>
 

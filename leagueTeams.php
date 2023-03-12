@@ -9,7 +9,7 @@ $conn = require 'includes/dbhconfig.php';
 //Variables
 
 $leagueID = $_POST['leagueID'];
-$leagueName = getLeagueName($conn, $leagueID);
+$leagueName = getLeagueName($leagueID);
 
 ?>
 
@@ -114,6 +114,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
+                            //Get all teams in league
                             $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
                             $result = mysqli_query($conn, $query);
                             if (mysqli_num_rows($result) > 0) {
@@ -131,7 +132,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                 <div class="row">
                                                     <div class="col-12 text-center">
                                                         <?php
-
+                                                        //Get club logo
                                                         $query = "SELECT clubID FROM team WHERE teamID = '$teamID'";
                                                         $result2 = mysqli_query($conn, $query);
                                                         $row = mysqli_fetch_array($result2);

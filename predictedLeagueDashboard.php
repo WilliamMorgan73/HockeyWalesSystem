@@ -7,7 +7,7 @@ require_once('includes/functions.inc.php');
 $conn = require 'includes/dbhconfig.php';
 
 $leagueID = $_POST['leagueID'];
-$leagueName = getLeagueName($conn, $leagueID);
+$leagueName = getLeagueName($leagueID);
 
 ?>
 
@@ -100,7 +100,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                 <div class="container-fluid">
                     <div class="row mb">
                         <div class="col-sm">
-                            <h1><?php echo $leagueName ?> predictions</h1>
+                            <h1><?php echo $leagueName ?> predictions</h1> <!-- League name -->
                         </div>
                     </div>
                 </div>
@@ -119,27 +119,27 @@ $leagueName = getLeagueName($conn, $leagueID);
                                         <div class="card shadow" style="width: 100%">
                                             <div class="card-body p-0">
                                                 <?php
-                                                $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
+                                                $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID"; // Get all teams in the league
                                                 $result = $conn->query($sql);
 
                                                 if ($result->num_rows > 0) {
                                                     $teams = array();
                                                     while ($row = $result->fetch_assoc()) {
-                                                        $teams[] = $row;
+                                                        $teams[] = $row; // Add each team to the array
                                                     }
 
                                                     // Sort the teams based on their predicted points
                                                     usort($teams, function ($a, $b) use ($conn) {
                                                         $teamAID = $a['teamID'];
                                                         $teamBID = $b['teamID'];
-                                                        $predictedPointsA = getPredictedPoints($teamAID, $conn);
-                                                        $predictedPointsB = getPredictedPoints($teamBID, $conn);
+                                                        $predictedPointsA = getPredictedPoints($teamAID);
+                                                        $predictedPointsB = getPredictedPoints($teamBID);
                                                         return $predictedPointsB - $predictedPointsA;
                                                     });
                                                 } else {
                                                     $teams = null;
                                                 }
-
+                                                //League table
                                                 echo '<table class="table table-striped" style="width: 100%">';
                                                 echo '<thead>';
                                                 echo '<tr>';
@@ -153,12 +153,13 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                 echo '<tbody id="tableBody">';
 
                                                 foreach ($teams as $team) {
+                                                    // Get the predicted wins, draws, losses, and points for each team
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
-                                                    $predictedWins = getTeamWins($teamID, $conn) + getPredictedWins($teamID, $conn);
-                                                    $predictedDraws = getTeamDraws($teamID, $conn) + getPredictedDraws($teamID, $conn);
-                                                    $predictedLosses = getTeamLosses($teamID, $conn) + getPredictedLosses($teamID, $conn);
-                                                    $predictedPoints = getPredictedPoints($teamID, $conn);
+                                                    $predictedWins = getTeamWins($teamID) + getPredictedWins($teamID);
+                                                    $predictedDraws = getTeamDraws($teamID) + getPredictedDraws($teamID);
+                                                    $predictedLosses = getTeamLosses($teamID) + getPredictedLosses($teamID);
+                                                    $predictedPoints = getPredictedPoints($teamID);
 
                                                     echo '<tr>';
                                                     echo '<td>' . $teamName . '</td>';
@@ -227,6 +228,7 @@ $leagueName = getLeagueName($conn, $leagueID);
 
                                                         if (mysqli_num_rows($teamIDresult) > 0) {
                                                             while ($row = mysqli_fetch_array($teamIDresult)) {
+                                                                // Get the playerID, firstName, lastName, and teamID for each player in the league
                                                                 $playerID = $row['playerID'];
                                                                 $firstName = $row['firstName'];
                                                                 $lastName = $row['lastName'];
@@ -242,7 +244,7 @@ $leagueName = getLeagueName($conn, $leagueID);
 
                                                                 $row = mysqli_fetch_array($teamNameresult);
                                                                 $teamName = $row['teamName'];
-
+                                                                //Get the number of goals for each player in the league
                                                                 $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID'";
                                                                 $numOfGoalsresult = mysqli_query($conn, $query);
 
@@ -263,7 +265,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                                 $appearancesResult = mysqli_query($conn, $query);
 
 
-
+                                                                //Get the number of appearances for each player in the league
                                                                 if (!$appearancesResult) {
                                                                     echo "Error: " . mysqli_error($conn);
                                                                     exit();
@@ -277,7 +279,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                                 } else {
                                                                     $predictedNumOfGoals = 0;
                                                                 }
-
+                                                                //Get the predicted number of goals for each player in the league
                                                                 $predictedScorers[] = array("firstName" => $firstName, "lastName" => $lastName, "teamName" => $teamName, "predictedNumOfGoals" => $predictedNumOfGoals);
                                                             }
                                                         }
@@ -286,7 +288,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                     usort($predictedScorers, function ($a, $b) {
                                                         return $b['predictedNumOfGoals'] <=> $a['predictedNumOfGoals'];
                                                     });
-
+                                                    //Loop through the predictedScorers array and display the predicted top scorers
                                                     foreach ($predictedScorers as $player) {
                                                     ?>
                                                         <div class="row">
@@ -318,8 +320,9 @@ $leagueName = getLeagueName($conn, $leagueID);
                                                 <br />
                                                 <div class="col-md-12">
                                                     <?php
-                                                    $predictedResults = getPredictedResults($leagueID, $conn);
+                                                    $predictedResults = getPredictedResults($leagueID);
                                                     if (!empty($predictedResults)) {
+                                                        // Loop through the predicted results and display them
                                                         foreach ($predictedResults as $match) {
                                                             $homeTeam = $match['homeTeam'];
                                                             $awayTeam = $match['awayTeam'];
@@ -372,7 +375,6 @@ $leagueName = getLeagueName($conn, $leagueID);
 </div>
 <!-- REQUIRED SCRIPTS -->
 
-<!-- REQUIRED SCRIPTS -->
 
 <!-- jQuery -->
 <script src="js/jquery/jquery.min.js"></script>
@@ -388,6 +390,7 @@ $leagueName = getLeagueName($conn, $leagueID);
 
 <script>
     <?php
+    // Get the leagueID from the URL
     $query = "SELECT teamID, teamName FROM team WHERE leagueID = '$leagueID'";
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -398,9 +401,10 @@ $leagueName = getLeagueName($conn, $leagueID);
     $allPointsPerWeek = [];
     $teams = [];
     while ($row = mysqli_fetch_assoc($result)) {
+        // Get the points per week for each team in the league
         $teamID = $row['teamID'];
         $teamName = $row['teamName'];
-        $pointsPerWeek = calculatePointsPerWeek($teamID, $conn);
+        $pointsPerWeek = calculatePointsPerWeek($teamID);
         $allPointsPerWeek[$teamID] = $pointsPerWeek;
         $teams[$teamID] = array(
             'name' => $teamName
@@ -421,7 +425,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                 return [item[0], item[1]];
             }));
         }
-
+        //Create an array of colors
         $.plot('#line-chart', line_data, {
             grid: {
                 hoverable: true,
@@ -443,6 +447,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                 color: ['#3c8dbc']
             },
             yaxis: {
+                //Show the y-axis label
                 show: true,
                 axisLabel: "Predicted points",
                 axisLabelUseCanvas: true,
@@ -451,6 +456,7 @@ $leagueName = getLeagueName($conn, $leagueID);
                 axisLabelPadding: 3
             },
             xaxis: {
+                //Show the x-axis label
                 show: true,
                 axisLabel: "Game Week",
                 axisLabelUseCanvas: true,
@@ -468,6 +474,7 @@ $leagueName = getLeagueName($conn, $leagueID);
         $('#line-chart').bind('plothover', function(event, pos, item) {
 
             if (item) {
+                //Get the x and y values
                 var x = item.datapoint[0].toFixed(2),
                     y = item.datapoint[1].toFixed(2),
                     teamName = teams[Object.keys(teams)[item.seriesIndex]].name;
@@ -520,7 +527,7 @@ $leagueName = getLeagueName($conn, $leagueID);
     $(document).ready(function() {
         $("th").click(function() {
             var table = $(this).parents("table");
-            var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+            var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index())); // Get the rows of the table
             this.asc = !this.asc;
             if (!this.asc) {
                 rows = rows.reverse();
@@ -544,12 +551,12 @@ $leagueName = getLeagueName($conn, $leagueID);
         return function(a, b) {
             var valA = getCellValue(a, index),
                 valB = getCellValue(b, index);
-            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+            return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB); // Compare the values
         }
     }
 
     function getCellValue(row, index) {
-        return $(row).children("td").eq(index).text();
+        return $(row).children("td").eq(index).text(); // Get the value of the cell
     }
 </script>
 

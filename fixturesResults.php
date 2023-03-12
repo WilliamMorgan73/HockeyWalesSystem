@@ -104,6 +104,7 @@ $leagueName = getLeagueName($leagueID);
                         <div class="col-sm">
                             <h1>
                                 <?php
+                                // Get the selected week from the form
                                 if (isset($_POST['selectedWeek'])) {
                                     $selectedWeek = $_POST['selectedWeek'];
                                 } else {
@@ -116,7 +117,7 @@ $leagueName = getLeagueName($leagueID);
                                         echo "No game week numbers found in the fixture table";
                                     }
                                 }
-
+                                //Get the maximum week number from the result table
                                 $query = "SELECT MAX(matchWeek) AS maxWeek FROM result";
                                 $result = mysqli_query($conn, $query);
                                 if (mysqli_num_rows($result) > 0) {
@@ -149,8 +150,10 @@ $leagueName = getLeagueName($leagueID);
                                 <label for="selectedWeek">Select Game Week:</label>
                                 <select name="selectedWeek" id="selectedWeek" class="form-control">
                                     <?php
+                                    // Get the game weeks from the database
                                     $query = "SELECT gameWeekID, gameDate FROM gameweek";
                                     $result = mysqli_query($conn, $query);
+                                    // Display the game weeks in the select box
                                     if (mysqli_num_rows($result) > 0) {
                                         while ($row = mysqli_fetch_array($result)) {
                                             $matchWeekID = $row['gameWeekID'];
@@ -172,14 +175,15 @@ $leagueName = getLeagueName($leagueID);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
+                            // Get the fixtures and results for the selected week
                             $query = "SELECT * FROM fixture WHERE matchWeek = '$selectedWeek' AND leagueID = '$leagueID' UNION ALL SELECT * FROM result WHERE matchWeek = '$selectedWeek' AND leagueID = '$leagueID'";
                             $result = mysqli_query($conn, $query);
-
+                            // Display the fixtures and results
                             if (mysqli_num_rows($result) > 0) {
                                 while ($row = mysqli_fetch_array($result)) {
                                     $homeTeamID = $row['homeTeamID'];
                                     $awayTeamID = $row['awayTeamID'];
-
+                                    // Get the team names and club IDs for the home and away teams
                                     $query = "SELECT teamName, clubID FROM team WHERE teamID = '$homeTeamID'";
                                     $result2 = mysqli_query($conn, $query);
                                     $homeRow = mysqli_fetch_array($result2);
@@ -215,6 +219,7 @@ $leagueName = getLeagueName($leagueID);
                                             <div class="card-footer">
                                                 <div class="text-center">
                                                     <?php
+                                                    // Display the result if the match has been played, otherwise display the location and time
                                                     if (array_key_exists("homeTeamScore", $row)) {
                                                         echo "Result: " . $row['homeTeamScore'] . " - " . $row['awayTeamScore'];
                                                     } else {
@@ -251,13 +256,5 @@ $leagueName = getLeagueName($leagueID);
     <!-- AdminLTE App -->
     <script src="js/adminlte/adminlte.min.js"></script>
 </body>
-
-<!--
-Make so drop down does not reset to first option when page is refreshed
-make all info centered
-Make it output the correct info when first opening the page
-
-                        -->
-
 
 </html>

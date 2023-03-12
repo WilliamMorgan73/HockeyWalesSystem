@@ -8,9 +8,9 @@ $conn = require 'includes/dbhconfig.php';
 
 session_start();
 $userID = $_SESSION['userID'];
-$clubAdminName = getclubAdminName($conn, $userID);
-$clubName = getClubName($conn, $userID);
-$clubID = getClubID($conn, $clubName);
+$clubAdminName = getclubAdminName($userID);
+$clubName = getClubName($userID);
+$clubID = getClubID($clubName);
 ?>
 
 <html lang="en">
@@ -105,6 +105,7 @@ $clubID = getClubID($conn, $clubName);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
+                            // Query to get all the players that are waiting to be approved
                             $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
                             $result = mysqli_query($conn, $query);
                             if (mysqli_num_rows($result) > 0) {
@@ -138,6 +139,7 @@ $clubID = getClubID($conn, $clubName);
                                                                 <!-- Drop-down list of teams -->
                                                                 <select name="teamID">
                                                                     <?php
+                                                                    // Query to get all the teams in the club
                                                                     $teamQuery = "SELECT * FROM team WHERE clubID = '$clubID'";
                                                                     $teamResult = mysqli_query($conn, $teamQuery);
                                                                     while ($teamRow = mysqli_fetch_array($teamResult)) {

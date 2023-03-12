@@ -25,7 +25,8 @@
             <!-- Heading and subheading-->
             <p class="heading">Hockey Wales</p>
             <p class="sub-heading">
-              Enter your email here to recieve a verification email to change your password
+              Enter your email here to send a password change request to your club admin.
+              Already sent? Enter your email to be able to reset your password.
               <!-- Change password form -->
             <form action="#" method="post">
               <!-- Email -->

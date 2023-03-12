@@ -7,7 +7,7 @@ require_once('includes/functions.inc.php');
 $conn = require 'includes/dbhconfig.php';
 
 $clubID = $_POST['clubID'];
-$topTeamLeague = getTopTeamLeague($clubID, $conn);
+$topTeamLeague = getTopTeamLeague($clubID);
 $query = "SELECT clubName FROM club WHERE clubID = $clubID";
 $result = mysqli_query($conn, $query);
 $row = mysqli_fetch_array($result);
@@ -108,7 +108,7 @@ $clubName = $row['clubName'];
                                 <div class="col-md-12">
                                     <div class="card shadow" style="width: 100%">
                                         <div class="card-body p-0">
-                                            <table class=" table table-striped" style="width: 100%">
+                                            <table class=" table table-striped" style="width: 100%"> <!-- League table of league of club top team-->
                                                 <thead>
                                                     <tr>
                                                         <th onclick="sortTable(0)">Team</th>
@@ -130,15 +130,15 @@ $clubName = $row['clubName'];
                                                             $teams[] = $row;
                                                         }
 
-                                                        $points = getTeamPoints($teams, $conn);
+                                                        $points = getTeamPoints($teams);
                                                         // Display the teams in descending order of points
                                                         foreach ($points as $team) {
                                                             echo "<tr>
               <td>" . $team["teamName"] . "</td>
-              <td>" . getTeamWins($team["teamID"], $conn) . "</td>
-              <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
-              <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
-              <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+              <td>" . getTeamWins($team["teamID"]) . "</td>
+              <td>" . getTeamDraws($team["teamID"]) . "</td>
+              <td>" . getTeamLosses($team["teamID"]) . "</td>
+              <td>" . getTeamGoalDifference($team["teamID"]) . "</td>
               <td>" . $team["points"] . "</td>
             </tr>";
                                                         }
@@ -250,19 +250,19 @@ $clubName = $row['clubName'];
 
                                                     $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE (homeTeamID = '$clubID' OR awayTeamID = '$clubID')";
                                                     $resultdetailresult = mysqli_query($conn, $query);
-
+                                                    // Check if there are any results for the given club ID
                                                     if (mysqli_num_rows($resultdetailresult) > 0) {
                                                         while ($row = mysqli_fetch_array($resultdetailresult)) {
                                                             $homeTeamID = $row['homeTeamID'];
                                                             $awayTeamID = $row['awayTeamID'];
                                                             $homeTeamScore = $row['homeTeamScore'];
                                                             $awayTeamScore = $row['awayTeamScore'];
-
+                                                            //Get home team name
                                                             $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
                                                             $result2 = mysqli_query($conn, $query);
                                                             $row2 = mysqli_fetch_array($result2);
                                                             $homeTeamName = $row2['teamName'];
-
+                                                            //Get away team name
                                                             $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
                                                             $result3 = mysqli_query($conn, $query);
                                                             $row3 = mysqli_fetch_array($result3);
@@ -291,6 +291,7 @@ $clubName = $row['clubName'];
                                                 <br />
                                                 <div class="col-md-12">
                                                     <?php
+                                                    // SELECT all fixtures for the teams associated with the given club ID
                                                     $query = "SELECT teamID FROM team WHERE clubID = '$clubID'";
                                                     $result = mysqli_query($conn, $query);
 
@@ -299,27 +300,27 @@ $clubName = $row['clubName'];
                                                         while ($row = mysqli_fetch_assoc($result)) {
                                                             array_push($teamIDs, $row['teamID']);
                                                         }
-
+                                                        // SELECT the match week of the earliest fixture for the teams associated with the given club ID
                                                         $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture WHERE homeTeamID IN ('" . implode("','", $teamIDs) . "') OR awayTeamID IN ('" . implode("','", $teamIDs) . "')";
                                                         $result = mysqli_query($conn, $query);
-
+                                                        // Check if there are any fixtures for the given club ID
                                                         if (mysqli_num_rows($result) > 0) {
                                                             $row = mysqli_fetch_assoc($result);
                                                             $minWeek = $row['minWeek'];
 
                                                             $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE (homeTeamID IN ('" . implode("','", $teamIDs) . "') OR awayTeamID IN ('" . implode("','", $teamIDs) . "')) AND matchWeek = '$minWeek'";
                                                             $resultFixtures = mysqli_query($conn, $query);
-
+                                                            // Check if there are any fixtures for the given club ID
                                                             if (mysqli_num_rows($resultFixtures) > 0) {
                                                                 while ($row = mysqli_fetch_array($resultFixtures)) {
                                                                     $homeTeamID = $row['homeTeamID'];
                                                                     $awayTeamID = $row['awayTeamID'];
-
+                                                                    // Get home team name
                                                                     $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
                                                                     $result2 = mysqli_query($conn, $query);
                                                                     $row2 = mysqli_fetch_array($result2);
                                                                     $homeTeamName = $row2['teamName'];
-
+                                                                    // Get away team name
                                                                     $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
                                                                     $result3 = mysqli_query($conn, $query);
                                                                     $row3 = mysqli_fetch_array($result3);
@@ -355,8 +356,10 @@ $clubName = $row['clubName'];
                                                 <h1 class="card-title">Top scorers</h1>
                                                 <br />
                                                 <?php
+                                                // SELECT all players for the teams associated with the given club ID
                                                 $query = "SELECT teamID FROM team WHERE clubID = '$clubID'";
                                                 $result = mysqli_query($conn, $query);
+                                                // Check if there are any results for the given club ID
                                                 if (mysqli_num_rows($result) > 0) {
                                                     $teamIDs = [];
                                                     while ($row = mysqli_fetch_array($result)) {
@@ -367,6 +370,7 @@ $clubName = $row['clubName'];
                                                     $playersResult = mysqli_query($conn, $query);
                                                     if (mysqli_num_rows($playersResult) > 0) {
                                                         $players = [];
+                                                        // Loop through all players
                                                         while ($row = mysqli_fetch_array($playersResult)) {
                                                             $playerID = $row['playerID'];
                                                             $firstName = $row['firstName'];
@@ -377,7 +381,7 @@ $clubName = $row['clubName'];
                                                             $teamNameResult = mysqli_query($conn, $query);
                                                             $row = mysqli_fetch_array($teamNameResult);
                                                             $teamName = $row['teamName'];
-
+                                                            // SELECT the number of goals scored by the player with the given player ID
                                                             $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
                                                             $numOfGoalsResult = mysqli_query($conn, $query);
                                                             if (mysqli_num_rows($numOfGoalsResult) > 0) {
@@ -393,6 +397,7 @@ $clubName = $row['clubName'];
                                                             }
                                                         }
                                                     }
+                                                    // Sort the players array by the number of goals scored
                                                     usort($players, function ($a, $b) {
                                                         return $b['numOfGoals'] - $a['numOfGoals'];
                                                     });
@@ -413,14 +418,10 @@ $clubName = $row['clubName'];
                                         </div>
                                     </div>
                                     <!-- End of top scorers -->
-
                                 </div>
-
                             </div>
-
                             <!-- End of results -->
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -430,7 +431,6 @@ $clubName = $row['clubName'];
     </div>
     <!-- /.content-wrapper -->
 </div>
-<!-- REQUIRED SCRIPTS -->
 
 <!-- REQUIRED SCRIPTS -->
 

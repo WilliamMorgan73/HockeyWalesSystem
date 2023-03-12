@@ -8,10 +8,10 @@ $conn = require 'includes/dbhconfig.php';
 
 session_start();
 $userID = $_SESSION['userID'];
-$clubAdminName = getclubAdminName($conn, $userID);
-$clubName = getClubName($conn, $userID);
-$clubID = getClubID($conn, $clubName);
-$leagueID = getLeagueID($userID, $conn);
+$clubAdminName = getclubAdminName($userID);
+$clubName = getClubName($userID);
+$clubID = getClubID($clubName);
+$leagueID = getLeagueID($userID);
 ?>
 
 <html lang="en">
@@ -40,7 +40,7 @@ $leagueID = getLeagueID($userID, $conn);
             <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
                 <img src="images/hw_feathers2.png" style="width:25%;">
-                <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span>
+                <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span> <!-- Club admin club name-->
             </a>
             <!-- Sidebar -->
             <div class="sidebar">
@@ -135,7 +135,7 @@ $leagueID = getLeagueID($userID, $conn);
                         </div>
                         <!-- End of header -->
                         <?php
-
+                        //Get the results for the club that are awaiting approval
                         $query = "SELECT hometeam.teamName AS hometeam, awayteam.teamName AS awayteam, homeTeamScore, awayTeamScore, tempresult.homeTeamID AS homeTeamID, tempresult.awayTeamID AS awayTeamID
                         FROM tempresult
                         INNER JOIN team hometeam ON tempresult.homeTeamID = hometeam.teamID
@@ -163,6 +163,7 @@ $leagueID = getLeagueID($userID, $conn);
                                 <div class="col-md-3">
                                     <div class="row">
                                         <div class="col-md-6">
+                                            <!-- Approve button -->
                                             <form action="includes/approveResult.php" method="post">
                                                 <input type="hidden" name="homeTeamID" value="<?php echo $row['homeTeamID']; ?>">
                                                 <input type="hidden" name="awayTeamID" value="<?php echo $row['awayTeamID']; ?>">
@@ -170,6 +171,7 @@ $leagueID = getLeagueID($userID, $conn);
                                             </form>
                                         </div>
                                         <div class="col-md-6">
+                                            <!-- Challenge button -->
                                             <form action="includes/challengeResult.php" method="post">
                                                 <input type="hidden" name="homeTeamID" value="<?php echo $row['homeTeamID']; ?>">
                                                 <input type="hidden" name="awayTeamID" value="<?php echo $row['awayTeamID']; ?>">
@@ -185,8 +187,6 @@ $leagueID = getLeagueID($userID, $conn);
                         ?>
                     </div>
                 </div>
-
-
                 <!-- /.card-body -->
 
                 <!-- Enter result card -->
@@ -239,6 +239,7 @@ $leagueID = getLeagueID($userID, $conn);
                         if (!$conn) {
                             die("Connection failed: " . mysqli_connect_error());
                         }
+                        // Get the results for the club that are awaiting approval
                         $query = "SELECT tr.tempResultID, tr.homeTeamID, tr.awayTeamID, t1.teamName AS homeTeamName, t2.teamName AS awayTeamName
           FROM tempresult tr
           JOIN team t1 ON t1.teamID = tr.homeTeamID
@@ -280,6 +281,7 @@ $leagueID = getLeagueID($userID, $conn);
                                         <div class="col-md-6">
                                             <select class="select2" multiple="multiple" data-placeholder="Home scorers" style="width: 100%;" id="homeScorers">
                                                 <?php
+                                                // Get the players for the home team
                                                 $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
                                                 $result = mysqli_query($conn, $query);
 
@@ -289,81 +291,84 @@ $leagueID = getLeagueID($userID, $conn);
                                                 ?>
                                             </select>
                                         </div>
-                                        <div class="col-md-6">
-                                            <select class="select2" multiple="multiple" data-placeholder="Away scorers" style="width: 100%;" id="awayScorers">
-                                                <?php
-                                                $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
-                                                $result = mysqli_query($conn, $query);
+                                        <div class="col-md-6"></div>
+                                        <select class="select2" multiple="multiple" data-placeholder="Away scorers" style="width: 100%;" id="awayScorers">
+                                            <?php
+                                            // Get the players for the away team
+                                            $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
+                                            $result = mysqli_query($conn, $query);
 
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <select class="select2" multiple="multiple" data-placeholder="Home assisters" style="width: 100%;" id="homeAssisters">
-                                                <?php
-                                                $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
-                                                $result = mysqli_query($conn, $query);
-
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <select class="select2" multiple="multiple" data-placeholder="Away assisters" style="width: 100%;" id="awayAssisters">
-                                                <?php
-                                                $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
-                                                $result = mysqli_query($conn, $query);
-
-                                                while ($row = mysqli_fetch_array($result)) {
-                                                    echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <button type="button" id="Submit" class="btn btn-block btn-success">Submit</button>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <h4>Home Scorers</h4>
-                                            <div id="homeScorersRows"></div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <h4>Away Scorers</h4>
-                                            <div id="awayScorersRows"></div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <h4>Home Assisters</h4>
-                                            <div id="homeAssistersRows"></div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <h4>Away Assisters</h4>
-                                            <div id="awayAssistersRows"></div>
-                                        </div>
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                        <?php
-                        }
-                        ?>
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <select class="select2" multiple="multiple" data-placeholder="Home assisters" style="width: 100%;" id="homeAssisters">
+                                            <?php
+                                            // Get the players for the home team
+                                            $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
+                                            $result = mysqli_query($conn, $query);
+
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="select2" multiple="multiple" data-placeholder="Away assisters" style="width: 100%;" id="awayAssisters">
+                                            <?php
+                                            // Get the players for the away team
+                                            $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
+                                            $result = mysqli_query($conn, $query);
+
+                                            while ($row = mysqli_fetch_array($result)) {
+                                                echo "<option value='" . $row['playerID'] . "'>" . $row['firstName'] . "</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" id="Submit" class="btn btn-block btn-success">Submit</button>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h4>Home Scorers</h4>
+                                        <div id="homeScorersRows"></div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4>Away Scorers</h4>
+                                        <div id="awayScorersRows"></div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4>Home Assisters</h4>
+                                        <div id="homeAssistersRows"></div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h4>Away Assisters</h4>
+                                        <div id="awayAssistersRows"></div>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
+                <?php
+                        }
+                ?>
                 </div>
         </div>
-        <!-- /.card -->
-        </section>
-        <!-- /.content -->
+    </div>
+    <!-- /.card -->
+    </section>
+    <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
     <!-- REQUIRED SCRIPTS -->
@@ -391,7 +396,7 @@ $leagueID = getLeagueID($userID, $conn);
                 // Create new rows for each selected option
                 selectedOptions.forEach(function(option) {
                     var optionText = $("#homeAssisters option[value='" + option + "']").text();
-                    var newRow = '<div class="form-group"><label>' + optionText + '(Assists)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    var newRow = '<div class="form-group"><label>' + optionText + '(Assists)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>'; // Create new row
                     $('#homeAssistersRows').append(newRow);
                 });
             });
@@ -404,7 +409,7 @@ $leagueID = getLeagueID($userID, $conn);
                 // Create new rows for each selected option
                 selectedOptions.forEach(function(option) {
                     var optionText = $("#awayAssisters option[value='" + option + "']").text();
-                    var newRow = '<div class="form-group"><label>' + optionText + '(Assists)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    var newRow = '<div class="form-group"><label>' + optionText + '(Assists)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>'; // Create new row
                     $('#awayAssistersRows').append(newRow);
                 });
             });
@@ -416,7 +421,7 @@ $leagueID = getLeagueID($userID, $conn);
                 // Create new rows for each selected option
                 selectedOptions.forEach(function(option) {
                     var optionText = $("#homeScorers option[value='" + option + "']").text();
-                    var newRow = '<div class="form-group"><label>' + optionText + ' (Goals)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    var newRow = '<div class="form-group"><label>' + optionText + ' (Goals)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>'; // Create new row
                     $('#homeScorersRows').append(newRow);
                 });
             });
@@ -427,7 +432,7 @@ $leagueID = getLeagueID($userID, $conn);
                 $('#awayScorersRows').empty();
                 // Create new rows for each selected option
                 selectedOptions.forEach(function(option) {
-                    var newRow = '<div class="form-group"><label>' + option.text + ' (Goals)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>';
+                    var newRow = '<div class="form-group"><label>' + option.text + ' (Goals)</label><select class="form-control"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>'; // Create new row
                     $('#awayScorersRows').append(newRow);
                 });
             });

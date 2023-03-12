@@ -9,8 +9,8 @@ $conn = require 'includes/dbhconfig.php';
 //Variables
 session_start();
 $userID = $_SESSION['userID'];
-$playerID = getPlayerID($conn, $userID);
-$playerTeam = getPlayerTeam($conn, $userID);
+$playerID = getPlayerID($userID);
+$playerTeam = getPlayerTeam($userID);
 
 ?>
 

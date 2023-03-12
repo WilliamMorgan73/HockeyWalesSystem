@@ -9,10 +9,10 @@ $conn = require 'includes/dbhconfig.php';
 session_start();
 $userID = $_SESSION['userID'];
 
-$clubAdminName = getclubAdminName($conn, $userID);
-$clubName = getClubName($conn, $userID);
-$clubID = getClubID($conn, $clubName);
-$teams = getTeams($conn, $clubID);
+$clubAdminName = getclubAdminName($userID);
+$clubName = getClubName($userID);
+$clubID = getClubID($clubName);
+$teams = getTeams($clubID);
 
 ?>
 
@@ -123,6 +123,7 @@ $teams = getTeams($conn, $clubID);
                                         $selectedTeamName = $row['teamName'];
                                         $selectedTeamID = $row['lowestTeamID'];
                                     }
+                                    // If the user has selected a team, get the team name
                                     if (isset($_POST['selected-team-id'])) {
                                         $selectedTeamID = $_POST['selected-team-id'];
                                         foreach ($teams as $team) {
@@ -142,6 +143,7 @@ $teams = getTeams($conn, $clubID);
                                         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                                             <select class="form-control select2 " style="width: 30%;" name="selected-team-id">
                                                 <?php
+                                                // Get all teams for the club
                                                 foreach ($teams as $team) {
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
@@ -163,13 +165,14 @@ $teams = getTeams($conn, $clubID);
                     <div class="card-body pb-0">
                         <?php
                         //Get fixtures where the home team or away team has clubID = $clubID
-                        $fixtures = getFixturesByTeamID($selectedTeamID, $conn);
+                        $fixtures = getFixturesByTeamID($selectedTeamID);
+                        //Loop through each fixture
                         foreach ($fixtures as $fixture) {
                             $homeTeamID = $fixture['homeTeamID'];
                             $awayTeamID = $fixture['awayTeamID'];
                             $fixtureID = $fixture['fixtureID'];
-                            $homeTeamName = getTeamNameByID($homeTeamID, $conn);
-                            $awayTeamName = getTeamNameByID($awayTeamID, $conn);
+                            $homeTeamName = getTeamNameByID($homeTeamID);
+                            $awayTeamName = getTeamNameByID($awayTeamID);
                         ?>
                             <div class="row">
                                 <div class="col-md-12">
@@ -183,10 +186,10 @@ $teams = getTeams($conn, $clubID);
                                             <h5>Available</h5>
                                             <?php
                                             //Get all players with availability = 1 for this fixture
-                                            $availablePlayers = getAvailablePlayersByFixtureID($fixtureID, $conn);
+                                            $availablePlayers = getAvailablePlayersByFixtureID($fixtureID);
                                             foreach ($availablePlayers as $player) {
                                                 $playerID = $player['playerID'];
-                                                $playerName = getPlayerNameByID($playerID, $conn);
+                                                $playerName = getPlayerNameByID($playerID);
                                             ?>
                                                 <p><?php echo $playerName; ?></p>
                                             <?php } ?>
@@ -195,10 +198,10 @@ $teams = getTeams($conn, $clubID);
                                             <h5>Unavailable</h5>
                                             <?php
                                             //Get all players with availability = 0 for this fixture
-                                            $unavailablePlayers = getUnavailablePlayersByFixtureID($fixtureID, $conn);
+                                            $unavailablePlayers = getUnavailablePlayersByFixtureID($fixtureID);
                                             foreach ($unavailablePlayers as $player) {
                                                 $playerID = $player['playerID'];
-                                                $playerName = getPlayerNameByID($playerID, $conn);
+                                                $playerName = getPlayerNameByID($playerID);
                                             ?>
                                                 <p><?php echo $playerName; ?></p>
                                             <?php } ?>
@@ -207,10 +210,10 @@ $teams = getTeams($conn, $clubID);
                                             <h5>Unanswered</h5>
                                             <?php
                                             //Get all players with no entry in the availability table for this fixture
-                                            $unansweredPlayers = getUnansweredPlayersByFixtureID($fixtureID, $clubID, $conn);
+                                            $unansweredPlayers = getUnansweredPlayersByFixtureID($fixtureID);
                                             foreach ($unansweredPlayers as $player) {
                                                 $playerID = $player['playerID'];
-                                                $playerName = getPlayerNameByID($playerID, $conn);
+                                                $playerName = getPlayerNameByID($playerID);
                                             ?>
                                                 <p><?php echo $playerName; ?></p>
                                             <?php } ?>

@@ -9,10 +9,10 @@ include('includes/datechecker.inc.php');
 
 session_start();
 $userID = $_SESSION['userID'];
-$clubAdminName = getclubAdminName($conn, $userID);
-$clubName = getClubName($conn, $userID);
-$clubID = getClubID($conn, $clubName);
-$leagueID = getLeagueID($userID, $conn);
+$clubAdminName = getclubAdminName($userID);
+$clubName = getClubName($userID);
+$clubID = getClubID($clubName);
+$leagueID = getLeagueID($userID);
 ?>
 
 <html lang="en">
@@ -40,7 +40,7 @@ $leagueID = getLeagueID($userID, $conn);
       <!-- Brand Logo -->
       <a href="index.php" class="brand-link">
         <img src="images/hw_feathers2.png" style="width:25%;">
-        <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span>
+        <span class="brand-text font-weight-bolder"><?php echo $clubName ?></span> <!-- Club name -->
       </a>
       <!-- Sidebar -->
       <div class="sidebar">
@@ -96,7 +96,7 @@ $leagueID = getLeagueID($userID, $conn);
         <div class="container-fluid">
           <div class="row mb">
             <div class="col-sm">
-              <h1 class="m-0">Hi <?php echo $clubAdminName ?>,</h1>
+              <h1 class="m-0">Hi <?php echo $clubAdminName ?>,</h1> <!-- Club admin name -->
               <h5>You can manage your club from here</h5>
             </div>
           </div>
@@ -119,7 +119,7 @@ $leagueID = getLeagueID($userID, $conn);
                 <div class="col-md-6">
                   <div class="card shadow" style="width: 100%">
                     <div class="card-body p-0">
-                      <table class="table table-striped" style="width: 100%">
+                      <table class="table table-striped" style="width: 100%"> <!-- League table -->
                         <thead>
                           <tr>
                             <th onclick="sortTable(0)">Team</th>
@@ -141,15 +141,15 @@ $leagueID = getLeagueID($userID, $conn);
                               $teams[] = $row;
                             }
 
-                            $points = getTeamPoints($teams, $conn);
+                            $points = getTeamPoints($teams);
                             // Display the teams in descending order of points
                             foreach ($points as $team) {
                               echo "<tr>
   <td>" . $team["teamName"] . "</td>
-  <td>" . getTeamWins($team["teamID"], $conn) . "</td>
-  <td>" . getTeamDraws($team["teamID"], $conn) . "</td>
-  <td>" . getTeamLosses($team["teamID"], $conn) . "</td>
-  <td>" . getTeamGoalDifference($team["teamID"], $conn) . "</td>
+  <td>" . getTeamWins($team["teamID"]) . "</td>
+  <td>" . getTeamDraws($team["teamID"]) . "</td>
+  <td>" . getTeamLosses($team["teamID"]) . "</td>
+  <td>" . getTeamGoalDifference($team["teamID"]) . "</td>
   <td>" . $team["points"] . "</td>
 </tr>";
                             }
@@ -168,7 +168,7 @@ $leagueID = getLeagueID($userID, $conn);
                   <!-- Results approval -->
                   <div class="card card-outline shadow">
                     <div class="card-body">
-                      <h5 class="card-title">Results approval</h5>
+                      <h5 class="card-title">Results approval</h5> 
                       <br />
                       <div class="row">
                         <div class="col-md-12">
@@ -215,6 +215,7 @@ $leagueID = getLeagueID($userID, $conn);
                       <?php
                       $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
                       $result2 = mysqli_query($conn, $query);
+                      // Loop through the data and display it
                       if (mysqli_num_rows($result2) > 0) {
                         while ($row = mysqli_fetch_array($result2)) {
                           $tempUserID = $row['tempUserID'];
@@ -305,7 +306,7 @@ $leagueID = getLeagueID($userID, $conn);
     $(document).ready(function() {
       $("th").click(function() {
         var table = $(this).parents("table");
-        var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
+        var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index())); // Get the rows
         this.asc = !this.asc;
         if (!this.asc) {
           rows = rows.reverse();
@@ -329,12 +330,12 @@ $leagueID = getLeagueID($userID, $conn);
       return function(a, b) {
         var valA = getCellValue(a, index),
           valB = getCellValue(b, index);
-        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+        return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB); // Compare the values
       }
     }
 
     function getCellValue(row, index) {
-      return $(row).children("td").eq(index).text();
+      return $(row).children("td").eq(index).text(); // Get the value of the cell
     }
   </script>
 
