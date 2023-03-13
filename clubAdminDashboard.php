@@ -74,7 +74,13 @@ $leagueID = getLeagueID($userID);
             <li class="nav-item">
               <a href="resultApproval.php" class="nav-link">
                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
-                <p>Result apporval</p>
+                <p>Result approval</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="approvePasswordChange.php" class="nav-link">
+                <i class="far bi bi-person-fill-lock"></i>
+                <p>Password requests</p>
               </a>
             </li>
             <li class="nav-item">
@@ -103,11 +109,6 @@ $leagueID = getLeagueID($userID);
         </div>
         <!-- /.container-fluid -->
       </section>
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <!-- /.container-fluid -->
-      </div>
-      <!-- /.content-header -->
 
       <!-- Main content -->
       <div class="content">
@@ -168,7 +169,7 @@ $leagueID = getLeagueID($userID);
                   <!-- Results approval -->
                   <div class="card card-outline shadow">
                     <div class="card-body">
-                      <h5 class="card-title">Results approval</h5> 
+                      <h5 class="card-title">Results approval</h5>
                       <br />
                       <div class="row">
                         <div class="col-md-12">

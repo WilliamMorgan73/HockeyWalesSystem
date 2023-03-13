@@ -74,7 +74,13 @@ $teams = getTeams($clubID);
                         <li class="nav-item">
                             <a href="resultApproval.php" class="nav-link">
                                 <i class="far bi bi-bar-chart-fill nav-icon"></i>
-                                <p>Result apporval</p>
+                                <p>Result approval</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="approvePasswordChange.php" class="nav-link">
+                                <i class="far bi bi-person-fill-lock"></i>
+                                <p>Password requests</p>
                             </a>
                         </li>
                         <li class="nav-item">

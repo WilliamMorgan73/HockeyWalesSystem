@@ -1589,3 +1589,17 @@ function getClubs()
 
     return $clubs; //return the array
 }
+
+//Check if email exists in the changePassword table
+
+function emailExistsInPasswordChangeRequest($email)
+{
+    global $conn;
+    $query = "SELECT * FROM changePassword WHERE email = '$email'"; //query to check if email exists
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) > 0) {
+        return true; //return true if email exists
+    } else {
+        return false; //return false if email doesn't exist
+    }
+}
