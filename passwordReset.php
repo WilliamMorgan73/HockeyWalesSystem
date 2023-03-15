@@ -27,7 +27,7 @@
             <p class="sub-heading">
               Enter a new password here to change your password
               <!-- Change password form -->
-            <form action="#" method="post">
+            <form action="includes/changepassword.inc.php?userID=<?php echo $_GET['userID']; ?>" method="post">
               <!-- Password -->
               <p class="title">Password</p>
               <input type="password" id="password" name="password" class="club-player-search" />
@@ -37,17 +37,27 @@
               <!-- Error message -->
               <?php
               //Empty input
-              
+              if (isset($_GET['error'])) {
+                if ($_GET['error'] == "emptyinput") {
+                  echo "<p class='error-message'>Please fill in all fields.</p>";
+                }
+              }
               //Password doesn't match
+              if (isset($_GET['error'])) {
+                if ($_GET['error'] == "passwordsDoNotMatch") {
+                  echo "<p class='error-message'>Passwords don't match.</p>";
+                }
+              }
               ?>
 
-              <!-- Login button -->
+              <!-- Change password button -->
               <button type="submit" name="submit" class="btn btn-login">Change password</button>
             </form>
             <!-- Signup link -->
             <a class="sub-heading" style="display: block; text-align: center" href="signup.php">Need an account? Signup</a>
             <a class="sub-heading" style="display: block; text-align: center" href="index.php">View leagues</a>
           </div>
+
         </div>
       </div>
     </div>

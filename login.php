@@ -55,6 +55,11 @@
                 $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                 echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
               }
+              //Password changed
+              if (isset($_GET['success']) && $_GET['success'] === "passwordChanged") {
+                $message = isset($_GET['message']) ? $_GET['message'] : "Password has been changed succesfully.";
+                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%;'>" . htmlspecialchars($message) . "</div>";
+              }
               ?>
 
               <!-- Login button -->

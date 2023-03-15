@@ -27,8 +27,9 @@
             <p class="sub-heading">
               Enter your email here to send a password change request to your club admin.
               Already sent? Enter your email to be able to reset your password.
-              <!-- Change password form -->
-            <form action="#" method="post">
+            </p>
+            <!-- Change password form -->
+            <form action="includes/passwordChangeRequest.inc.php" method="post">
               <!-- Email -->
               <p class="title">Enter your email</p>
               <input type="email" id="email" name="email" class="club-player-search" />
@@ -37,10 +38,28 @@
 
               <!-- Error message -->
               <?php
-              //Email not found
+              if (isset($_GET['error'])) {
+                switch ($_GET['error']) {
+                  case 'emptyinput':
+                    echo '<p class="title" style="text-align: center; padding: 2% 0% 2% 0%;">Please enter an email address.</p>';
+                    break;
+                  case 'emailnotfound':
+                    echo '<p class="title" style="text-align: center; padding: 2% 0% 2% 0%;">This email address is not registered with us. Please try again or sign up for an account.</p>';
+                    break;
+                  case 'requestalreadyexists':
+                    echo '<p class="title" style="text-align: center; padding: 2% 0% 2% 0%;">A password change request has already been sent for this email address. Please wait for an admin to approve it.</p>';
+                    break;
+                  case 'stmtfailed':
+                    echo '<p class="title" style="text-align: center; padding: 2% 0% 2% 0%;">Something went wrong. Please try again later.</p>';
+                    break;
+                  case 'requestsubmitted':
+                    echo '<p class="title" style="text-align: center; padding: 2% 0% 2% 0%;">Your password change request has been sent to an admin. Please wait for them to approve it.</p>';
+                    break;
+                }
+              }
               ?>
 
-              <!-- Login button -->
+              <!-- Change password button -->
               <button type="submit" name="submit" class="btn btn-login">Change password</button>
             </form>
             <!-- Signup link -->

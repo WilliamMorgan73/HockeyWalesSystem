@@ -115,7 +115,93 @@ $leagueID = getLeagueID($userID);
                     <div class="card-body-0">
                         <div class="container-fluid">
                             <div class="row" style="padding-top:1%;">
-                                INSERT STUFF HERE
+                                <?php
+                                // Get all teamIDs with a clubID = $clubID
+                                $teamIDs = array();
+                                $result = mysqli_query($conn, "SELECT teamID FROM team WHERE clubID = '$clubID'");
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    $teamIDs[] = $row['teamID'];
+                                }
+
+                                // Get all playerIDs with a teamID in $teamIDs
+                                $playerIDs = array();
+                                if (!empty($teamIDs)) {
+                                    $teamIDsStr = implode(',', $teamIDs);
+                                    $result = mysqli_query($conn, "SELECT playerID FROM player WHERE teamID IN ($teamIDsStr)");
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        $playerIDs[] = $row['playerID'];
+                                    }
+                                }
+
+                                // Get all userIDs with a playerID in $playerIDs
+                                $userIDs = array();
+                                if (!empty($playerIDs)) {
+                                    $playerIDsStr = implode(',', $playerIDs);
+                                    $result = mysqli_query($conn, "SELECT userID FROM player WHERE playerID IN ($playerIDsStr)");
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        $userIDs[] = $row['userID'];
+                                    }
+                                }
+
+                                // Get all password change requests for userIDs in $userIDs where status is "waiting"
+                                if (!empty($userIDs)) {
+                                    $userIDsStr = implode(',', $userIDs);
+                                    $result = mysqli_query($conn, "SELECT * FROM passwordchangerequest WHERE userID IN ($userIDsStr) AND status='waiting'");
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        // Get user details from userID
+                                        $userID = $row['userID'];
+                                        $userDetails = getUserDetails($userID);
+                                        $firstName = $userDetails['firstName'];
+                                        $lastName = $userDetails['lastName'];
+                                        $DOB = $userDetails['DOB'];
+
+                                        // Display the user details and profile picture
+                                        echo '<div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">';
+                                        echo '<div class="card bg-light d-flex flex-fill">';
+                                        echo '<div class="card-body pt-0">';
+                                        echo '<div class="row">';
+                                        echo '<div class="col-12 text-center">';
+                                        echo '<h4 class="header"><b>' . $firstName . ' ' . $lastName . '</b></h4>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '<div class="row">';
+                                        echo '<div class="col-12 text-center">';
+                                        echo '<img src="images/pfp/' . $userID . '.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 50%; display: block;">';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '<div class="row">';
+                                        echo '<div class="col-12 text-center">';
+                                        echo '<p><b>Date of Birth:</b> ' . $DOB . '</p>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '<div class="row">';
+                                        echo '<div class="col-md-6 text-left">';
+                                        echo '<!-- Button that approves password change request -->';
+                                        echo '<form action="includes\approvePasswordChange.php" method="post">';
+                                        echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                                        echo '<button type="submit" class="btn btn-sm btn-success">';
+                                        echo 'Approve';
+                                        echo '</button>';
+                                        echo '</form>';
+                                        echo '</div>';
+                                        echo '<div class="col-md-6 text-right">';
+                                        echo '<!-- Button that rejects password change request -->';
+                                        echo '<form action="includes\rejectPasswordChange.php" method="post">';
+                                        echo '<input type="hidden" name="userID" value="' . $userID . '">';
+                                        echo '<button type="submit" class="btn btn-sm btn-danger">';
+                                        echo 'Reject';
+                                        echo '</button>';
+                                        echo '</form>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                    }
+                                } else {
+                                    echo "No password change requests found for players in this club.";
+                                }
+                                ?>
                             </div>
                         </div>
                         <!-- /.card-body -->

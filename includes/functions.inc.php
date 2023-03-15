@@ -1590,16 +1590,68 @@ function getClubs()
     return $clubs; //return the array
 }
 
-//Check if email exists in the changePassword table
+//Check if userID exists in the changePassword table and status is waiting
 
-function emailExistsInPasswordChangeRequest($email)
+function userWaitingInPasswordChangeRequest($userID)
 {
     global $conn;
-    $query = "SELECT * FROM changePassword WHERE email = '$email'"; //query to check if email exists
+    $query = "SELECT * FROM passwordchangerequest WHERE userID = '$userID' AND status = 'Waiting'"; //query to check if userID exists and status is waiting
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) > 0) {
-        return true; //return true if email exists
+        return true; //return true if userID exists and status is waiting
     } else {
-        return false; //return false if email doesn't exist
+        return false; //return false if userID doesn't exist or status is not waiting
     }
+}
+
+//Function to check if userID exists in the changePassword table and status is approved
+
+function userApprovedInPasswordChangeRequest($userID)
+{
+    global $conn;
+    $query = "SELECT * FROM passwordchangerequest WHERE userID = '$userID' AND status = 'Approved'"; //query to check if userID exists and status is approved
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) > 0) {
+        return true; //return true if userID exists and status is approved
+    } else {
+        return false; //return false if userID doesn't exist or status is not approved
+    }
+}
+
+//Function to get userID from the user table using email
+
+function getUserIDByEmail($email)
+{
+    global $conn;
+    $query = "SELECT userID FROM user WHERE email = '$email'"; //query to get the userID
+    $result = mysqli_query($conn, $query);
+    if (!$result) {
+        echo "Error: " . mysqli_error($conn); //display error message
+        exit;
+    }
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $userID = $row['userID']; //store the userID
+        return $userID; //return the userID
+    } else {
+        return ""; //return an empty string
+    }
+}
+
+//Function to get user details from userID
+
+function getUserDetails($userID)
+{
+    global $conn;
+    $userDetails = array();
+    $result = mysqli_query($conn, "SELECT firstName, lastName, teamID, DOB FROM player WHERE userID = $userID");
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        $userDetails['firstName'] = $row['firstName'];
+        $userDetails['lastName'] = $row['lastName'];
+        $userDetails['teamID'] = $row['teamID'];
+        $userDetails['DOB'] = $row['DOB'];
+    }
+    return $userDetails;
 }

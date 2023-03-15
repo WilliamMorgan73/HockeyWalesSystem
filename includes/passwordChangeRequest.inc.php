@@ -7,32 +7,52 @@ require('functions.inc.php');
 $email = $_POST['email'];
 $conn = require __DIR__ . '/dbhconfig.php';
 
+
+//Get userID from email
+
+$userID = getUserIDByEmail($email);
+
 //Check if email is empty
 if ($email == "") {
-    header("Location: ../passwordReset.php?error=emptyinput");
+    header("Location: ../forgotPassword.php?error=emptyinput");
     exit();
 }
 
 //Check if email exists in database
 
 if (emailExists($email) == false) {
-    header("Location: ../passwordReset.php?error=emailnotfound");
+    header("Location: ../forgotPassword.php?error=emailnotfound");
     exit();
 }
 
-//Check if email is already in password change request table
+//Check if userID is already in password change request table and status is waiting
 
-if (emailExistsInPasswordChangeRequest($email) == true) {
-    header("Location: ../passwordReset.php?error=emailalreadyrequested");
+if (userWaitingInPasswordChangeRequest($userID) == true) {
+    header("Location: ../forgotPassword.php?error=requestalreadyexists");
     exit();
 }
-//Add request to database
 
-$sql = "INSERT INTO password_change_request (email) VALUES (?)";
+//Check if userID is already in password change request table and status is approved
+
+if(userApprovedInPasswordChangeRequest($userID) == true) {
+    header("Location: ../passwordReset.php?userID=$userID");
+    exit();
+}
+
+// Add request to database using the userID from the email
+
+$sql = "INSERT INTO passwordChangeRequest (userID, status) VALUES (?, 'waiting')";
 $stmt = mysqli_stmt_init($conn);
 if (!mysqli_stmt_prepare($stmt, $sql)) {
-    header("Location: ../passwordReset.php?error=stmtfailed");
+    header("Location: ../forgotPassword.php?error=stmtfailed");
     exit();
 }
 
-mysqli_stmt_bind_param($stmt, "s", $email);
+mysqli_stmt_bind_param($stmt, "i", $userID);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
+
+//Redirect to password reset request success page
+header("Location: ../forgotPassword.php?error=requestsubmitted");
+exit();
