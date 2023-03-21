@@ -195,7 +195,7 @@ $leagueName = getLeagueName($leagueID);
                                                         $row = mysqli_fetch_array($result);
                                                         $teamID = $row['teamID'];
 
-                                                        // Get the number of teams in the league
+                                                        // Get the number of other teams in the league
                                                         $numOfTeams = mysqli_num_rows($result) - 1;
 
                                                         // Calculate the number of games played

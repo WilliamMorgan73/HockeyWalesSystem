@@ -12,7 +12,7 @@ $conn = require __DIR__ . '/dbhconfig.php';
 
 $userID = getUserIDByEmail($email);
 
-//Check if email is empty
+//Presence check | Check if email is empty
 if ($email == "") {
     header("Location: ../forgotPassword.php?error=emptyinput");
     exit();

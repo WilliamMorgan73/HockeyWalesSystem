@@ -11,14 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     session_start();
     $userID = $_SESSION['userID'];
 
-    // Check if the passwords match
+    // Cross field check | Check if the passwords match
     if ($password != $confirmPassword) {
         // Redirect back to the change password page with an error message
         header("Location: ../passwordReset.php?userID=$userID; error=passwordsDoNotMatch");
         exit;
     }
 
-    //Check if password is empty
+    //Presence check |  Check if password is empty
 
     if ($password = "" || $confirmPassword = "") {
         header("Location: ../passwordReset.php?userID=$userID; error=emptyinput");
