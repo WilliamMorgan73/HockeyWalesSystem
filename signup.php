@@ -80,7 +80,7 @@ $clubs = getClubs();
                   <p class="title">Club</p>
                   <select class="form-select form-select-solid" data-control="select2" data-placeholder="Select a club" name="club" style="background-color: #d8d6d680;">
                     <?php
-                    //Loop through all clubs in the club database
+                    //Loop through all clubs in the club database and display them in the select box
                     foreach ($clubs as $club) {
                       //Get the club name
                       $clubName = $club['clubName'];

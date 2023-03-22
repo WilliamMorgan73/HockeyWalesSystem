@@ -17,14 +17,14 @@ $accountType = $_POST['accountType'];
 $conn = require __DIR__ . '/dbhconfig.php';
 
 if (isset($_POST['submit'])) {
-    //Function call to check for empty fields
+    //Presence check | Function call to check for empty fields
     if (emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB, $accountType) !== false) {
         header("Location: ../signup.php?error=emptyinput&message=" . urlencode("Please fill in all the required fields."));
         exit();
     }
 
 
-    //Function call to check if password and confirm password match
+    //Cross field check | Function call to check if password and confirm password match
 
     if (passwordMatch($password, $confirmPassword) !== false) {
         header("Location: ../signup.php?error=passwordsdontmatch&message=" . urlencode("Passwords do not match."));
@@ -45,7 +45,7 @@ if (isset($_POST['submit'])) {
         exit();
     }
 
-    //Function call to check if fields are correct length
+    //Length check | Function call to check if fields are correct length
 
     if (checkLength($email, $password, $firstName, $lastName, $club) !== false) {
         header("Location: ../signup.php?error=fieldlength&message=" . urlencode("Fields are not the correct length."));

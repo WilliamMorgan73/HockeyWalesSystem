@@ -150,7 +150,7 @@ $leagueID = getLeagueID($userID);
 
                         $result = mysqli_query($conn, $query);
 
-                        // Loop through the data and display it
+                        // Loop through the the results waiting for approval and display them
                         while ($row = mysqli_fetch_assoc($result)) {
                             $hometeam = $row['hometeam'];
                             $awayteam = $row['awayteam'];
@@ -258,7 +258,7 @@ $leagueID = getLeagueID($userID);
                         if (!$result) {
                             die("Query failed: " . mysqli_error($conn));
                         }
-                        // Loop through the results
+                        // Loop through the the results waiting to be entered or challenged and display them
                         while ($row = mysqli_fetch_assoc($result)) {
                             $tempResultID = $row['tempResultID'];
                             $homeTeamName = $row['homeTeamName'];

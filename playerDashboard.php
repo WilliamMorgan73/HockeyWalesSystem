@@ -197,162 +197,162 @@ $playerTeamID = getTeamID($userID);
                             </div>
                             <!-- /.col -->
                             <div class="col-sm-4 border-right">
-                              < class="description-block">
+                              <div class="description-block">
                                 <h5 class="description-header"><?php echo $assists ?></h5> <!-- Assists -->
                                 <span class="description-text">ASSISTS</span>
+                              </div>
+                              <!-- /.description-block -->
                             </div>
-                            <!-- /.description-block -->
-                          </div>
-                          <!-- /.col -->
-                          <div class="col-sm-4">
-                            <div class="description-block">
-                              <h5 class="description-header"><?php echo $apperances ?></h5> <!-- Appearances -->
-                              <span class="description-text">APPEARANCES</span>
+                            <!-- /.col -->
+                            <div class="col-sm-4">
+                              <div class="description-block">
+                                <h5 class="description-header"><?php echo $apperances ?></h5> <!-- Appearances -->
+                                <span class="description-text">APPEARANCES</span>
+                              </div>
+                              <!-- /.description-block -->
                             </div>
-                            <!-- /.description-block -->
+                            <!-- /.col -->
                           </div>
-                          <!-- /.col -->
+                          <!-- /.row -->
                         </div>
-                        <!-- /.row -->
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="row">
-                  <!-- Fixtures -->
-                  <div class="col-md-12 text-center">
-                    <div class="card card-outline shadow">
-                      <div class="card-body">
-                        <h1 class="card-title">Fixtures</h1>
-                        <br />
-                        <div class="col-md-12">
-                          <?php
-                          $sql = "SELECT teamID FROM player WHERE playerID = $playerID";
-                          $teamResult = mysqli_query($conn, $sql);
-                          if (mysqli_num_rows($teamResult) > 0) {
-                            $teamRow = mysqli_fetch_assoc($teamResult);
-                            $teamID = $teamRow['teamID'];
-                            //Get the minimum match week
-                            $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
-                            $result = mysqli_query($conn, $query);
+                  <div class="row">
+                    <!-- Fixtures -->
+                    <div class="col-md-12 text-center">
+                      <div class="card card-outline shadow">
+                        <div class="card-body">
+                          <h1 class="card-title">Fixtures</h1>
+                          <br />
+                          <div class="col-md-12">
+                            <?php
+                            $sql = "SELECT teamID FROM player WHERE playerID = $playerID";
+                            $teamResult = mysqli_query($conn, $sql);
+                            if (mysqli_num_rows($teamResult) > 0) {
+                              $teamRow = mysqli_fetch_assoc($teamResult);
+                              $teamID = $teamRow['teamID'];
+                              //Get the minimum match week
+                              $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
+                              $result = mysqli_query($conn, $query);
 
-                            if (mysqli_num_rows($result) > 0) {
-                              $row = mysqli_fetch_assoc($result);
-                              $minWeek = $row['minWeek'];
-                              //Get the next 3 fixtures
-                              $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek >= '$minWeek' AND leagueID = '$leagueID' AND (homeTeamID = '$teamID' OR awayTeamID = '$teamID') LIMIT 3";
-                              $resultFixtures = mysqli_query($conn, $query);
+                              if (mysqli_num_rows($result) > 0) {
+                                $row = mysqli_fetch_assoc($result);
+                                $minWeek = $row['minWeek'];
+                                //Get the next 3 fixtures
+                                $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek >= '$minWeek' AND leagueID = '$leagueID' AND (homeTeamID = '$teamID' OR awayTeamID = '$teamID') LIMIT 3";
+                                $resultFixtures = mysqli_query($conn, $query);
 
-                              if (mysqli_num_rows($resultFixtures) > 0) {
-                                while ($row = mysqli_fetch_array($resultFixtures)) {
-                                  $homeTeamID = $row['homeTeamID'];
-                                  $awayTeamID = $row['awayTeamID'];
-                                  //Get the team names
-                                  $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
-                                  $result2 = mysqli_query($conn, $query);
-                                  $row2 = mysqli_fetch_array($result2);
-                                  $homeTeamName = $row2['teamName'];
+                                if (mysqli_num_rows($resultFixtures) > 0) {
+                                  while ($row = mysqli_fetch_array($resultFixtures)) {
+                                    $homeTeamID = $row['homeTeamID'];
+                                    $awayTeamID = $row['awayTeamID'];
+                                    //Get the team names
+                                    $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
+                                    $result2 = mysqli_query($conn, $query);
+                                    $row2 = mysqli_fetch_array($result2);
+                                    $homeTeamName = $row2['teamName'];
 
-                                  $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
-                                  $result3 = mysqli_query($conn, $query);
-                                  $row3 = mysqli_fetch_array($result3);
-                                  $awayTeamName = $row3['teamName'];
-                          ?>
-                                  <div class="card">
-                                    <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?></b></h2>
-                                  </div>
-                          <?php
+                                    $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
+                                    $result3 = mysqli_query($conn, $query);
+                                    $row3 = mysqli_fetch_array($result3);
+                                    $awayTeamName = $row3['teamName'];
+                            ?>
+                                    <div class="card">
+                                      <h2 class="lead"><b><?php echo "$homeTeamName - $awayTeamName" . "<br>"; ?></b></h2>
+                                    </div>
+                            <?php
+                                  }
+                                } else {
+                                  echo "No fixtures found for the team";
                                 }
                               } else {
-                                echo "No fixtures found for the team";
+                                echo "No match week numbers found in the fixtures table";
                               }
                             } else {
-                              echo "No match week numbers found in the fixtures table";
+                              echo "No team found for the player";
                             }
-                          } else {
-                            echo "No team found for the player";
-                          }
-                          ?>
+                            ?>
+                          </div>
                         </div>
                       </div>
                     </div>
+
+                    <!-- End of fixtures -->
                   </div>
+                  <div class="row">
 
-                  <!-- End of fixtures -->
-                </div>
-                <div class="row">
-
-                  <!-- Teammates -->
-                  <div class="col-md-12 text-center">
-                    <div class="card card-outline shadow">
-                      <div class="card-body">
-                        <h5 class="card-title">Teammates</h5>
-                        <br />
-                        <div class="row">
-                          <div class="col-md-12">
-                            <div class="row">
-                              <!-- teammate loop -->
-                              <?php
-                              // get all the players who have the same teamID as the current user
-                              $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
-                              $stmt = mysqli_stmt_init($conn);
-                              if (!mysqli_stmt_prepare($stmt, $sql)) {
-                                header("Location: ../signup.php?error=stmtfailed");
-                                exit();
-                              }
-
-                              mysqli_stmt_bind_param($stmt, "ss", $playerTeamID, $playerID);
-                              mysqli_stmt_execute($stmt);
-                              $result = mysqli_stmt_get_result($stmt);
-                              $counter = 0;
-                              // loop through the results and display the players
-                              while ($row = mysqli_fetch_assoc($result)) {
-                                if ($counter == 6) {
-                                  break;
+                    <!-- Teammates -->
+                    <div class="col-md-12 text-center">
+                      <div class="card card-outline shadow">
+                        <div class="card-body">
+                          <h5 class="card-title">Teammates</h5>
+                          <br />
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="row">
+                                <!-- teammate loop -->
+                                <?php
+                                // get all the players who have the same teamID as the current user
+                                $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
+                                $stmt = mysqli_stmt_init($conn);
+                                if (!mysqli_stmt_prepare($stmt, $sql)) {
+                                  header("Location: ../signup.php?error=stmtfailed");
+                                  exit();
                                 }
-                                $userID = $row['userID'];
-                                $firstName = $row['firstName'];
-                                $lastName = $row['lastName'];
-                              ?>
-                                <div class="col-md-4">
-                                  <div class="card card-danger card-outline">
-                                    <div class="card-body box-profile">
-                                      <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
+
+                                mysqli_stmt_bind_param($stmt, "ss", $playerTeamID, $playerID);
+                                mysqli_stmt_execute($stmt);
+                                $result = mysqli_stmt_get_result($stmt);
+                                $counter = 0;
+                                // loop through the results and display the players 
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                  if ($counter == 6) {
+                                    break;
+                                  }
+                                  $userID = $row['userID'];
+                                  $firstName = $row['firstName'];
+                                  $lastName = $row['lastName'];
+                                ?>
+                                  <div class="col-md-4">
+                                    <div class="card card-danger card-outline">
+                                      <div class="card-body box-profile">
+                                        <div class="text-center">
+                                          <img class="profile-user-img img-fluid img-circle" src="images\pfp\defaultpfp.jpg" alt="User profile picture"> <!-- Player profile picture -->
+                                        </div>
+                                        <h5 class="profile-username text-center"><?php echo $firstName . ' ' . $lastName; ?></h5> <!-- Player name -->
+                                        <p class="text-muted text-center">Team name</p> <!-- Team name -->
                                       </div>
-                                      <h5 class="profile-username text-center"><?php echo $firstName . ' ' . $lastName; ?></h5> <!-- Player name -->
-                                      <p class="text-muted text-center">Team name</p> <!-- Team name -->
                                     </div>
                                   </div>
-                                </div>
-                              <?php
-                                $counter++;
-                              }
-                              ?>
+                                <?php
+                                  $counter++;
+                                }
+                                ?>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                    <!-- End of fixtures -->
                   </div>
-                  <!-- End of fixtures -->
+
                 </div>
-
+                <!-- End of stats -->
               </div>
-              <!-- End of stats -->
+              <!-- End of top row -->
+
+              <!-- End of second row -->
+              <!-- Third row- Teammates -->
+
             </div>
-            <!-- End of top row -->
-
-            <!-- End of second row -->
-            <!-- Third row- Teammates -->
-
           </div>
         </div>
+        <!-- /.card -->
+      </section>
+      <!-- /.content -->
     </div>
-    <!-- /.card -->
-    </section>
-    <!-- /.content -->
-  </div>
   </div>
 
   <!-- REQUIRED SCRIPTS -->

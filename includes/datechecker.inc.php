@@ -26,7 +26,7 @@ if (!$result) {
 // Array to store the fixtureIDs of fixtures being moved
 $fixtureIDs = array();
 
-// Loop through the results
+// Loop through the results to get the fixtureID, homeTeamID, awayTeamID, leagueID, matchweek and dateTime
 while ($row = mysqli_fetch_assoc($result)) {
     $fixtureID = $row['fixtureID'];
     $homeTeamID = $row['homeTeamID'];

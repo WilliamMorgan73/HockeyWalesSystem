@@ -141,7 +141,7 @@ $leagueName = getLeagueName($leagueID);
                                 $teams[] = $row;
                               }
 
-                              $points = getTeamPoints($teams,);
+                              $points = getTeamPoints($teams);
                               // Display the teams in descending order of points
                               foreach ($points as $team) {
                                 echo "<tr>

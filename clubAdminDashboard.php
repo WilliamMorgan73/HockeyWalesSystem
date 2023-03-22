@@ -183,7 +183,7 @@ $leagueID = getLeagueID($userID);
 
                             $result = mysqli_query($conn, $query);
 
-                            // Loop through the data and display it
+                            // Loop through the results waiting approval and display them
                             while ($row = mysqli_fetch_assoc($result)) {
                               $hometeam = $row['hometeam'];
                               $awayteam = $row['awayteam'];
@@ -216,7 +216,7 @@ $leagueID = getLeagueID($userID);
                       <?php
                       $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
                       $result2 = mysqli_query($conn, $query);
-                      // Loop through the data and display it
+                      // Loop through all temp player data and display it
                       if (mysqli_num_rows($result2) > 0) {
                         while ($row = mysqli_fetch_array($result2)) {
                           $tempUserID = $row['tempUserID'];

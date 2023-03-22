@@ -10,7 +10,7 @@ $target_dir = "../images/pfp/";
 // Find the file extension of the uploaded file
 $file_extension = pathinfo($_FILES['uploadedfile']['name'], PATHINFO_EXTENSION); 
 
-// Loop through all possible file extensions
+// Loop through all possible file extensions and delete the file with the same name if it exists
 $possible_extensions = array("png", "jpg", "jpeg");
 foreach ($possible_extensions as $extension) {
     // Check if a file with the same name and the current extension exists

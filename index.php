@@ -50,7 +50,7 @@ $conn = require 'includes/dbhconfig.php'; // establish a database connection usi
               <?php
               $query = "SELECT * FROM league"; // SQL query to select all leagues
               $result = mysqli_query($conn, $query); // execute the query using the established database connection
-              while ($row = mysqli_fetch_array($result)) { // loop through the query results
+              while ($row = mysqli_fetch_array($result)) { // loop through the query results to get league data
               ?>
                 <button type="submit" name="leagueID" value="<?php echo $row['leagueID']; ?>" class="btn btn-league">
                   <?php echo $row['leagueName']; ?> <!-- display the league name in a button -->

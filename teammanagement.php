@@ -183,7 +183,7 @@ $teams = getTeams($clubID);
                             mysqli_stmt_bind_param($stmt, "s", $teamID);
                             mysqli_stmt_execute($stmt);
                             $resultData = mysqli_stmt_get_result($stmt);
-                            //loop through the results
+                            //loop through the results to get the playerID, userID, firstName and lastName
                             while ($row = mysqli_fetch_assoc($resultData)) {
                                 $userID = $row['userID'];
                                 $firstName = $row['firstName'];

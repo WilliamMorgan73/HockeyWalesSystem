@@ -390,69 +390,6 @@ $userID = $_SESSION['userID'];
     <!-- AdminLTE App -->
     <script src="js/adminlte/adminlte.min.js"></script>
 
-    <script>
-        // Global variable to store the sorting order
-        var sortOrder = [];
-
-        // QuickSort function to sort the table
-        function quickSort(arr, low, high, column) {
-            if (low < high) {
-                var pivot = partition(arr, low, high, column);
-                quickSort(arr, low, pivot - 1, column);
-                quickSort(arr, pivot + 1, high, column);
-            }
-        }
-
-        // Partition function for QuickSort
-        function partition(arr, low, high, column) {
-            var pivotValue = arr[high][column];
-            var i = low - 1;
-            for (var j = low; j <= high - 1; j++) {
-                if (arr[j][column] < pivotValue) {
-                    i++;
-                    swap(arr, i, j);
-                }
-            }
-            swap(arr, i + 1, high);
-            return i + 1;
-        }
-
-        // Swap function to swap two elements in the array
-        function swap($arr, $a, $b) {
-            $temp = $arr[$a];
-            $arr[$a] = $arr[$b];
-            $arr[$b] = $temp;
-        }
-
-
-
-        $(document).ready(function() {
-            $("th").click(function() {
-                var table = $(this).parents("table");
-                var rows = table.find("tr:gt(0)").toArray().sort(comparer($(this).index()));
-                this.asc = !this.asc;
-                if (!this.asc) {
-                    rows = rows.reverse();
-                }
-                for (var i = 0; i < rows.length; i++) {
-                    table.append(rows[i]);
-                }
-            });
-        });
-
-        function comparer(index) {
-            return function(a, b) {
-                var valA = getCellValue(a, index),
-                    valB = getCellValue(b, index);
-                return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
-            }
-        }
-
-        function getCellValue(row, index) {
-            return $(row).children("td").eq(index).text();
-        }
-    </script>
-
 </body>
 
 </html>

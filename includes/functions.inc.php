@@ -3,7 +3,7 @@
 
 $conn = require __DIR__ . '/dbhconfig.php';
 
-// Function to check for empty fields in the signup form
+//Presence check | Function to check for empty fields in the signup form
 function emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB, $accountType)
 {
     $result = '';
@@ -16,7 +16,7 @@ function emptyInputSignup($email, $password, $firstName, $lastName, $club, $DOB,
     return $result; // Return the result
 }
 
-// Function to check for empty fields in the system admin form
+//Presence check | Function to check for empty fields in the system admin form
 function emptyInputSystemAdmin($email, $password)
 {
     $result = '';
@@ -29,7 +29,7 @@ function emptyInputSystemAdmin($email, $password)
     return $result; // Return the result
 }
 
-// Function to check if password and confirm password match
+//Cross field check | Function to check if password and confirm password match
 function passwordMatch($password, $confirmPassword)
 {
     $result = '';
@@ -90,7 +90,7 @@ function emailExistsInTempUsers($email)
     }
 }
 
-//Function to check if fields are correct length
+//Length check | Function to check if fields are correct length
 function checkLength($email, $password, $firstName, $lastName, $club)
 {
     $result = '';
@@ -119,7 +119,7 @@ function clubHasAdmin($clubID)
     }
 }
 
-//Function to check for empty fields in login form
+//Presence check Function to check for empty fields in login form
 function emptyInputLogin($email, $password)
 {
     $result = '';
@@ -492,7 +492,7 @@ function getPlayerGoals($userID)
         exit();
     }
     // Bind parameters and execute statement
-    mysqli_stmt_bind_param($stmt, "s", $playerID);
+    mysqli_stmt_bind_param($stmt, "s", $playerID); 
     mysqli_stmt_execute($stmt);
     // Get result and return numOfGoals if found
     $resultData = mysqli_stmt_get_result($stmt);
@@ -1293,13 +1293,13 @@ function calculatePointsPerWeek($teamID)
     // Initialize an array to store the team's points per week
     $pointsPerWeek = [];
 
-    // Loop through every game week
+    // Loop through every game week to calculate the team's points
     for ($i = $minGWID; $i <= $maxGWID; $i++) {
         // Get the fixtures for the current game week
         $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE (homeTeamID = '$teamID' OR awayTeamID = '$teamID') AND matchWeek = '$i'";
         $result = mysqli_query($conn, $query);
 
-        // Loop through each fixture for the current game week
+        // Loop through each fixture for the current game week and calculate the points
         $numGames = 0;
         while ($fixtureData = mysqli_fetch_assoc($result)) {
             if ($fixtureData['homeTeamID'] == $teamID || $fixtureData['awayTeamID'] == $teamID) {

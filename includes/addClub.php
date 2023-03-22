@@ -10,7 +10,7 @@ $conn = require __DIR__ . '/dbhconfig.php';
 $clubName = $_POST['clubName'];
 
 if (isset($_POST['submitClub'])) {
-    //Function call to check for empty fields
+    //Presence check
     if (empty($clubName)) {
         header("Location: ../systemAdminDashboard.php?error=emptyinputClub&message=" . urlencode("Please fill in all fields."));
         exit();

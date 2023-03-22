@@ -14,14 +14,14 @@ $accountType = 'System Admin';
 $conn = require __DIR__ . '/dbhconfig.php';
 
 if (isset($_POST['submitUser'])) {
-    //Function call to check for empty fields
+
+    //Presenece check
     if (emptyInputSystemAdmin($email, $password) !== false) {
         header("Location: ../systemAdminDashboard.php?error=emptyinputSignup&message=" . urlencode("Please fill in all fields."));
         exit();
     }
 
-
-    //Function call to check if password and confirm password match
+    //Cross field check | Check if passwords match
 
     if (passwordMatch($password, $confirmPassword) !== false) {
         header("Location: ../systemAdminDashboard.php?error=passwordsdontmatch&message=" . urlencode("Passwords do not match."));

@@ -369,8 +369,8 @@ $clubName = $row['clubName'];
                                                     $query = "SELECT * FROM player WHERE teamID IN ($teamIDs)";
                                                     $playersResult = mysqli_query($conn, $query);
                                                     if (mysqli_num_rows($playersResult) > 0) {
-                                                        $players = [];
-                                                        // Loop through all players
+                                                        $players = []; 
+                                                        // Loop through all players for the teams associated with the given club ID to get the player's name and team name
                                                         while ($row = mysqli_fetch_array($playersResult)) {
                                                             $playerID = $row['playerID'];
                                                             $firstName = $row['firstName'];
@@ -583,8 +583,5 @@ $clubName = $row['clubName'];
 </script>
 
 </body>
-
-
-<!-- Add error messages when there are no games played or no scorers etc -->
 
 </html>

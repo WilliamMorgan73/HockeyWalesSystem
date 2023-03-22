@@ -11,7 +11,7 @@ $leagueID = $_POST['league'];
 $conn = require __DIR__ . '/dbhconfig.php';
 
 if (isset($_POST['submitTeam'])) {
-    //Function call to check for empty fields
+    //Presence check
     if (empty($teamName)|| empty($leagueID) || empty($clubID)) {
         header("Location: ../systemAdminDashboard.php?error=emptyinputTeam&message=" . urlencode("Please fill in all fields."));
         exit();

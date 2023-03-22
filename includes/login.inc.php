@@ -9,7 +9,7 @@ $password = $_POST['password'];
 
 if (isset($_POST["submit"])){
 
-    //Function call to check for empty fields
+    //Presence check | Function call to check for empty fields
 
     if (emptyInputLogin($email, $password) !== false) {
         header("Location: ../login.php?error=emptyinput&message=" . urlencode("Please fill all fields"));

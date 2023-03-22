@@ -172,7 +172,7 @@ $teams = getTeams($clubID);
                         <?php
                         //Get fixtures where the home team or away team has clubID = $clubID
                         $fixtures = getFixturesByTeamID($selectedTeamID);
-                        //Loop through each fixture
+                        //Loop through each fixture to get the players available for each fixture
                         foreach ($fixtures as $fixture) {
                             $homeTeamID = $fixture['homeTeamID'];
                             $awayTeamID = $fixture['awayTeamID'];
