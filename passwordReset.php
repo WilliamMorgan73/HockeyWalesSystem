@@ -30,10 +30,10 @@
             <form action="includes/changepassword.inc.php?userID=<?php echo $_GET['userID']; ?>" method="post">
               <!-- Password -->
               <p class="title">Password</p>
-              <input type="password" id="password" name="password" class="club-player-search" />
+              <input type="password" id="password" name="password" class="club-player-search" required  minlength="5" maxlength="30"/> <!-- Presence check and length check -->
               <!-- Confirm password -->
               <p class="title">Confirm password</p>
-              <input type="password" id="confirmPassword" name="confirmPassword" class="club-player-search" />
+              <input type="password" id="confirmPassword" name="confirmPassword" class="club-player-search" required minlength="5" maxlength="30" /> <!-- Presence check and length check -->
               <!-- Error message -->
               <?php
               //Empty input

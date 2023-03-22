@@ -277,10 +277,10 @@ $leagueID = getLeagueID($userID);
                                 <div class="col-md-2">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control text-center" placeholder="Home" id="homeScore">
+                                            <input type="number" class="form-control text-center" placeholder="Home" id="homeScore" required > <!-- Presence and type check -->
                                         </div>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control text-center" placeholder="Away" id="awayScore">
+                                            <input type="number" class="form-control text-center" placeholder="Away" id="awayScore" required> <!-- Presence and type check -->
                                         </div>
                                     </div>
                                 </div>

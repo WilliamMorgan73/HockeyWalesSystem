@@ -225,7 +225,7 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="clubName">Club name</label>
-                                                    <input type="text" class="form-control" id="clubName" placeholder="Club name" name="clubName">
+                                                    <input type="text" class="form-control" id="clubName" placeholder="Club name" name="clubName" required> <!-- Presence check -->
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="clubLogo">Club logo</label>
@@ -267,7 +267,7 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="leagueName">League name</label>
-                                                    <input type="text" class="form-control" id="leagueName" placeholder="League name" name="leagueName">
+                                                    <input type="text" class="form-control" id="leagueName" placeholder="League name" name="leagueName"> <!-- Presence check -->
                                                 </div>
                                                 <!-- Error message -->
                                                 <?php
@@ -299,7 +299,7 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="teamName">Team name</label>
-                                                    <input type="text" class="form-control" id="teamName" placeholder="Team name" name="teamName">
+                                                    <input type="text" class="form-control" id="teamName" placeholder="Team name" name="teamName"> <!-- Presence check -->
                                                 </div>
                                                 <!-- Drop-down list of clubs -->
                                                 <div class="form-group">
