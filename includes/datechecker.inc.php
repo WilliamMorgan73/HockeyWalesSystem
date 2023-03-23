@@ -11,7 +11,7 @@ $conn = require __DIR__ . '/dbhconfig.php';
 $currentDate = date("Y-m-d");
 $currentTime = date("H:i:s");
 
-// Query to select the matchweek and dateTime from the fixture table where the date has passed and the time has also passed
+// Query to select the matchweek and dateTime from the fixture table where the date has passed and the time has also passed so that the fixture can be moved to the tempresult table
 $query = "SELECT f.fixtureID, f.homeTeamID, f.awayTeamID, f.leagueID, f.matchweek, f.dateTime
           FROM fixture f
           JOIN gameweek g ON g.gameWeekID = f.matchweek
@@ -23,10 +23,10 @@ if (!$result) {
     die("Query failed: " . mysqli_error($conn));
 }
 
-// Array to store the fixtureIDs of fixtures being moved
+// Array to store the fixtureIDs of fixtures being moved so that they can be deleted from the fixture table
 $fixtureIDs = array();
 
-// Loop through the results to get the fixtureID, homeTeamID, awayTeamID, leagueID, matchweek and dateTime
+// Loop through the results to get the fixtureID, homeTeamID, awayTeamID, leagueID, matchweek and dateTime so that they can be moved to the tempresult table
 while ($row = mysqli_fetch_assoc($result)) {
     $fixtureID = $row['fixtureID'];
     $homeTeamID = $row['homeTeamID'];
@@ -37,7 +37,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     // Store the fixtureID of the fixture being moved
     $fixtureIDs[] = $fixtureID;
 
-    // Get all playerIDs of players who were available for the fixture
+    // Get all playerIDs of players who were available for the fixture so that their appearances count can be updated
     $query = "SELECT playerID
               FROM availability
               WHERE fixtureID = $fixtureID AND available = 1";
@@ -50,7 +50,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     while ($player = mysqli_fetch_assoc($playerIDs)) {
         $playerID = $player['playerID'];
 
-        // Check if the player already has an entry in the appearances table
+        // Check if the player already has an entry in the appearances table so that their appearances count can be updated,
         $query = "SELECT appearanceID
                   FROM appearance
                   WHERE playerID = $playerID";

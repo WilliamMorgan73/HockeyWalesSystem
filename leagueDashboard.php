@@ -132,7 +132,7 @@ $leagueName = getLeagueName($leagueID);
                           </thead>
                           <tbody id="tableBody">
                             <?php
-                            // Assuming the database connection is established and stored in the variable $conn
+                            // Get team details from the team table where the leagueID matches the leagueID of the league the user is currently viewing
                             $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
                             $result = mysqli_query($conn, $sql);
                             if (mysqli_num_rows($result) > 0) {
@@ -187,12 +187,12 @@ $leagueName = getLeagueName($leagueID);
                                 $firstName = $row['firstName'];
                                 $lastName = $row['lastName'];
                                 $teamID = $row['teamID'];
-                                // Get the team name
+                                // Get the team name of the player to display
                                 $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
                                 $teamNameresult = mysqli_query($conn, $query);
                                 $row = mysqli_fetch_array($teamNameresult);
                                 $teamName = $row['teamName'];
-                                // Get the number of goals scored by the player
+                                // Get the number of goals scored by the player to display
                                 $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
                                 $numOfGoalsresult = mysqli_query($conn, $query);
                                 if (mysqli_num_rows($numOfGoalsresult) > 0) {
@@ -249,7 +249,7 @@ $leagueName = getLeagueName($leagueID);
                             if (mysqli_num_rows($result) > 0) {
                               $row = mysqli_fetch_assoc($result);
                               $maxWeek = $row['maxWeek'];
-
+                              //Get the results for the current week so that they can be displayed
                               $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE matchWeek = '$maxWeek' AND leagueID = '$leagueID'";
                               $resultdetailresult = mysqli_query($conn, $query);
 
@@ -299,14 +299,14 @@ $leagueName = getLeagueName($leagueID);
                         <br />
                         <div class="col-md-12">
                           <?php
-                          // Get the minimum game week number
+                          // Get the minimum game week number so that the fixtures for the next game week can be displayed
                           $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
                           $result = mysqli_query($conn, $query);
 
                           if (mysqli_num_rows($result) > 0) {
                             $row = mysqli_fetch_assoc($result);
                             $minWeek = $row['minWeek'];
-                            // Get the fixtures with the minimum game week number
+                            // Get the fixtures with the minimum game week number so that they can be displayed
                             $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE matchWeek = '$minWeek' AND leagueID = '$leagueID'";
                             $resultFixtures = mysqli_query($conn, $query);
 

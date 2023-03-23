@@ -5,7 +5,7 @@
 $conn = require __DIR__ . '/dbhconfig.php';
 $userID = $_POST['userID'];
 
-// Delete data from passwordChangeRequest table
+// Delete data from passwordChangeRequest table so that it is not displayed on the password change approval page and cannot be approved again
 $sql = "DELETE FROM passwordchangerequest WHERE userID='$userID'";
 if (mysqli_query($conn, $sql)) {
     echo "Data from passwordchangerequest table deleted successfully.\n";

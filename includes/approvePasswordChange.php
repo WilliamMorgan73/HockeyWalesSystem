@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Retrieve the data from the form
     $userID = $_POST['userID'];
 
-    // Update the password change request status to approved
+    // Update the password change request status to approved so that it is not displayed on the password change approval page
     $query = "UPDATE passwordchangerequest SET status = 'approved' WHERE userID = $userID";
     mysqli_query($conn, $query);
 

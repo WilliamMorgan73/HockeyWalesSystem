@@ -119,7 +119,7 @@ function clubHasAdmin($clubID)
     }
 }
 
-//Presence check Function to check for empty fields in login form
+//Presence check | Function to check for empty fields in login form
 function emptyInputLogin($email, $password)
 {
     $result = '';

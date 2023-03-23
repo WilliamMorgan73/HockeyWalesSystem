@@ -8,6 +8,7 @@ $tempuserID = $_POST['tempUserID'];
 $teamID = $_POST['teamID'];
 
 // Move data from tempuser to user
+//Insert data from tempuser table into user table so that the data can safely be deleted from the tempuser table
 $sql = "INSERT INTO user (email, password, accountType)
 SELECT email, password, accountType
 FROM tempuser
@@ -22,7 +23,7 @@ if (mysqli_query($conn, $sql)) {
 // Get the new userID
 $userID = mysqli_insert_id($conn);
 
-// Move data from tempplayer to player
+// Move data from tempplayer to player 
 $sql = "INSERT INTO player (firstName, lastName, teamID, DOB, userID)
 SELECT firstName, lastName, $teamID, DOB, '$userID'
 FROM tempplayer
@@ -34,7 +35,7 @@ if (mysqli_query($conn, $sql)) {
     echo "Error moving data from tempplayer table: " . mysqli_error($conn) . "\n";
 }
 
-//Delete data from tempuser and tempplayer
+//Delete data from tempuser and tempplayer so that they are not displayed on the player approval page and cannot be approved again
 
 $sql = "DELETE FROM tempuser WHERE tempuserID='$tempuserID'";
 if (mysqli_query($conn, $sql)) {

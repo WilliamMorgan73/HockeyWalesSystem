@@ -13,21 +13,20 @@ if (isset($_POST["homeScore"]) && isset($_POST["awayScore"]) && isset($_POST["te
     $awayScorers = $_POST["awayScorers"];
     $homeAssisters = $_POST["homeAssisters"];
     $awayAssisters = $_POST["awayAssisters"];
-    
+    //Update tempresult table to include the score and set the status to "sent" so that it is no longer displayed on the result approval page but is displayed for the opposing team to challenge or approve
     $query = "UPDATE tempresult SET homeTeamScore = '$homeScore', awayTeamScore = '$awayScore', status = 'sent' WHERE tempResultID = '$tempResultID'"; // Update tempresult table
     $result = mysqli_query($conn, $query);
     if (!$result) {
         die("Query failed: " . mysqli_error($conn));
     }
     
-    // Update player stats
+    // Update player stats so that they can be displayed on the player dashboard
     if (count($homeScorers) > 0) {
         foreach ($homeScorers as $homeScorer) {
             $goalsScored = count(array_keys($homeScorers, $homeScorer)); // Count number of times player is in array
             updateGoals($homeScorer, $goalsScored);
         }
     }
-    
     if (count($awayScorers) > 0) {
         foreach ($awayScorers as $awayScorer) {
             $goalsScored = count(array_keys($awayScorers, $awayScorer)); // Count number of times player is in array

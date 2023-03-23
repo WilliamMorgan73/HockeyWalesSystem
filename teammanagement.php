@@ -120,7 +120,7 @@ $teams = getTeams($clubID);
                                     $selectedTeamID = null;
                                     if (isset($_POST['selected-team-id'])) {
                                         $selectedTeamID = $_POST['selected-team-id'];
-                                        // get the selected team name
+                                        // get the selected team name from the teams array so we can display it
                                         foreach ($teams as $team) {
                                             if ($team['teamID'] == $selectedTeamID) {
                                                 $selectedTeamName = $team['teamName'];
@@ -138,7 +138,7 @@ $teams = getTeams($clubID);
                                         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                                             <select class="form-control select2" style="width: 30%;" name="selected-team-id">
                                                 <?php
-                                                // get the teams for the club
+                                                // get the teams for the club and display them in the select box so the user can select a team
                                                 foreach ($teams as $team) {
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
@@ -160,9 +160,9 @@ $teams = getTeams($clubID);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
-                            // get the selected team ID from the hidden input
+                            // get the selected team ID from the hidden input 
                             if (!isset($_POST["selected-team-id"])) {
-                                // Get the lowest teamID for the club
+                                // Get the lowest teamID for the club so we can display the first team by default
                                 $query = "SELECT MIN(teamID) as lowestTeamID, teamName FROM team WHERE clubID = '$clubID'";
                                 $result = mysqli_query($conn, $query);
                                 $row = mysqli_fetch_assoc($result);
@@ -171,8 +171,8 @@ $teams = getTeams($clubID);
                             } elseif (isset($_POST["selected-team-id"])) {
                                 $teamID = $_POST["selected-team-id"];
                             }
-
-                            // get all the players who have the same teamID as the current user
+ 
+                            // get all the players who have the same teamID as the current user so they can be displayed
                             $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ?";
                             $stmt = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -183,7 +183,7 @@ $teams = getTeams($clubID);
                             mysqli_stmt_bind_param($stmt, "s", $teamID);
                             mysqli_stmt_execute($stmt);
                             $resultData = mysqli_stmt_get_result($stmt);
-                            //loop through the results to get the playerID, userID, firstName and lastName
+                            //loop through the results to get the playerID, userID, firstName and lastName so they can be displayed individually
                             while ($row = mysqli_fetch_assoc($resultData)) {
                                 $userID = $row['userID'];
                                 $firstName = $row['firstName'];
@@ -211,7 +211,7 @@ $teams = getTeams($clubID);
                                                     <!-- Drop down to change the player's team -->
                                                     <select name="change-team-id">
                                                         <?php
-                                                        // get all the teams from the database
+                                                        // get all the teams from the database so the user can select a team to change the player to
                                                         $sql = "SELECT teamID, teamName FROM team WHERE clubID = $clubID";
                                                         $result = mysqli_query($conn, $sql);
                                                         while ($row = mysqli_fetch_assoc($result)) {

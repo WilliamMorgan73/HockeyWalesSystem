@@ -141,7 +141,7 @@ $leagueID = getLeagueID($userID);
                         </div>
                         <!-- End of header -->
                         <?php
-                        //Get the results for the club that are awaiting approval
+                        //Get the results for the club that are awaiting approval so the user can approve them or challenge them
                         $query = "SELECT hometeam.teamName AS hometeam, awayteam.teamName AS awayteam, homeTeamScore, awayTeamScore, tempresult.homeTeamID AS homeTeamID, tempresult.awayTeamID AS awayTeamID
                         FROM tempresult
                         INNER JOIN team hometeam ON tempresult.homeTeamID = hometeam.teamID
@@ -202,7 +202,7 @@ $leagueID = getLeagueID($userID);
                 <div class="card card-solid text-center">
                     <div class="card-header pb-0">
                         <div class="text-left">
-                            <h3>Enter results</h3> <!-- Make this say team name instead -->
+                            <h3>Enter results</h3>
                         </div>
                     </div>
                     <div class="card-body pb-0">
@@ -247,7 +247,7 @@ $leagueID = getLeagueID($userID);
                         if (!$conn) {
                             die("Connection failed: " . mysqli_connect_error());
                         }
-                        // Get the results for the club that are waiting to be entered or challenged
+                        // Get the results for the club that are waiting to be entered or challenged so the user can enter the result
                         $query = "SELECT tr.tempResultID, tr.homeTeamID, tr.awayTeamID, t1.teamName AS homeTeamName, t2.teamName AS awayTeamName
           FROM tempresult tr
           JOIN team t1 ON t1.teamID = tr.homeTeamID
@@ -289,7 +289,7 @@ $leagueID = getLeagueID($userID);
                                         <div class="col-md-6">
                                             <select class="select2" multiple="multiple" data-placeholder="Home scorers" style="width: 100%;" id="homeScorers">
                                                 <?php
-                                                // Get the players for the home team
+                                                // Get the players for the home team so the user can select the scorers
                                                 $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
                                                 $result = mysqli_query($conn, $query);
 
@@ -302,7 +302,7 @@ $leagueID = getLeagueID($userID);
                                         <div class="col-md-6">
                                             <select class="select2" multiple="multiple" data-placeholder="Away scorers" style="width: 100%;" id="awayScorers">
                                                 <?php
-                                                // Get the players for the away team
+                                                // Get the players for the away team so the user can select the scorers
                                                 $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
                                                 $result = mysqli_query($conn, $query);
 
@@ -319,7 +319,7 @@ $leagueID = getLeagueID($userID);
                                         <div class="col-md-6">
                                             <select class="select2" multiple="multiple" data-placeholder="Home assisters" style="width: 100%;" id="homeAssisters">
                                                 <?php
-                                                // Get the players for the home team
+                                                // Get the players for the home team so the user can select the assisters
                                                 $query = "SELECT * FROM player WHERE teamID = '$homeTeamID'";
                                                 $result = mysqli_query($conn, $query);
 
@@ -332,7 +332,7 @@ $leagueID = getLeagueID($userID);
                                         <div class="col-md-6">
                                             <select class="select2" multiple="multiple" data-placeholder="Away assisters" style="width: 100%;" id="awayAssisters">
                                                 <?php
-                                                // Get the players for the away team
+                                                // Get the players for the away team so the user can select the assisters
                                                 $query = "SELECT * FROM player WHERE teamID = '$awayTeamID'";
                                                 $result = mysqli_query($conn, $query);
 

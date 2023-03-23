@@ -107,7 +107,7 @@ $teamID = getTeamID($currentUserID);
                         <div class="row">
                             <!-- PHP code to get all players with the same teamID -->
                             <?php
-                            // get all the players who have the same teamID as the current user
+                            // get all the players who have the same teamID as the current user so they can be displayed
                             $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
                             $stmt = mysqli_stmt_init($conn);
                             if (!mysqli_stmt_prepare($stmt, $sql)) {

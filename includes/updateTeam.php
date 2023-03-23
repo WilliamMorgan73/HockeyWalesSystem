@@ -8,7 +8,7 @@ if (isset($_POST['change-team'])) {
     $userID = $_POST['userID'];
     $selectedTeamID = $_POST['change-team-id'];
 
-    // update the player's teamID in the database
+    //get the current teamID of the player so that their teamID can be updated when they are moved to a new team
     $sql = "UPDATE player SET teamID = ? WHERE userID = ?";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $homeTeamID = $_POST['homeTeamID'];
   $awayTeamID = $_POST['awayTeamID'];
 
-  // Update the status of the tempresult to "challenged"
+  // Update the status of the tempresult to "challenged" so that it is displayed on the result approval page for the opposing team to reenter the result
   $query = "UPDATE tempresult
             SET status = 'challenged'
             WHERE homeTeamID = $homeTeamID AND awayTeamID = $awayTeamID";

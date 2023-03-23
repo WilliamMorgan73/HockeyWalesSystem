@@ -111,7 +111,7 @@ $clubID = getClubID($clubName);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
-                            // Query to get all the players that are waiting to be approved
+                            // Query to get all the players that are waiting to be approved so they can be displayed on the page for the club admin to approve or reject
                             $query = "SELECT * FROM tempplayer WHERE clubID = '$clubID'";
                             $result = mysqli_query($conn, $query);
                             if (mysqli_num_rows($result) > 0) {

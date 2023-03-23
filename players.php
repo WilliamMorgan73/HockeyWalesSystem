@@ -103,7 +103,7 @@ $clubID = $_POST['clubID'];
                         <div class="row">
                             <!-- PHP code to get all players with the same clubID -->
                             <?php
-                            // get all the players who have the same clubID as the current club
+                            // get all the players who have the same clubID as the current club so that they can be displayed
                             $sql = "SELECT player.playerID, player.userID, player.firstName, player.lastName, team.clubID 
 FROM player 
 JOIN team ON player.teamID = team.teamID 

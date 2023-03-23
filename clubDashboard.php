@@ -121,7 +121,7 @@ $clubName = $row['clubName'];
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    // Assuming the database connection is established and stored in the variable $conn
+                                                    // get the teams in the league of the club's top team so that the league table can be displayed
                                                     $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $topTeamLeague";
                                                     $result = mysqli_query($conn, $sql);
                                                     if (mysqli_num_rows($result) > 0) {
@@ -159,7 +159,7 @@ $clubName = $row['clubName'];
                                                 <div id="pie-chart" style="height: 25rem;"></div>
                                             </div>
                                             <?php
-                                            // SELECT all team IDs for the given club ID from the 'team' table
+                                            // SELECT all team IDs for the given club ID from the 'team' table so that the top scorers can be displayed
                                             $query = "SELECT teamID FROM team WHERE clubID = '$clubID'";
                                             $result = mysqli_query($conn, $query);
 
@@ -167,13 +167,13 @@ $clubName = $row['clubName'];
                                             if (mysqli_num_rows($result) > 0) {
                                                 // If there are teams, create an empty array to store team IDs
                                                 $teamIDs = [];
-                                                // Loop through the result set and add each team ID to the array
+                                                // Loop through the result set and add each team ID to the array so that it can be used in the SQL query
                                                 while ($row = mysqli_fetch_array($result)) {
                                                     $teamIDs[] = $row['teamID'];
                                                 }
                                                 // Convert the array of team IDs to a comma-separated string
                                                 $teamIDs = implode(',', $teamIDs);
-                                                // SELECT all player data for the teams associated with the given club ID
+                                                // SELECT all player data for the teams associated with the given club ID so that the top scorers can be displayed
                                                 $query = "SELECT * FROM player WHERE teamID IN ($teamIDs)";
                                                 $playersResult = mysqli_query($conn, $query);
 
@@ -181,7 +181,7 @@ $clubName = $row['clubName'];
                                                 if (mysqli_num_rows($playersResult) > 0) {
                                                     // If there are players, create an empty array to store player data
                                                     $players = [];
-                                                    // Loop through the result set and add each player's data to the array
+                                                    // Loop through the result set and add each player's data to the array so that it can be used in the SQL query
                                                     while ($row = mysqli_fetch_array($playersResult)) {
                                                         $playerID = $row['playerID'];
                                                         $firstName = $row['firstName'];
@@ -194,13 +194,13 @@ $clubName = $row['clubName'];
                                                         $row = mysqli_fetch_array($teamNameResult);
                                                         $teamName = $row['teamName'];
 
-                                                        // SELECT the number of goals scored by the current player, limited to the top 6
+                                                        // SELECT the number of goals scored by the current player, limited to the top 6 
                                                         $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID' ORDER BY numOfGoals DESC LIMIT 6";
                                                         $numOfGoalsResult = mysqli_query($conn, $query);
 
                                                         // Check if there are any goals in the result set
                                                         if (mysqli_num_rows($numOfGoalsResult) > 0) {
-                                                            // If there are goals, loop through the result set and add the player's data to the array for each goal
+                                                            // If there are goals, loop through the result set and add the player's data to the array for each goal so that it can be used to display the top scorers
                                                             while ($row = mysqli_fetch_array($numOfGoalsResult)) {
                                                                 $numOfGoals = $row['numOfGoals'];
                                                                 $players[] = [
@@ -221,7 +221,7 @@ $clubName = $row['clubName'];
 
                                                 // Create a new array to store the top scorers for the given club
                                                 $clubTopScorers = array();
-                                                // Loop through the sorted array of players and add each player's data to the new array
+                                                // Loop through the sorted array of players and add each player's data to the new array so that it can be used to display the top scorers
                                                 foreach ($players as $player) {
                                                     $clubTopScorers[] = [
                                                         'firstName' => $player['firstName'],
@@ -250,7 +250,7 @@ $clubName = $row['clubName'];
 
                                                     $query = "SELECT homeTeamID, homeTeamScore, awayTeamID, awayTeamScore FROM result WHERE (homeTeamID = '$clubID' OR awayTeamID = '$clubID')";
                                                     $resultdetailresult = mysqli_query($conn, $query);
-                                                    // Check if there are any results for the given club ID
+                                                    // Check if there are any results for the given club ID so that they can be displayed
                                                     if (mysqli_num_rows($resultdetailresult) > 0) {
                                                         while ($row = mysqli_fetch_array($resultdetailresult)) {
                                                             $homeTeamID = $row['homeTeamID'];

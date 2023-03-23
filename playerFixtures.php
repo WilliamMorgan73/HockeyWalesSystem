@@ -104,7 +104,7 @@ $playerTeam = getPlayerTeam($userID);
                 <div class="card card-solid">
                     <div class="card-body pb-0">
                         <div class="row">
-                            <!-- Loop through fixtures where homeTeamID or awayTeamID = $teamID -->
+                            <!-- Loop through fixtures where homeTeamID or awayTeamID = $teamID so we can get all fixtures that the team is apart of -->
                             <?php
 
                             $query = "SELECT teamID FROM player WHERE playerID = '$playerID'";
@@ -118,7 +118,7 @@ $playerTeam = getPlayerTeam($userID);
                                 die("Error: " . mysqli_error($conn));
                             }
 
-                            // Loop through the fixtures and display only the fixtures that match the team ID
+                            // Loop through the fixtures and display only the fixtures that match the team ID so only fixtures that the team is apart of are displayed
                             while ($fixture = mysqli_fetch_array($result)) {
                                 if ($fixture['homeTeamID'] == $teamID || $fixture['awayTeamID'] == $teamID) {
                                     // Display the fixture
@@ -129,7 +129,7 @@ $playerTeam = getPlayerTeam($userID);
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <h4 class="header"><b><?php
-                                                                                // Get the home team ID from the fixture
+                                                                                // Get the home team ID from the fixture so that we can get the home team name 
                                                                                 $homeTeamID = $fixture['homeTeamID'];
                                                                                 // Get the home team name from the team database using the home team ID
                                                                                 $homeTeamQuery = "SELECT * FROM team WHERE teamID = '$homeTeamID'";
@@ -142,6 +142,7 @@ $playerTeam = getPlayerTeam($userID);
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <img src="images\clubLogos\<?php
+                                                                                    //Get the club ID from the team database using the home team ID so that we can get the club logo
                                                                                     $query = "SELECT clubID FROM team WHERE teamID = '$homeTeamID'";
                                                                                     $result = mysqli_query($conn, $query);
                                                                                     $team = mysqli_fetch_array($result);
@@ -154,9 +155,9 @@ $playerTeam = getPlayerTeam($userID);
                                                 <div class="row">
                                                     <div class="col-12">
                                                         <h4 class="header"><b><?php
-                                                                                // Get the home team ID from the fixture
+                                                                                // Get the away team ID from the fixture so that we can get the away team name
                                                                                 $awayTeamID = $fixture['awayTeamID'];
-                                                                                // Get the home team name from the team database using the home team ID
+                                                                                // Get the away team name from the team database using the away team ID 
                                                                                 $awayTeamQuery = "SELECT * FROM team WHERE teamID = '$awayTeamID'";
                                                                                 $awayTeamResult = mysqli_query($conn, $awayTeamQuery);
                                                                                 $awayTeam = mysqli_fetch_array($awayTeamResult);
@@ -167,6 +168,7 @@ $playerTeam = getPlayerTeam($userID);
                                                 <div class="row" style="padding-bottom: 1%;">
                                                     <div class="col-12">
                                                         <img src="images\clubLogos\<?php
+                                                                                    //Get the club ID from the team database using the away team ID so that we can get the club logo
                                                                                     $query = "SELECT clubID FROM team WHERE teamID = '$awayTeamID'";
                                                                                     $result = mysqli_query($conn, $query);
                                                                                     $team = mysqli_fetch_array($result);

@@ -116,14 +116,14 @@ $leagueID = getLeagueID($userID);
                         <div class="container-fluid">
                             <div class="row" style="padding-top:1%;">
                                 <?php
-                                // Get all teamIDs with a clubID = $clubID
+                                // Get all teamIDs with a clubID = $clubID so we can get all playerIDs
                                 $teamIDs = array();
                                 $result = mysqli_query($conn, "SELECT teamID FROM team WHERE clubID = '$clubID'");
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     $teamIDs[] = $row['teamID'];
                                 }
 
-                                // Get all playerIDs with a teamID in $teamIDs
+                                // Get all playerIDs with a teamID in $teamIDs so we can get all userIDs
                                 $playerIDs = array();
                                 if (!empty($teamIDs)) {
                                     $teamIDsStr = implode(',', $teamIDs);
@@ -133,7 +133,7 @@ $leagueID = getLeagueID($userID);
                                     }
                                 }
 
-                                // Get all userIDs with a playerID in $playerIDs
+                                // Get all userIDs with a playerID in $playerIDs so we can get all password change requests
                                 $userIDs = array();
                                 if (!empty($playerIDs)) {
                                     $playerIDsStr = implode(',', $playerIDs);
@@ -143,7 +143,7 @@ $leagueID = getLeagueID($userID);
                                     }
                                 }
 
-                                // Get all password change requests for userIDs in $userIDs where status is "waiting"
+                                // Get all password change requests for userIDs in $userIDs where status is "waiting" so that the club admin can approve or deny them
                                 if (!empty($userIDs)) {
                                     $userIDsStr = implode(',', $userIDs);
                                     $result = mysqli_query($conn, "SELECT * FROM passwordchangerequest WHERE userID IN ($userIDsStr) AND status='waiting'");

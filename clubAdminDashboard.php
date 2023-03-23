@@ -133,7 +133,7 @@ $leagueID = getLeagueID($userID);
                         </thead>
                         <tbody id="tableBody">
                           <?php
-                          // Assuming the database connection is established and stored in the variable $conn
+                          // get team details from the team database where the leagueID matches the leagueID of the club's best team, so that the league table can be displayed
                           $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
                           $result = mysqli_query($conn, $sql);
                           if (mysqli_num_rows($result) > 0) {
@@ -175,6 +175,7 @@ $leagueID = getLeagueID($userID);
                         <div class="col-md-12">
                           <div class="row text-center">
                             <?php
+                            // Get the results waiting approval from the tempresult database so the user can see what results need to be approved
                             $query = "SELECT hometeam.teamName AS hometeam, awayteam.teamName AS awayteam, homeTeamScore, awayTeamScore, tempresult.homeTeamID AS homeTeamID, tempresult.awayTeamID AS awayTeamID
                         FROM tempresult
                         INNER JOIN team hometeam ON tempresult.homeTeamID = hometeam.teamID

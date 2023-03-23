@@ -142,7 +142,7 @@ $playerTeamID = getTeamID($userID);
                         </thead>
                         <tbody id="tableBody">
                           <?php
-                          // Assuming the database connection is established and stored in the variable $conn
+                          // get the teams in the league so we can get their points
                           $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
                           $result = mysqli_query($conn, $sql);
                           if (mysqli_num_rows($result) > 0) {
@@ -178,12 +178,12 @@ $playerTeamID = getTeamID($userID);
                   <div class="row">
                     <div class="col-md-12">
                       <div class="card card-widget widget-user shadow">
-                        <!-- Add the bg color to the header using any of the bg-* classes -->
                         <div class="widget-user-header bg-danger">
                           <h3 class="widget-user-username"><?php echo $playerName ?></h3>
                           <h5 class="widget-user-desc"><?php echo $playerTeam ?></h5>
                         </div>
                         <div class="widget-user-image">
+                          <!-- Check if the user has a pfp, if not give them the defaultpfp -->
                           <?php userPfpCheck($userID) ?> <!-- User pfp -->
                         </div>
                         <div class="card-footer">
@@ -227,12 +227,13 @@ $playerTeamID = getTeamID($userID);
                           <br />
                           <div class="col-md-12">
                             <?php
+                            //Get the teamID of the player so we can get their fixtures
                             $sql = "SELECT teamID FROM player WHERE playerID = $playerID";
                             $teamResult = mysqli_query($conn, $sql);
                             if (mysqli_num_rows($teamResult) > 0) {
                               $teamRow = mysqli_fetch_assoc($teamResult);
                               $teamID = $teamRow['teamID'];
-                              //Get the minimum match week
+                              //Get the minimum match week so we can get the next 3 fixtures
                               $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture";
                               $result = mysqli_query($conn, $query);
 
@@ -247,7 +248,7 @@ $playerTeamID = getTeamID($userID);
                                   while ($row = mysqli_fetch_array($resultFixtures)) {
                                     $homeTeamID = $row['homeTeamID'];
                                     $awayTeamID = $row['awayTeamID'];
-                                    //Get the team names
+                                    //Get the team names so we can display them
                                     $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
                                     $result2 = mysqli_query($conn, $query);
                                     $row2 = mysqli_fetch_array($result2);
@@ -293,7 +294,7 @@ $playerTeamID = getTeamID($userID);
                               <div class="row">
                                 <!-- teammate loop -->
                                 <?php
-                                // get all the players who have the same teamID as the current user
+                                // get all the players who have the same teamID as the current user so we can display them
                                 $sql = "SELECT playerID, userID, firstName, lastName FROM player WHERE teamID = ? AND playerID != ?";
                                 $stmt = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -305,7 +306,7 @@ $playerTeamID = getTeamID($userID);
                                 mysqli_stmt_execute($stmt);
                                 $result = mysqli_stmt_get_result($stmt);
                                 $counter = 0;
-                                // loop through the results and display the players 
+                                // loop through the results so we can get the playerID, userID, firstName and lastName to display them
                                 while ($row = mysqli_fetch_assoc($result)) {
                                   if ($counter == 6) {
                                     break;

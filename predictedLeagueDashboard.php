@@ -119,16 +119,16 @@ $leagueName = getLeagueName($leagueID);
                                         <div class="card shadow" style="width: 100%">
                                             <div class="card-body p-0">
                                                 <?php
-                                                $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID"; // Get all teams in the league
+                                                $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID"; // Get all teams in the league so we can sort them
                                                 $result = $conn->query($sql);
 
                                                 if ($result->num_rows > 0) {
                                                     $teams = array();
                                                     while ($row = $result->fetch_assoc()) {
-                                                        $teams[] = $row; // Add each team to the array
+                                                        $teams[] = $row; // Add each team to the array 
                                                     }
 
-                                                    // Sort the teams based on their predicted points
+                                                    // Sort the teams based on their predicted points (highest to lowest)
                                                     usort($teams, function ($a, $b) use ($conn) {
                                                         $teamAID = $a['teamID'];
                                                         $teamBID = $b['teamID'];
@@ -153,7 +153,7 @@ $leagueName = getLeagueName($leagueID);
                                                 echo '<tbody id="tableBody">';
 
                                                 foreach ($teams as $team) {
-                                                    // Get the predicted wins, draws, losses, and points for each team
+                                                    // Get the predicted wins, draws, losses, and points for each team and display them in the table
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
                                                     $predictedWins = getTeamWins($teamID) + getPredictedWins($teamID);
@@ -191,17 +191,17 @@ $leagueName = getLeagueName($leagueID);
                                                     $result = mysqli_query($conn, $query);
 
                                                     if (mysqli_num_rows($result) > 0) {
-                                                        // Take the first team in the team table with a leagueID = $leagueID
+                                                        // Take the first team in the team table with a leagueID = $leagueID so we can get the teamID
                                                         $row = mysqli_fetch_array($result);
                                                         $teamID = $row['teamID'];
 
-                                                        // Get the number of other teams in the league
+                                                        // Get the number of other teams in the league so we can calculate the number of games left
                                                         $numOfTeams = mysqli_num_rows($result) - 1;
 
-                                                        // Calculate the number of games played
+                                                        // Calculate the number of games played by each team
                                                         $numOfGames = $numOfTeams * 2;
 
-                                                        // Get the number of records with homeTeamID or awayTeamID = $teamID
+                                                        // Get the number of records with homeTeamID or awayTeamID = $teamID in the result table
                                                         $query = "SELECT * FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
                                                         $gamesPlayedResult = mysqli_query($conn, $query);
 
@@ -212,7 +212,7 @@ $leagueName = getLeagueName($leagueID);
 
                                                         $gamesPlayed = mysqli_num_rows($gamesPlayedResult);
 
-                                                        // Calculate the number of games left
+                                                        // Calculate the number of games left to play
                                                         $gamesLeft = $numOfGames - $gamesPlayed;
 
                                                         $query = "SELECT player.* FROM player
@@ -228,7 +228,7 @@ $leagueName = getLeagueName($leagueID);
 
                                                         if (mysqli_num_rows($teamIDresult) > 0) {
                                                             while ($row = mysqli_fetch_array($teamIDresult)) {
-                                                                // Get the playerID, firstName, lastName, and teamID for each player in the league
+                                                                // Get the playerID, firstName, lastName, and teamID for each player in the league so we can get the teamName
                                                                 $playerID = $row['playerID'];
                                                                 $firstName = $row['firstName'];
                                                                 $lastName = $row['lastName'];
@@ -244,7 +244,7 @@ $leagueName = getLeagueName($leagueID);
 
                                                                 $row = mysqli_fetch_array($teamNameresult);
                                                                 $teamName = $row['teamName'];
-                                                                //Get the number of goals for each player in the league
+                                                                //Get the number of goals for each player in the league so we can calculate the goals per game for each player
                                                                 $query = "SELECT numOfGoals FROM goal WHERE playerID = '$playerID'";
                                                                 $numOfGoalsresult = mysqli_query($conn, $query);
 
@@ -265,7 +265,7 @@ $leagueName = getLeagueName($leagueID);
                                                                 $appearancesResult = mysqli_query($conn, $query);
 
 
-                                                                //Get the number of appearances for each player in the league
+                                                                //Get the number of appearances for each player in the league so we can calculate the goals per game for each player
                                                                 if (!$appearancesResult) {
                                                                     echo "Error: " . mysqli_error($conn);
                                                                     exit();
@@ -273,13 +273,13 @@ $leagueName = getLeagueName($leagueID);
                                                                 $appearancesRow = mysqli_fetch_array($appearancesResult);
                                                                 $appearances = $appearancesRow['numOfAppearances'];
 
-                                                                // Calculate the predicted number of goals
+                                                                // Calculate the predicted number of goals using the goals per game formula
                                                                 if ($appearances > 0) {
                                                                     $predictedNumOfGoals = round($numOfGoals * $gamesLeft / $appearances);
                                                                 } else {
                                                                     $predictedNumOfGoals = 0;
                                                                 }
-                                                                //Get the predicted number of goals for each player in the league
+                                                                //Get the predicted number of goals for each player in the league so we can display the predicted top scorers
                                                                 $predictedScorers[] = array("firstName" => $firstName, "lastName" => $lastName, "teamName" => $teamName, "predictedNumOfGoals" => $predictedNumOfGoals);
                                                             }
                                                         }
@@ -288,7 +288,7 @@ $leagueName = getLeagueName($leagueID);
                                                     usort($predictedScorers, function ($a, $b) {
                                                         return $b['predictedNumOfGoals'] <=> $a['predictedNumOfGoals'];
                                                     });
-                                                    //Loop through the predictedScorers array and display the predicted top scorers
+                                                    //Loop through the predictedScorers array and display the predicted top scorers sorted in descending order
                                                     foreach ($predictedScorers as $player) {
                                                     ?>
                                                         <div class="row">

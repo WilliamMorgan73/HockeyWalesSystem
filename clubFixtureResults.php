@@ -95,7 +95,7 @@ $clubName = $row['clubName'];
                         <div class="col-sm">
                             <h1>
                                 <?php
-                                // If the user has selected a game week, use that, otherwise use the first game week
+                                // If the user has selected a game week, use that, otherwise use the first game week 
                                 if (isset($_POST['selectedWeek'])) {
                                     $selectedWeek = $_POST['selectedWeek'];
                                 } else {
@@ -108,7 +108,6 @@ $clubName = $row['clubName'];
                                         echo "No game week numbers found in the fixture table";
                                     }
                                 }
-
                                 $query = "SELECT MAX(matchWeek) AS maxWeek FROM result";
                                 $result = mysqli_query($conn, $query);
                                 if (mysqli_num_rows($result) > 0) {
@@ -141,7 +140,7 @@ $clubName = $row['clubName'];
                                 <label for="selectedWeek">Select Game Week:</label>
                                 <select name="selectedWeek" id="selectedWeek" class="form-control">
                                     <?php
-                                    // Get all the game weeks from the database
+                                    // Get all the game weeks from the database so the user can select one
                                     $query = "SELECT gameWeekID, gameDate FROM gameweek";
                                     $result = mysqli_query($conn, $query);
                                     if (mysqli_num_rows($result) > 0) {
@@ -165,7 +164,7 @@ $clubName = $row['clubName'];
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
-                            // Get all the fixtures and results for the selected game week
+                            // Get all the fixtures and results for the selected game week so they can be displayed
                             $query = "SELECT fixture.* FROM fixture JOIN team as homeTeam ON fixture.homeTeamID = homeTeam.teamID WHERE matchWeek = '$selectedWeek' AND homeTeam.clubID = '$clubID'
     UNION ALL
     SELECT result.* FROM result JOIN team as awayTeam ON result.awayTeamID = awayTeam.teamID WHERE matchWeek = '$selectedWeek' AND awayTeam.clubID = '$clubID'";

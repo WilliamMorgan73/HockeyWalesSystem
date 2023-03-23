@@ -11,13 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $awayTeamID = $_POST['awayTeamID'];
 
     // Move the data from tempresult to result table
+    // Get the data from tempresult table and insert it into result table so that it can be displayed on the results page and safely deleted from tempresult table
     $query = "INSERT INTO result (homeTeamID, awayTeamID, homeTeamScore, awayTeamScore, leagueID, matchWeek)
               SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore, leagueID, matchWeek
               FROM tempresult
               WHERE homeTeamID = $homeTeamID AND awayTeamID = $awayTeamID";
     mysqli_query($conn, $query);
 
-    // Delete the data from tempresult table
+    // Delete the data from tempresult table so that it is not displayed on the result approval page and cannot be approved again
     $query = "DELETE FROM tempresult WHERE homeTeamID = $homeTeamID AND awayTeamID = $awayTeamID";
     mysqli_query($conn, $query);
 

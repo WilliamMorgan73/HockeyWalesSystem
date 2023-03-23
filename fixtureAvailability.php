@@ -120,16 +120,16 @@ $teams = getTeams($clubID);
                                     <?php
                                     $selectedTeamName = '';
                                     $selectedTeamID = null;
-                                    // Get the lowest teamID with the same clubID
+                                    // Get the lowest teamID with the same clubID as the user and set it as the selected team 
                                     if ($selectedTeamID == null) {
-                                        // Get the lowest teamID for the club
+                                        // Get the lowest teamID for the club the user is a club admin of so that it can be selected by default
                                         $query = "SELECT MIN(teamID) as lowestTeamID, teamName FROM team WHERE clubID = '$clubID'";
                                         $result = mysqli_query($conn, $query);
                                         $row = mysqli_fetch_assoc($result);
                                         $selectedTeamName = $row['teamName'];
                                         $selectedTeamID = $row['lowestTeamID'];
                                     }
-                                    // If the user has selected a team, get the team name
+                                    // If the user has selected a team, get the team name and set it as the selected team so the data for that team is displayed
                                     if (isset($_POST['selected-team-id'])) {
                                         $selectedTeamID = $_POST['selected-team-id'];
                                         foreach ($teams as $team) {
@@ -149,7 +149,7 @@ $teams = getTeams($clubID);
                                         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                                             <select class="form-control select2 " style="width: 30%;" name="selected-team-id">
                                                 <?php
-                                                // Get all teams for the club
+                                                // Get all teams for the club so that the user can select a team to view the fixtures for
                                                 foreach ($teams as $team) {
                                                     $teamID = $team['teamID'];
                                                     $teamName = $team['teamName'];
@@ -170,9 +170,9 @@ $teams = getTeams($clubID);
                     </div>
                     <div class="card-body pb-0">
                         <?php
-                        //Get fixtures where the home team or away team has clubID = $clubID
+                        //Get fixtures where the home team or away team has clubID = $clubID and teamID = $selectedTeamID so that the fixtures for the selected team are displayed
                         $fixtures = getFixturesByTeamID($selectedTeamID);
-                        //Loop through each fixture to get the players available for each fixture
+                        //Loop through each fixture to get the players available for each fixture and display them
                         foreach ($fixtures as $fixture) {
                             $homeTeamID = $fixture['homeTeamID'];
                             $awayTeamID = $fixture['awayTeamID'];
@@ -191,7 +191,7 @@ $teams = getTeams($clubID);
                                         <div class="col-md-4 border-right broder-dark">
                                             <h5>Available</h5>
                                             <?php
-                                            //Get all players with availability = 1 for this fixture
+                                            //Get all players with availability = 1 for this fixture so that the user can see who is available for the fixture
                                             $availablePlayers = getAvailablePlayersByFixtureID($fixtureID);
                                             foreach ($availablePlayers as $player) {
                                                 $playerID = $player['playerID'];
@@ -203,7 +203,7 @@ $teams = getTeams($clubID);
                                         <div class="col-md-4 border-right broder-dark">
                                             <h5>Unavailable</h5>
                                             <?php
-                                            //Get all players with availability = 0 for this fixture
+                                            //Get all players with availability = 0 for this fixture so that the user can see who is unavailable for the fixture
                                             $unavailablePlayers = getUnavailablePlayersByFixtureID($fixtureID);
                                             foreach ($unavailablePlayers as $player) {
                                                 $playerID = $player['playerID'];
@@ -215,7 +215,7 @@ $teams = getTeams($clubID);
                                         <div class="col-md-4">
                                             <h5>Unanswered</h5>
                                             <?php
-                                            //Get all players with no entry in the availability table for this fixture
+                                            //Get all players with no entry in the availability table for this fixture so that the user can see who has not answered the availability question for the fixture
                                             $unansweredPlayers = getUnansweredPlayersByFixtureID($fixtureID);
                                             foreach ($unansweredPlayers as $player) {
                                                 $playerID = $player['playerID'];

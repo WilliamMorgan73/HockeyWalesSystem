@@ -89,7 +89,7 @@ $userID = $_SESSION['userID'];
                                             <h5 class="card-title">Club admin approval</h5>
                                             <br />
                                             <?php
-                                            // Query to get all the club admins that are waiting to be approved
+                                            // Query to get all the club admins that are waiting to be approved so the system admin can approve them or deny them
                                             $query = "SELECT * FROM tempclubadmin";
                                             $result = mysqli_query($conn, $query);
                                             if (mysqli_num_rows($result) > 0) {
@@ -100,6 +100,7 @@ $userID = $_SESSION['userID'];
                                                     $tempUserRow = mysqli_fetch_array($tempUserResult);
 
                                                     $clubID = $row['clubID'];
+                                                    // Query to get the club name from the clubID so the system admin can see which club the club admin is applying for
                                                     $clubQuery = "SELECT clubName FROM club WHERE clubID = '$clubID'";
                                                     $clubResult = mysqli_query($conn, $clubQuery);
                                                     $clubRow = mysqli_fetch_array($clubResult);
@@ -307,7 +308,7 @@ $userID = $_SESSION['userID'];
                                                     <select name="club" class="form-control">
                                                         <option value="" disabled selected hidden>Please select a club</option>
                                                         <?php
-                                                        //Get all clubs from database
+                                                        //Get all clubs from database so the system can select the club that the team will be added to
                                                         $clubQuery = "SELECT * FROM club";
                                                         $clubResult = mysqli_query($conn, $clubQuery);
                                                         while ($clubRow = mysqli_fetch_array($clubResult)) {
@@ -325,7 +326,7 @@ $userID = $_SESSION['userID'];
                                                     <label for="league">League</label>
                                                     <select name="league" class="form-control">
                                                         <?php
-                                                        //Get all leagues from database
+                                                        //Get all leagues from database so the system can select the league that the team will be added to
                                                         $leagueQuery = "SELECT * FROM league";
                                                         $leagueResult = mysqli_query($conn, $leagueQuery);
                                                         while ($leagueRow = mysqli_fetch_array($leagueResult)) {

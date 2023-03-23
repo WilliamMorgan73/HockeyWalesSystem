@@ -6,7 +6,7 @@ $conn = require __DIR__ . '/dbhconfig.php';
 $tempuserID = $_POST['tempUserID'];
 
 //Delete data from tempuser and tempplayer
-
+//get the tempUserID from the tempuser table so that the corresponding data can be deleted from the tempplayer table
 $sql = "DELETE FROM tempuser WHERE tempuserID='$tempuserID'";
 if (mysqli_query($conn, $sql)) {
     echo "Data from tempuser table deleted successfully.\n";
