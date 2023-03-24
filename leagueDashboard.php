@@ -132,7 +132,7 @@ $leagueName = getLeagueName($leagueID);
                           </thead>
                           <tbody id="tableBody">
                             <?php
-                            // Get team details from the team table where the leagueID matches the leagueID of the league the user is currently viewing
+                            // Get team details from the team table where the leagueID matches the leagueID of the league the user is currently viewing so the correct teams are displayed
                             $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
                             $result = mysqli_query($conn, $sql);
                             if (mysqli_num_rows($result) > 0) {
@@ -172,6 +172,7 @@ $leagueName = getLeagueName($leagueID);
                         <h1 class="card-title">Top scorers</h1>
                         <br />
                         <?php
+                        // Get all details from the team table where the leagueID matches the leagueID of the league the user is currently viewing so the correct teams are displayed
                         $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
                         $result = mysqli_query($conn, $query);
                         // If there are teams in the league
@@ -179,6 +180,7 @@ $leagueName = getLeagueName($leagueID);
                           $players = [];
                           while ($row = mysqli_fetch_array($result)) {
                             $teamID = $row['teamID'];
+                            //get all players from the player table where the teamID matches the teamID of the teams within the league
                             $query = "SELECT * FROM player WHERE teamID = '$teamID'";
                             $teamIDresult = mysqli_query($conn, $query);
                             if (mysqli_num_rows($teamIDresult) > 0) {
@@ -187,7 +189,7 @@ $leagueName = getLeagueName($leagueID);
                                 $firstName = $row['firstName'];
                                 $lastName = $row['lastName'];
                                 $teamID = $row['teamID'];
-                                // Get the team name of the player to display
+                                // Get the team name of the player to display 
                                 $query = "SELECT teamName FROM team WHERE teamID = '$teamID'";
                                 $teamNameresult = mysqli_query($conn, $query);
                                 $row = mysqli_fetch_array($teamNameresult);
@@ -260,12 +262,12 @@ $leagueName = getLeagueName($leagueID);
                                   $awayTeamID = $row['awayTeamID'];
                                   $homeTeamScore = $row['homeTeamScore'];
                                   $awayTeamScore = $row['awayTeamScore'];
-
+                                  //get the home team name so that it can be displayed
                                   $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
                                   $result2 = mysqli_query($conn, $query);
                                   $row2 = mysqli_fetch_array($result2);
                                   $homeTeamName = $row2['teamName'];
-
+                                  //get the away team name so that it can be displayed
                                   $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
                                   $result3 = mysqli_query($conn, $query);
                                   $row3 = mysqli_fetch_array($result3);

@@ -114,7 +114,7 @@ $leagueName = getLeagueName($leagueID);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
-                            //Get all teams in league
+                            //Get all teams in the league so the user can select one to view their club page
                             $query = "SELECT * FROM team WHERE leagueID = '$leagueID'";
                             $result = mysqli_query($conn, $query);
                             if (mysqli_num_rows($result) > 0) {
@@ -132,7 +132,7 @@ $leagueName = getLeagueName($leagueID);
                                                 <div class="row">
                                                     <div class="col-12 text-center">
                                                         <?php
-                                                        //Get club logo
+                                                        //Get club ID to get the club logo so the user can easily identify the club
                                                         $query = "SELECT clubID FROM team WHERE teamID = '$teamID'";
                                                         $result2 = mysqli_query($conn, $query);
                                                         $row = mysqli_fetch_array($result2);

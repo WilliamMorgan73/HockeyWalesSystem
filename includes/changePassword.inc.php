@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Connect to the database
     $conn = require __DIR__ . '/dbhconfig.php';
 
-    // Delete the password change request record for the specified user ID
+    // Delete the password change request record for the specified user ID so that they can request a new password change in the future
     $sql = "DELETE FROM passwordchangerequest WHERE userID='$userID'";
     if (mysqli_query($conn, $sql)) {
         echo "Password change request record deleted successfully.\n";
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Error deleting password change request record: " . mysqli_error($conn) . "\n";
     }
 
-    // Update the user's password
+    // Update the user's password so the user can log in with the new password
     $sql = "UPDATE user SET password='$hashedPassword' WHERE userID='$userID'";
     if (mysqli_query($conn, $sql)) {
         echo "Password updated successfully.\n";

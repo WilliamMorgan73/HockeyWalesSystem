@@ -150,7 +150,7 @@ $leagueName = getLeagueName($leagueID);
                                 <label for="selectedWeek">Select Game Week:</label>
                                 <select name="selectedWeek" id="selectedWeek" class="form-control">
                                     <?php
-                                    // Get the game weeks from the database and display them in the select box
+                                    // Get the game weeks from the database and display them in the select box so that the user can select which week they want to view
                                     $query = "SELECT gameWeekID, gameDate FROM gameweek";
                                     $result = mysqli_query($conn, $query);
                                     // Display the game weeks in the select box 
@@ -175,7 +175,7 @@ $leagueName = getLeagueName($leagueID);
                     <div class="card-body pb-0">
                         <div class="row">
                             <?php
-                            // Get the fixtures and results for the selected week
+                            // Get the fixtures and results for the selected week so that the correct fixtures/results are displayed
                             $query = "SELECT * FROM fixture WHERE matchWeek = '$selectedWeek' AND leagueID = '$leagueID' UNION ALL SELECT * FROM result WHERE matchWeek = '$selectedWeek' AND leagueID = '$leagueID'";
                             $result = mysqli_query($conn, $query);
                             // Display the fixtures and results for the selected week
@@ -219,7 +219,7 @@ $leagueName = getLeagueName($leagueID);
                                             <div class="card-footer">
                                                 <div class="text-center">
                                                     <?php
-                                                    // Display the result if the match has been played, otherwise display the location and time 
+                                                    // Display the result if the match has been played, otherwise display the location and time so the user knows where and when the match will be played or the outcome of the match
                                                     if (array_key_exists("homeTeamScore", $row)) {
                                                         echo "Result: " . $row['homeTeamScore'] . " - " . $row['awayTeamScore'];
                                                     } else {

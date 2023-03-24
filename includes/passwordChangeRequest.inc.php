@@ -39,7 +39,7 @@ if(userApprovedInPasswordChangeRequest($userID) == true) {
     exit();
 }
 
-// Add request to database using the userID from the email
+// Add request to database using the userID from the email so the request can be approved by the club admin
 
 $sql = "INSERT INTO passwordChangeRequest (userID, status) VALUES (?, 'waiting')";
 $stmt = mysqli_stmt_init($conn);

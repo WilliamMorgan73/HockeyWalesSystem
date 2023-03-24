@@ -142,7 +142,7 @@ $playerTeamID = getTeamID($userID);
                         </thead>
                         <tbody id="tableBody">
                           <?php
-                          // get the teams in the league so we can get their points
+                          // get the teams in the league so we can get their respective information
                           $sql = "SELECT teamID, teamName FROM team WHERE leagueID = $leagueID";
                           $result = mysqli_query($conn, $sql);
                           if (mysqli_num_rows($result) > 0) {

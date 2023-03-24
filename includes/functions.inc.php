@@ -69,6 +69,7 @@ function emailExists($email)
 function emailExistsInTempUsers($email)
 {
     global $conn;
+    //get data from temp user table to check if email exists so that we can output the correct error message
     $sql = "SELECT * FROM tempuser WHERE email = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -107,7 +108,7 @@ function clubHasAdmin($clubID)
 {
     global $conn;
     echo $clubID;
-    // Prepare the query
+    // get the club admin data from the clubAdmin table to check if the club already has a club admin so that we can output the correct error message
     $stmt = $conn->prepare('SELECT * FROM clubAdmin WHERE clubID = ?');
     $stmt->bind_param('i', $clubID);
     $stmt->execute();
@@ -135,6 +136,7 @@ function emptyInputLogin($email, $password)
 function getClubID($club)
 {
     global $conn;
+    //get club ID from club table to check if the club exists so that we can return the club ID
     $sql = "SELECT clubID FROM club WHERE clubName = ?";
     $stmt = $conn->stmt_init();
     if (!$stmt->prepare($sql)) {
@@ -160,7 +162,7 @@ function createPlayer($email, $password, $firstName, $lastName, $club, $DOB, $ac
     global $conn; // Access the global database connection object
     $conn->begin_transaction(); // Start a database transaction
 
-    // Define SQL statement to insert values into the temporary user table
+    // insert values into the temp user table so that the club admin can approve the account
     $sql = "INSERT INTO tempUser (email, password, accountType) 
     VALUES (?, ?, ?)";
 
@@ -180,7 +182,7 @@ function createPlayer($email, $password, $firstName, $lastName, $club, $DOB, $ac
     // Get the user ID of the newly created user account
     $userID = $conn->insert_id;
 
-    // Define SQL statement to insert values into the temporary player table
+    // insert values into the temp player table so that the club admin can approve the account
     $sql = "INSERT INTO tempPlayer (firstName, lastName, clubID, DOB, tempUserID) 
     VALUES (?, ?, ?, ?, ?)";
 
@@ -204,7 +206,7 @@ function createClubAdmin($email, $password, $firstName, $lastName, $clubID, $DOB
 {
     global $conn; // access to global variable $conn, which is the database connection object
     $conn->begin_transaction(); // starts a transaction
-
+    // insert values into the temp user table so that the system admin can approve the account
     $sql = "INSERT INTO tempUser (email, password, accountType) 
 VALUES (?, ?, ?)"; // SQL statement to insert user data into the tempUser table
 
@@ -221,7 +223,7 @@ VALUES (?, ?, ?)"; // SQL statement to insert user data into the tempUser table
     }
 
     $tempuserID = $conn->insert_id; // retrieve the ID generated for an AUTO_INCREMENT column
-
+    // insert values into the temp club admin table so that the system admin can approve the account
     $sql = "INSERT INTO tempclubadmin (firstName, lastName, clubID, DOB, tempUserID) 
 VALUES (?, ?, ?, ?, ?)"; // SQL statement to insert club admin data into the tempclubadmin table
 
@@ -252,7 +254,7 @@ function createSystemAdmin($email, $password, $accountType)
 {
     global $conn; // access to global variable $conn, which is the database connection object
     $conn->begin_transaction(); // starts a transaction
-
+    // insert values into the user table so the system admin can login
     $sql = "INSERT INTO user (email, password, accountType) 
     VALUES (?, ?, ?)";
 
@@ -286,7 +288,7 @@ function createClub($clubName)
 {
     global $conn; // Access the global variable $conn which is the database connection
 
-    // SQL statement to insert club name into club table
+    // insert data into the club table so that the club can be viewed and have a related club page.
     $sql = "INSERT INTO club (clubName) VALUES (?)";
 
     // Prepare the SQL statement to be executed by the database
@@ -312,7 +314,7 @@ function createLeague($leagueName)
 {
     global $conn; // Access the global variable $conn which is the database connection
 
-    // SQL statement to insert league name into league table
+    // insert data into the league table so that the league can be viewed and have a related league page.
     $sql = "INSERT INTO league (leagueName) VALUES (?)";
 
     // Prepare the SQL statement to be executed by the database
@@ -338,7 +340,7 @@ function createTeam($teamName, $clubID, $leagueID)
 {
     global $conn; // Access the global variable $conn which is the database connection
 
-    // SQL statement to insert team name, club ID, and league ID into team table
+    // insert data into the team table so that the team can be viewed and have a link to the club page.
     $sql = "INSERT INTO team (teamName, clubID, leagueID) VALUES (?, ?, ?)";
 
     // Prepare the SQL statement to be executed by the database
@@ -368,7 +370,7 @@ function loginUser($email, $password)
     $emailExists = emailExists($email);
 
     if ($emailExists === false) {
-        // If the email does not exist, look for the email in the temporary user table
+        // get the user's details from the tempuser table so that the correct error message can be displayed
         $query = "SELECT * FROM tempuser WHERE email = ?";
         $stmt = mysqli_stmt_init($conn);
         if (!mysqli_stmt_prepare($stmt, $query)) {
@@ -430,6 +432,7 @@ function loginUser($email, $password)
 function getPlayerName($userID)
 {
     global $conn;
+    // get the player's first name from the player table so that it can be displayed on the player dashboard
     $sql = "SELECT firstName FROM player WHERE userID = ?;";
     $stmt = mysqli_stmt_init($conn);
     // Check if SQL statement is prepared successfully
@@ -456,6 +459,7 @@ function getPlayerName($userID)
 function getPlayerID($userID)
 {
     global $conn;
+    // get the player's ID from the player table so that it relevant information can be displayed on the player dashboard
     $sql = "SELECT playerID FROM player WHERE userID = ?;";
     $stmt = mysqli_stmt_init($conn);
     // Check if SQL statement is prepared successfully
@@ -482,8 +486,9 @@ function getPlayerID($userID)
 function getPlayerGoals($userID)
 {
     global $conn;
-    // Get playerID using userID
+    //get the player ID so that it can be used to get the player's goals from the goal table
     $playerID = getPlayerID($userID);
+    // get the player's goals from the goal table so that it can be displayed on the player dashboard
     $sql = "SELECT numOfGoals FROM goal WHERE playerID = ?;";
     $stmt = mysqli_stmt_init($conn);
     // Prepare statement and check for errors
@@ -492,7 +497,7 @@ function getPlayerGoals($userID)
         exit();
     }
     // Bind parameters and execute statement
-    mysqli_stmt_bind_param($stmt, "s", $playerID); 
+    mysqli_stmt_bind_param($stmt, "s", $playerID);
     mysqli_stmt_execute($stmt);
     // Get result and return numOfGoals if found
     $resultData = mysqli_stmt_get_result($stmt);
@@ -509,8 +514,9 @@ function getPlayerGoals($userID)
 function getPlayerAssists($userID)
 {
     global $conn;
-    // Get playerID using userID
+    // Get playerID using userID so that it can be used to get the player's assists from the assist table
     $playerID = getPlayerID($userID);
+    // Get the player's assists from the assist table so that it can be displayed on the player dashboard
     $sql = "SELECT numOfAssists FROM assist WHERE playerID = ?;";
     $stmt = mysqli_stmt_init($conn);
     // Prepare statement and check for errors
@@ -536,8 +542,9 @@ function getPlayerAssists($userID)
 function getPlayerApperances($userID)
 {
     global $conn;
-    // Get playerID using userID
+    // Get playerID using userID so that it can be used to get the player's appearances from the appearance table
     $playerID = getPlayerID($userID);
+    // Get the player's appearances from the appearance table so that it can be displayed on the player dashboard
     $sql = "SELECT numOfAppearances FROM appearance WHERE playerID = ?;";
     $stmt = mysqli_stmt_init($conn);
     // Prepare statement and check for errors
@@ -563,10 +570,10 @@ function getPlayerApperances($userID)
 function getPlayerTeam($userID)
 {
     global $conn;
-    //get playerID using userID
+    //get playerID using userID so that it can be used to get the player's team from the player table
     $playerID = getPlayerID($userID); //calls the function getPlayerID which returns the playerID associated with the userID
 
-    //get teamID using playerID
+    //get teamID using playerID so that team information can be retrieved from the team table relevant to the player
     $sql = "SELECT teamID FROM player WHERE playerID = ?;"; //SQL statement to get the teamID from the player table using playerID
     $stmt = mysqli_stmt_init($conn); //initialize a new prepared statement using the database connection
 
@@ -612,9 +619,9 @@ function getPlayerTeam($userID)
 function getNextGame($userID)
 {
     global $conn; // Use the global connection variable
-    // Get playerID using userID
+    // Get playerID using userID so that it can be used to get the player's next game from the fixture table
     $playerID = getPlayerID($userID);
-    // Get teamID using playerID
+    // Get teamID using playerID so that the correct fixture can be retrieved from the fixture table to be displayed on the player dashboard
     $sql = "SELECT teamID FROM player WHERE playerID = ?;";
     $stmt = mysqli_stmt_init($conn); // Initialize a prepared statement
     if (!mysqli_stmt_prepare($stmt, $sql)) { // Check if the SQL statement is valid
@@ -697,9 +704,9 @@ function getDaysUntilGame($userID)
 function getOppositionName($userID)
 {
     global $conn; //accessing global variable $conn
-    //get playerID using userID
+    //get playerID using userID so that it can be used to get the player's next game from the fixture table
     $playerID = getPlayerID($userID); //calling the function getPlayerID and storing the result in $playerID
-    //get teamID using playerID
+    //get teamID using playerID so that the correct fixture can be retrieved from the fixture table to be displayed on the player dashboard
     $sql = "SELECT teamID FROM player WHERE playerID = ?;"; //creating a SQL query
     $stmt = mysqli_stmt_init($conn); //initialize a new statement using the $conn variable
     if (!mysqli_stmt_prepare($stmt, $sql)) { //preparing the statement and checking for any errors
@@ -764,6 +771,7 @@ function getOppositionName($userID)
                         return $result;  //returning false if the query fails
                     }
                 } else {
+                    //get opposition team name using teamID as hometeamID or awayteamID so that the correct fixture can be retrieved from the fixture table to be displayed on the player dashboard
                     $sql = "SELECT teamName FROM team WHERE teamID = ?;";
                     $stmt = mysqli_stmt_init($conn);
                     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -808,6 +816,7 @@ function userPfpCheck($userID)
 function getclubAdminName($userID)
 {
     global $conn;
+    //getting the club admin's first name from the database using the user's ID so that it can be displayed on the club admin dashboard
     $sql = "SELECT firstName FROM clubadmin WHERE userID = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -832,6 +841,7 @@ function getclubAdminName($userID)
 function getClubName($userID)
 {
     global $conn;
+    //getting the club admin's club name from the database using the user's ID so that it can be displayed on the club admin dashboard
     $sql = "SELECT clubID FROM clubadmin WHERE userID = ?";
     $stmt = $conn->stmt_init();
     if (!$stmt->prepare($sql)) {
@@ -844,6 +854,7 @@ function getClubName($userID)
         $row = $result->fetch_assoc();
         if ($row) {
             $clubID = $row['clubID'];  //storing the value of $row['clubID'] in $clubID
+            //getting the club name from the database using the clubID so that it can be displayed on the club admin dashboard
             $sql = "SELECT clubName FROM club WHERE clubID = ?";
             $stmt = $conn->stmt_init();
             if (!$stmt->prepare($sql)) {
@@ -871,6 +882,7 @@ function getClubName($userID)
 function getTeamID($userID)
 {
     global $conn;
+    //getting the teamID of the player from the database using the user's ID so that it can be displayed on the player section
     $sql = "SELECT teamID FROM player WHERE userID = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -896,6 +908,7 @@ function getTeamID($userID)
 function getTeams($clubID)
 {
     global $conn;
+    //getting the teams from the database using the clubID so that it can be displayed on the club admin section
     $sql = "SELECT teamID, teamName FROM team WHERE clubID = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -921,6 +934,7 @@ function getTeams($clubID)
 function getLeagueName($leagueID)
 {
     global $conn;
+    //getting the league name from the database using the leagueID so that it can be displayed on the league dashboard
     $sql = "SELECT leagueName FROM league WHERE leagueID = ?;";
     $stmt = mysqli_stmt_init($conn);
     if (!mysqli_stmt_prepare($stmt, $sql)) {
@@ -945,6 +959,7 @@ function getLeagueName($leagueID)
 function getAveragePointPerGame($teamID)
 {
     global $conn;
+    //getting the number of games played by a team from the database using the teamID so that it can be used to predict results for future games
     $sql = "SELECT COUNT(*) AS gamesPlayed
     FROM result
     WHERE homeTeamID = $teamID OR awayTeamID = $teamID;
@@ -1057,6 +1072,7 @@ function getPredictedLosses($teamID)
 function getFixturesForTeam($teamID)
 {
     global $conn;
+    //getting the fixtures for a team using the team ID so that these fixtures can be used to calculate the predicted points for a team
     $sql = "SELECT homeTeamID, awayTeamID FROM fixture WHERE homeTeamID = $teamID OR awayTeamID = $teamID";  //query to get the fixtures for a team
     $result = $conn->query($sql);
 
@@ -1099,6 +1115,7 @@ function getTeamPoints($teams)
 function getNumberOfGamesLeft($teamID)
 {
     global $conn;
+    //getting the number of games left for a team using the team ID so that these games can be used to calculate the predicted points for a team
     $sql = "SELECT COUNT(*) as totalGames
             FROM fixture
             WHERE (homeTeamID = $teamID OR awayTeamID = $teamID)";  //query to get the number of games left for a team
@@ -1117,6 +1134,7 @@ function getNumberOfGamesLeft($teamID)
 function getTeamWins($teamID)
 {
     global $conn;
+    //getting the number of wins for a team using the team ID so that these wins can be used to calculate the points and predicted points for a team
     $sql = "SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore FROM result WHERE homeTeamID = ? OR awayTeamID = ?";  //query to get the results for a team
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -1151,6 +1169,7 @@ function getTeamWins($teamID)
 function getTeamDraws($teamID)
 {
     global $conn;
+    //getting the number of draws for a team using the team ID so that these draws can be used to calculate the points and predicted points for a team
     $sql = "SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore FROM result WHERE homeTeamID = ? OR awayTeamID = ?";  //query to get the results for a team
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
@@ -1180,6 +1199,7 @@ function getTeamDraws($teamID)
 function getTeamLosses($teamID)
 {
     global $conn;
+    //getting the number of losses for a team using the team ID so that these losses can be used to calculate the points and predicted points for a team
     $sql = "SELECT homeTeamID, awayTeamID, homeTeamScore, awayTeamScore FROM result WHERE homeTeamID = ? OR awayTeamID = ?";  //query to get the results for a team
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
@@ -1215,6 +1235,7 @@ function getTeamLosses($teamID)
 function getPredictedResults($leagueID)
 {
     global $conn;
+    //getting the minimum match week for a league so that the result of the next match week can be predicted
     $query = "SELECT MIN(matchWeek) AS minWeek FROM fixture"; //query to get the minimum match week
     $result = mysqli_query($conn, $query);
 
@@ -1233,12 +1254,12 @@ function getPredictedResults($leagueID)
 
                 $homeTeamPPG = getAveragePointPerGame($homeTeamID); //getting the average points per game for the home team
                 $awayTeamPPG = getAveragePointPerGame($awayTeamID); //getting the average points per game for the away team
-
+                //get the team name of the home team so that the predicted result can be displayed with the correct team name
                 $query = "SELECT teamName FROM team WHERE teamID = '$homeTeamID'";
                 $result2 = mysqli_query($conn, $query);
                 $row2 = mysqli_fetch_array($result2);
                 $homeTeamName = $row2['teamName']; //getting the home team name
-
+                //get the team name of the away team so that the predicted result can be displayed with the correct team name
                 $query = "SELECT teamName FROM team WHERE teamID = '$awayTeamID'";
                 $result3 = mysqli_query($conn, $query);
                 $row3 = mysqli_fetch_array($result3);
@@ -1272,7 +1293,7 @@ function getPredictedResults($leagueID)
 function calculatePointsPerWeek($teamID)
 {
     global $conn;
-    // Get the lowest and highest gameWeekID from the fixture table
+    // Get the lowest and highest gameWeekID from the fixture table for the team so that the points can be calculated for each game week
     $query = "SELECT MIN(matchWeek) as minGWID, MAX(matchWeek) as maxGWID FROM fixture WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -1295,7 +1316,7 @@ function calculatePointsPerWeek($teamID)
 
     // Loop through every game week to calculate the team's points
     for ($i = $minGWID; $i <= $maxGWID; $i++) {
-        // Get the fixtures for the current game week
+        // Get the fixtures for the current game week for the team so that the two teams can be compared
         $query = "SELECT homeTeamID, awayTeamID FROM fixture WHERE (homeTeamID = '$teamID' OR awayTeamID = '$teamID') AND matchWeek = '$i'";
         $result = mysqli_query($conn, $query);
 
@@ -1347,7 +1368,7 @@ function getTeamGoalDifference($teamID)
 function getTeamGoalsScored($teamID)
 {
     global $conn;
-    //Get the amount of goals the team has scored
+    //Get the amount of goals the team has scored so that the goal difference can be calculated
     $query = "SELECT SUM(homeTeamScore) as homeTeamScore, SUM(awayTeamScore) as awayTeamScore FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
     $result = mysqli_query($conn, $query);
     $teamGoals = mysqli_fetch_assoc($result);
@@ -1361,7 +1382,7 @@ function getTeamGoalsScored($teamID)
 function getTeamGoalsConceded($teamID)
 {
     global $conn;
-    //Get the amount of goals the team has conceded
+    //Get the amount of goals the team has conceded so that the goal difference can be calculated
     $query = "SELECT SUM(IF(homeTeamID = '$teamID', awayTeamScore, homeTeamScore)) as goalsConceded FROM result WHERE homeTeamID = '$teamID' OR awayTeamID = '$teamID'";
     $result = mysqli_query($conn, $query);
     $teamGoals = mysqli_fetch_assoc($result);
@@ -1375,13 +1396,13 @@ function getTeamGoalsConceded($teamID)
 function getLeagueID($userID)
 {
     global $conn;
-    //Check account type
+    //Check account type of the user so that the correct query can be run
     $query = "SELECT accountType FROM user WHERE userID = '$userID'";
     $result = mysqli_query($conn, $query);
     $accountType = mysqli_fetch_assoc($result)['accountType'];
 
     if ($accountType == 'Player') {
-        //Get the teamID of the player
+        //Get the teamID of the player 
         $query = "SELECT teamID FROM player WHERE userID = '$userID'";
         $result = mysqli_query($conn, $query);
         $teamID = mysqli_fetch_assoc($result)['teamID'];
@@ -1419,7 +1440,7 @@ function getLeagueID($userID)
 function getTopTeamLeague($clubID)
 {
     global $conn;
-    //Get the lowest league ID for the club
+    //Get the lowest league ID for the club so that the top team can be found
     $query = "SELECT MIN(leagueID) as lowestLeagueID FROM team WHERE clubID = '$clubID'";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
@@ -1433,8 +1454,8 @@ function getAvailablePlayersByFixtureID($fixtureID)
 {
     global $conn;
     $players = array(); //array to store the players
-
-    $query = "SELECT playerID FROM availability WHERE fixtureID = $fixtureID AND available = 1 AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))"; //query to get the players
+    //Query to get the players that are available for the fixture so that they can be added to the array to be displayed
+    $query = "SELECT playerID FROM availability WHERE fixtureID = $fixtureID AND available = 1 AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))";
     $result = mysqli_query($conn, $query);
 
     while ($row = mysqli_fetch_assoc($result)) {
@@ -1449,7 +1470,8 @@ function getTeamNameByID($teamID)
 {
     global $conn;
     $teamName = ""; //variable to store the team name
-    $query = "SELECT teamName FROM team WHERE teamID = $teamID"; //query to get the team name
+    //query to get the team name so that it can be displayed
+    $query = "SELECT teamName FROM team WHERE teamID = $teamID";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
     $teamName = $row['teamName']; //store the team name
@@ -1462,7 +1484,7 @@ function getFixturesByTeamID($teamID)
 {
     global $conn;
     $fixtures = array(); //array to store the fixtures
-
+    //query to get the fixtures so that they can be added to the array to be displayed
     $query = "SELECT fixtureID, homeTeamID, awayTeamID FROM fixture WHERE homeTeamID = $teamID OR awayTeamID = $teamID"; //query to get the fixtures
     $result = mysqli_query($conn, $query);
 
@@ -1478,7 +1500,7 @@ function getUnavailablePlayersByFixtureID($fixtureID)
 {
     global $conn;
     $players = array(); //array to store the players
-
+    //query to get the players that are unavailable for the fixture so that they can be added to the array to be displayed
     $query = "SELECT playerID FROM availability WHERE fixtureID = $fixtureID AND available = 0 AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))"; //query to get the players
     $result = mysqli_query($conn, $query);
 
@@ -1494,7 +1516,7 @@ function getUnansweredPlayersByFixtureID($fixtureID)
 {
     global $conn;
     $players = array(); //array to store the players
-
+    //query to get the players who haven't responded so that they can be added to the array to be displayed
     $query = "SELECT playerID FROM player WHERE playerID NOT IN (SELECT playerID FROM availability WHERE fixtureID = $fixtureID) AND playerID IN (SELECT playerID FROM player WHERE teamID = (SELECT homeTeamID FROM fixture WHERE fixtureID = $fixtureID) OR teamID = (SELECT awayTeamID FROM fixture WHERE fixtureID = $fixtureID))"; //query to get the players who haven't responded
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -1513,6 +1535,7 @@ function getUnansweredPlayersByFixtureID($fixtureID)
 function getPlayerNameByID($playerID)
 {
     global $conn;
+    //query to get the player's name so that it can be displayed for the availability of a fixture
     $query = "SELECT firstName, lastName FROM player WHERE playerID = $playerID"; //query to get the player's name
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -1535,6 +1558,7 @@ function getPlayerNameByID($playerID)
 function updateGoals($playerID, $goals)
 {
     global $conn;
+    //query to get the player's goals so that they can be updated
     $query = "SELECT * FROM goal WHERE playerID = $playerID"; //query to get the player's goals
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) == 0) {
@@ -1554,6 +1578,7 @@ function updateGoals($playerID, $goals)
 function updateAssists($playerID, $assists)
 {
     global $conn;
+    //query to get the player's assists so that they can be updated
     $query = "SELECT * FROM assist WHERE playerID = $playerID"; //query to get the player's assists
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) == 0) {
@@ -1575,7 +1600,7 @@ function getClubs()
 
     global $conn;
     $clubs = array(); //array to store the clubs
-
+    //query to get the clubs so that they can be added to the array to be displayed
     $query = "SELECT clubID, clubName FROM club"; //query to get the clubs
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -1595,6 +1620,7 @@ function getClubs()
 function userWaitingInPasswordChangeRequest($userID)
 {
     global $conn;
+    //query to check if userID exists and status is waiting so that they can be added to the array to be displayed
     $query = "SELECT * FROM passwordchangerequest WHERE userID = '$userID' AND status = 'Waiting'"; //query to check if userID exists and status is waiting
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) > 0) {
@@ -1609,6 +1635,7 @@ function userWaitingInPasswordChangeRequest($userID)
 function userApprovedInPasswordChangeRequest($userID)
 {
     global $conn;
+    //query to check if userID exists and status is approved so that they can be added to the array to be displayed
     $query = "SELECT * FROM passwordchangerequest WHERE userID = '$userID' AND status = 'Approved'"; //query to check if userID exists and status is approved
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) > 0) {
@@ -1623,6 +1650,7 @@ function userApprovedInPasswordChangeRequest($userID)
 function getUserIDByEmail($email)
 {
     global $conn;
+    //query to get the userID so that it can be used to update the password
     $query = "SELECT userID FROM user WHERE email = '$email'"; //query to get the userID
     $result = mysqli_query($conn, $query);
     if (!$result) {
@@ -1645,6 +1673,7 @@ function getUserDetails($userID)
 {
     global $conn;
     $userDetails = array();
+    //query to get the user details so that they can be displayed
     $result = mysqli_query($conn, "SELECT firstName, lastName, teamID, DOB FROM player WHERE userID = $userID");
     if ($result) {
         $row = mysqli_fetch_assoc($result);

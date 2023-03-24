@@ -48,7 +48,8 @@ $conn = require 'includes/dbhconfig.php'; // establish a database connection usi
             <p class="title">Leagues</p>
             <form action="leagueDashboard.php" method="post">
               <?php
-              $query = "SELECT * FROM league"; // SQL query to select all leagues
+              // Get all leagues from the database and display them in a button so the user can select one
+              $query = "SELECT * FROM league";
               $result = mysqli_query($conn, $query); // execute the query using the established database connection
               while ($row = mysqli_fetch_array($result)) { // loop through the query results to get league data so it can be displayed
               ?>
