@@ -170,19 +170,19 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">Email address</label>
-                                                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                                                    <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required maxlength="50" minlength="5" /> <!-- Length check and presence check -->
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="Password">Password</label>
-                                                            <input type="password" class="form-control" id="Password" placeholder="Password" name="password">
+                                                            <input type="password" class="form-control" id="Password" placeholder="Password" name="password" required maxlength="50" minlength="5" /> <!-- Length check and presence check -->
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="confirmPassword">Confirm password</label>
-                                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Password" name="confirmPassword">
+                                                            <input type="password" class="form-control" id="confirmPassword" placeholder="Password" name="confirmPassword" required maxlength="50" minlength="5" /> <!-- Length check and presence check -->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -226,7 +226,7 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="clubName">Club name</label>
-                                                    <input type="text" class="form-control" id="clubName" placeholder="Club name" name="clubName" required> <!-- Presence check -->
+                                                    <input type="text" class="form-control" id="clubName" placeholder="Club name" name="clubName" required maxlength="50" minlength="5" /> <!-- Length check and presence check -->
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="clubLogo">Club logo</label>
@@ -268,7 +268,7 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="leagueName">League name</label>
-                                                    <input type="text" class="form-control" id="leagueName" placeholder="League name" name="leagueName"> <!-- Presence check -->
+                                                    <input type="text" class="form-control" id="leagueName" placeholder="League name" name="leagueName" required maxlength="50" minlength="5" /> <!-- Length check and presence check -->
                                                 </div>
                                                 <!-- Error message -->
                                                 <?php
@@ -300,7 +300,7 @@ $userID = $_SESSION['userID'];
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label for="teamName">Team name</label>
-                                                    <input type="text" class="form-control" id="teamName" placeholder="Team name" name="teamName"> <!-- Presence check -->
+                                                    <input type="text" class="form-control" id="teamName" placeholder="Team name" name="teamName" required maxlength="50" minlength="5" /> <!-- Length check and presence check -->
                                                 </div>
                                                 <!-- Drop-down list of clubs -->
                                                 <div class="form-group">

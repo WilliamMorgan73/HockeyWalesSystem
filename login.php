@@ -30,10 +30,10 @@
             <form action="includes/login.inc.php" method="post">
               <!-- Email -->
               <p class="title">Email</p>
-              <input type="email" id="email" name="email" class="club-player-search" />
+              <input type="email" id="email" name="email" class="club-player-search" required maxlength="50" minlength="5"/> <!-- Length check and presence check -->
               <!-- Password -->
               <p class="title">Password</p>
-              <input type="password" id="password" name="password" class="club-player-search" />
+              <input type="password" id="password" name="password" class="club-player-search" required maxlength="50" minlength="3"/> <!-- Length check and presence check -->
               <!-- Forgot password link -->
               <a class="sub-heading" style="display: block; text-align: right;" href="forgotPassword.php">Forgot password?</a>
 
